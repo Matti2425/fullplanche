@@ -1,12 +1,16 @@
 clearvars
 
-[Geometry,vin,pin,Tin,phi_body,gas,NumericalParameters] = readInputData();
+[Geometry,Vin,Pin,Tin,phi_body,gas,NumericalParameters,Init] = readInputData();
 
 [X,Y] = generateMesh(Geometry, NumericalParameters);
 
-evalCoefficients(System)
-
 S = solidMaterial(Geometry,X,Y);
+
+[phi, T, P, rho] = initParams(Init, NumericalParameters, S, phi_body);
+
+%evalCoefficients(System)
+
+
 
 
 

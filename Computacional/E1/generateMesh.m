@@ -13,6 +13,10 @@ function [X,Y] = generateMesh(Geometry, NumericalParameters)
     % Increments
     deltaL = Geometry.L / N;
     deltaH = Geometry.H / M;
+
+    % Saving
+    Geometry.deltaX = deltaL;
+    Geometry.deltaY = deltaH;
     
     % Vectors límit
     xVec = (0.5 : N-0.5) * deltaL;
