@@ -14,6 +14,7 @@ S = solidMaterial(Geometry,X,Y);
 jflkañs
 
 
+
 % plot(X(S),Y(S),"Color",'red')
 % hold on
 % plot(X,Y,'o')
