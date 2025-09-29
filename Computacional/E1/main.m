@@ -5,6 +5,7 @@ clearvars
 [X,Y] = generateMesh(Geometry, NumericalParameters);
 
 S = solidMaterial(Geometry,X,Y);
+ 
 
 [phi, T, P, rho] = initParams(Init, NumericalParameters, S, phi_body);
 
