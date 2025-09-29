@@ -11,7 +11,6 @@ S = solidMaterial(Geometry,X,Y);
 %evalCoefficients(System)
 
 
-jflkañs
 
 
 
