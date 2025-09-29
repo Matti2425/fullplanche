@@ -11,7 +11,7 @@ S = solidMaterial(Geometry,X,Y);
 %evalCoefficients(System)
 
 
-ñ
+
 
 
 % plot(X(S),Y(S),"Color",'red')
