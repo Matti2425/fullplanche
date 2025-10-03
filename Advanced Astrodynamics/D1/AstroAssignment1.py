@@ -3,6 +3,9 @@ import numpy as np
 # =======================
 # Step 1 and 2: Julian Date (JD) and Julian Century (JC)
 # =======================
+year = 2017
+month = 9
+day = 15
 def JD_from_UTC(year, month, day):
     if month <=2:
         year = year - 1
@@ -17,8 +20,8 @@ def JC(JD):
     JC = (JD - 2451545)/36525
     return JC
 
-print("JD (15.09.2017):", JD_from_UTC(2017, 9, 15))
-print("JC (15.09.2017):",JC(JD_from_UTC(2017, 9, 15)))
+print("JD (15.09.2017):", JD_from_UTC(year, month, day))
+print("JC (15.09.2017):",JC(JD_from_UTC(year, month, day)))
 print("----------------------------------------------")
 
 # =======================
@@ -29,13 +32,16 @@ print("----------------------------------------------")
 def deg_correction(x): #every angle in 360 degrees system - Winkel in [0,360)
     return x % 360
 
+def propagation_equation(x_0, x_punkt, jc):
+    return x_0 + x_punkt * jc
+
 def propagate_elements(X_0 , X_punkt, JC):
-    a = X_0["a"] + X_punkt["a"] * JC  #AU
-    e = X_0["e"] + X_punkt["e"] * JC  # -
-    i = deg_correction(X_0["i"] + X_punkt["i"] * JC)  # rest is in deg
-    omega = deg_correction(X_0["omega"] + X_punkt["omega"] * JC)
-    w_bar = deg_correction(X_0["w_bar"] + X_punkt["w_bar"] * JC)
-    L = deg_correction(X_0["L"] + X_punkt["L"] * JC)
+    a = propagation_equation(X_0["a"], X_punkt["a"], JC ) #AU
+    e = propagation_equation(X_0["e"], X_punkt["e"], JC)  # -
+    i = deg_correction(propagation_equation(X_0["i"],X_punkt["i"], JC))  # rest is in deg
+    omega = deg_correction(propagation_equation(X_0["omega"], X_punkt["omega"], JC))
+    w_bar = deg_correction(propagation_equation(X_0["w_bar"], X_punkt["w_bar"],JC))
+    L = deg_correction(propagation_equation(X_0["L"], X_punkt["L"], JC))
     return dict(a = a, e = e, i = i, omega = omega, w_bar = w_bar, L = L)
 
 # ---- Table values --- (slide: Planetary orbital elements)
@@ -46,8 +52,8 @@ X_0_saturn = dict(a=9.53667594, e=0.05386179, i=2.48599187, omega=113.66242448, 
 X_punkt_saturn = dict(a=-0.00125060, e=-0.00050991, i=0.00193609, omega=-0.28867794, w_bar=-0.41897216, L=1222.49362201)
 
 
-pe_earth = propagate_elements(X_0_earth, X_punkt_earth, JC(JD_from_UTC(2017, 9, 15)))
-pe_saturn = propagate_elements(X_0_saturn, X_punkt_saturn, JC(JD_from_UTC(2017, 9, 15)))
+pe_earth = propagate_elements(X_0_earth, X_punkt_earth, JC(JD_from_UTC(year, month, day)))
+pe_saturn = propagate_elements(X_0_saturn, X_punkt_saturn, JC(JD_from_UTC(year, month, day)))
 print( "Propagated orbital elements:")
 print("Earth: ", pe_earth)
 print("Saturn: ", pe_saturn)
