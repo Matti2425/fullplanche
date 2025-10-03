@@ -102,17 +102,18 @@ print("----------------------------------------------")
 # STANDARD SERIES
 # =======================
 # solving Kepler equation with Standard series - error = O(e^4)
+# Now solving numerically with fsolve from scipy.optimize :)
 
 def rad_correction(x):
     return x % (2*np.pi)
 
-def equation(E, M, e):
+def kepler_equation(E, M, e):
     return E - e * np.sin(E) - M
 
 def kepler_E_series(M_deg, e):
     M = rad_correction(np.deg2rad(M_deg)) #Wraps the angle to the principal range [0,2π)
     E_init = 0.5 # Initial guess
-    E = fsolve(equation, E_init, args=(M, e))
+    E = fsolve(kepler_equation, E_init, args=(M, e))
     #E = M + e*np.sin(M) + 0.5*e**2*np.sin(2*M)+ (e**3/8.0)*(3*np.sin(3*M) - np.sin(M)) + (1/3)*e**4*np.sin(4*M)
     return rad_correction(E[0])
 
