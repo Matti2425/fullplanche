@@ -24,7 +24,7 @@ print("----------------------------------------------")
 # =======================
 # Step 3: Propagate six orbital elements
 # =======================
-#Aus bekannten Bahnelementen zu einem Ausgangsepoche (z. B. J2000) die Bahnelemente zu einem neuen Zeitpunkt berechnen.
+#Calculate the orbital elements at a new epoch (e.g. J2000) from known orbital elements at a reference epoch.
 
 def deg_correction(x): #every angle in 360 degrees system - Winkel in [0,360)
     return x % 360
@@ -38,7 +38,7 @@ def propagate_elements(X_0 , X_punkt, JC):
     L = deg_correction(X_0["L"] + X_punkt["L"] * JC)
     return dict(a = a, e = e, i = i, omega = omega, w_bar = w_bar, L = L)
 
-# ---- Tabellenwerte --- (slide: Planetary orbital elements)
+# ---- Table values --- (slide: Planetary orbital elements)
 X_0_earth = dict(a=1.00000261, e=0.01671123, i=-0.00001531, omega=0.0, w_bar=102.93768193, L=100.46457166)
 X_punkt_earth = dict(a=0.00000562, e=-0.00004392, i=-0.01294668, omega=0.0, w_bar=0.32327364, L=35999.37244981)
 
@@ -56,12 +56,12 @@ print("----------------------------------------------")
 # =======================
 # Step 4: Compute angular momentum h using semi-major axis a [AU] and eccentricity e [-]
 # =======================
-#Gravitationsparameter der Sonne mu=1.32712440018*10^20 m^3/s^2  - ask the Prof
+#Gravitational parameter of the Sun mu=1.32712440018*10^20 m^3/s^2  - ask the Prof
 k_gauss= 0.01720209895
-mu_sonne_AU = k_gauss**2
+mu_sun_AU = k_gauss**2
 
 def angular_momentum (a,e):
-    h = np.sqrt(mu_sonne_AU*a*(1-e**2))
+    h = np.sqrt(mu_sun_AU*a*(1-e**2))
     return h
 
 h_earth = angular_momentum(pe_earth["a"], pe_earth["e"])
@@ -100,7 +100,7 @@ def rad_correction(x):
     return x % (2*np.pi)
 
 def kepler_E_series(M_deg, e):
-    M= rad_correction(np.deg2rad(M_deg)) #Es wickelt den Winkel auf den Hauptbereich [0,2π) zurück
+    M= rad_correction(np.deg2rad(M_deg)) #Wraps the angle to the principal range [0,2π)
     E = M + e*np.sin(M) + 0.5*e**2*np.sin(2*M)+ (e**3/8.0)*(3*np.sin(3*M) - np.sin(M)) + (1/3)*e**4*np.sin(4*M)
     return rad_correction(E)
 
@@ -132,18 +132,18 @@ print("----------------------------------------------")
 # =======================
 # Step 8: Compute vector (r,v)
 # =======================
-# 1) in the perifocal system (Bahnebene, Origin= Sun) using theta
+# 1) in the perifocal system (orbital plane, origin= Sun) using theta
 
 def r_v_pf(h, e, theta):  # h [AU^2/day], e [-], theta [rad]
     # Radius r = (h^2/μ) / (1 + e cosθ)
-    r = (h**2 / mu_sonne_AU) / (1.0 + e*np.cos(theta))
-    # Positionsvektor (perifokal, PQW)
+    r = (h**2 / mu_sun_AU) / (1.0 + e*np.cos(theta))
+    # Position vector (perifocal, PQW)
     r_pf = np.array([r*np.cos(theta), r*np.sin(theta), 0.0])
-    # Geschwindigkeitsvektor (perifokal, PQW) – deine kompakte Formel
-    v_pf = (mu_sonne_AU / h) * np.array([-np.sin(theta), e + np.cos(theta), 0.0])
+    # Velocity vector (perifocal, PQW) – your compact formula
+    v_pf = (mu_sun_AU / h) * np.array([-np.sin(theta), e + np.cos(theta), 0.0])
     return r_pf, v_pf, r
 
-# neu auswerten:
+# re-evaluate:
 r_pf_E, v_pf_E, _ = r_v_pf(h_earth,  pe_earth["e"],  theta_earth)
 r_pf_S, v_pf_S, _ = r_v_pf(h_saturn, pe_saturn["e"], theta_saturn)
 print("Vectors (r,v) in perifocal system (r_pf in [AU] and v_pf in [AU/day]):")
@@ -154,7 +154,7 @@ print("----------------------------------------------")
 # 2) Rotation to the heliocentric ecliptic J2000 system (X to aries)
 # rotation matrices
 def R1(alpha):  # rotation around x-axis with angle alpha (rad)
-    ca, sa = np.cos(alpha), np.sin(alpha) #abkürzungen
+    ca, sa = np.cos(alpha), np.sin(alpha) #abbreviations
     return np.array([[1,0,0],
                      [0,ca,-sa],
                      [0,sa,ca]])
@@ -163,12 +163,12 @@ def R3(phi): # rotation around z-axis with angle phi (rad)
     return np.array([[cp,-sp,0],
                      [sp,cp,0],
                      [0,0,1]])
-# convert to radiant and use Rotation matrices
+# convert to radians and use rotation matrices
 def pf_to_ecliptic(elem, r_pf, v_pf):
     """
-    elem: dict mit a,e,i, omega(=Ω), w(=varpi), L  [Winkel in Grad]
-    r_pf, v_pf: Vektoren im perifokalen System (PQW)
-    Rückgabe: r, v im heliozentrisch-ekliptischen J2000 (x→Aries)
+    elem: dict with a,e,i, omega(=Ω), w(=varpi), L  [angles in degrees]
+    r_pf, v_pf: vectors in perifocal system (PQW)
+    Returns: r, v in heliocentric-ecliptic J2000 (x→Aries)
     """
     i_rad = np.deg2rad(elem["i"])
     omega_rad = np.deg2rad(elem["omega"])  # Ω
@@ -190,7 +190,7 @@ print("Saturn: r_ecliptic [AU] = ", rS_ecliptic)
 print("Saturn: v_ecliptic [AU/day] = ", vS_ecliptic)
 print("----------------------------------------------")
 
-# |r × v| sollte ≈ h sein
+# |r × v| should be ≈ sin(h)
 hE_num = np.linalg.norm(np.cross(rE_ecliptic, vE_ecliptic))
 hS_num = np.linalg.norm(np.cross(rS_ecliptic, vS_ecliptic))
 print("Consistency check:")
