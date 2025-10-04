@@ -6,8 +6,8 @@ disp('--------------------------------1:')
 disp('--->Rotation matrix: ')
 M1 = axisAngle2RotMat(axis,angle);
 disp(M1)
-disp('Determinante:')
-disp(det(M1))
+disp('RM*RM^-1:')
+disp(M1*inv(M1))
 disp('--->Axis-angle:')
 disp(axis)
 disp(angle)
@@ -34,6 +34,21 @@ disp(axisAngle2Quat(axis,angle))
 disp(norm(axisAngle2Quat(axis,angle)))
 
 %% 3 
+% Assemble rotation matrix
+M3 = euler2RotMat(30,90,45);
+[axis3, angle3] = rotMat2AxisAngle(M3);
+q3 = axisAngle2Quat(axis3,angle3);
+disp('--------------------------------3:')
+disp('--->Rotation matrix: ')
+disp(M3)
+disp('Axis-angle')
+disp(axis3)
+disp(angle3)
+disp('--->Quaternion:')
+disp(q3)
+disp('--->Back to Euler:')
+disp(rotMat2Euler(M3))
+
 
 %% 4
 axis4 = [1,0,0];
@@ -50,8 +65,8 @@ disp(angle4)
 disp('--->Quaternion:')
 q4 = axisAngle2Quat(axis4,angle4);
 disp(q4)
-disp('Norm: ')
-disp(norm(q4))
+disp('--->Back to Euler:')
+disp(rad2deg(rotMat2Euler(M4)))
 
 
 %% 5
