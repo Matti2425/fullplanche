@@ -16,7 +16,8 @@ S = solidMaterial(Geometry,X,Y);
 % Solver call
 [phi, i, error] = solveSystem(phi, phi_body, S, a_E, a_W, a_N, a_S, a_P, b_P, v_in, Y, NumericalParameters, Geometry, delta);
 
-
+% Compute velocities at faces and nodes
+[v_x, v_y, v_mag] = compute_vel(phi, X, Y, NumericalParameters, Vin, Geometry, rho);
 
 % plot(X(S),Y(S),"Color",'red')
 % hold on
