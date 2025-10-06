@@ -1,4 +1,4 @@
-function [phi, i, error] = solveSystem(phi, phi_body, S, a_E, a_W, a_N, a_S, a_P, b_P, v_in, Y, NumericalParameters, Geometry, delta)
+function [phi, i, error] = solveSystem(phi, phi_body, S, a_E, a_W, a_N, a_S, a_P, b_P, v_in, Y, NumericalParameters, Geometry)
 % GAUSS_SEIDEL Solves the stream function equation using the Gauss-Seidel method.
 %
 % This function iteratively solves the discretized stream function equation 
@@ -33,36 +33,36 @@ M = NumericalParameters.M;
 
 error = Inf; 
 
-for i = 1:mericalParameters.i_max
+for iter = 1:NumericalParameters.i_max
     phi_old = phi; 
 
-    for j = 1:N+2
+    for i = 1:N+2
         % Bot row
-        phi(1, j) = 0;
+        phi(i, 1) = 0;
 
         % Top row
-        phi(M+2, j) = v_in * Geometry.H;
+        phi(i, M+2) = v_in * Geometry.H;
     end
 
     for j = 1:M+2
         % Inlet
-        phi(j, 1) = v_in * Y(j);
+        phi(1, j) = v_in * Y(j);
 
         % Outlet
-        phi(j, N+2) = phi(j, N+1);
+        phi(N+2, j) = phi(N+1, j);
     end
 
     % Solid
     phi(S) = phi_body;
 
-    for j = 2:N+1
-        for k = 2:M+1
-                phi(j, k) = (a_E(j, k) * phi(j, k+1) + a_W(j, k) * phi(j, k-1) + ...
-                             a_N(j, k) * phi(j+1, k) + a_S(j, k) * phi(j-1, k) + b_P(j, k)) / a_P(j, k);
+    for i = 2:N+1
+        for j = 2:M+1
+                phi(i, j) = (a_E(i, j) * phi(i, j+1) + a_W(i, j) * phi(i, j-1) + ...
+                             a_N(i, j) * phi(i+1, j) + a_S(i, j) * phi(i-1, j) + b_P(i, j)) / a_P(i, j);
         end
     end
     error = max(max(abs(phi - phi_old)));
-    if error < delta
+    if error < NumericalParameters.d
         break;
     end
 end

@@ -10,7 +10,7 @@ function [a_E, a_W, a_N, a_S, b_P, a_P] = evalCoefficients(phi, phi_body, Numeri
 %   N         - Number of grid points in the horizontal direction.
 %   L         - Length of the computational domain.
 %   H         - Height of the computational domain.
-%   v_in      - Free-stream velocity.
+%   Vin      - Free-stream velocity.
 %   y_P, x_P  - Mesh grid points in the y and x directions.
 %   solid     - Matrix indicating solid regions (0 for solid, 1 for fluid).
 %
@@ -20,9 +20,13 @@ function [a_E, a_W, a_N, a_S, b_P, a_P] = evalCoefficients(phi, phi_body, Numeri
 %   b_P                 - Right-hand side term of the equation.
 %--------------------------------------------------------------------------
 
+% Local variables
+N = NumericalParameters.N;
+M = NumericalParameters.M;
+
 % Geometry increments
-dx = (Geometry.L/NumericalParameters.N);   
-dy = (Geometry.H/NumericalParameters.M); 
+dx = (Geometry.L/N);   
+dy = (Geometry.H/M); 
 
 % Allocating space
 a_E = zeros(N+2, M+2); 
@@ -37,10 +41,10 @@ phi_bot=phi;
 
 for i = 2:N+1
     for j = 2:M+1
-        a_E(i, j) = 1 * dy / (x_P(i+1)-x_P(i));
-        a_W(i, j) = 1 * dy / (x_P(i)-x_P(i-1));
-        a_N(i, j) = 1 * dx / (y_P(j+1)-y_P(j));
-        a_S(i, j) = 1 * dx / (y_P(j)-y_P(j-1));
+        a_E(i, j) = 1 * dy / (X(i+1)-X(i));
+        a_W(i, j) = 1 * dy / (X(i)-X(i-1));
+        a_N(i, j) = 1 * dx / (Y(j+1)-Y(j));
+        a_S(i, j) = 1 * dx / (Y(j)-Y(j-1));
         a_P(i, j) = a_E(i, j) + a_W(i, j) + a_N(i, j) + a_S(i, j);
         b_P(i, j) = 0;
     end
@@ -48,38 +52,37 @@ end
 
 for i = 1:N+2
     % Bot row
-    a_E(1, i) = 0;
-    a_W(1, i) = 0;
-    a_N(1, i) = 0;
-    a_S(1, i) = 0;
-    a_P(1, i) = 1;
-    b_P(1, i) = phi_bot;
+    a_E(i, 1) = 0;
+    a_W(i, 1) = 0;
+    a_N(i, 1) = 0;
+    a_S(i, 1) = 0;
+    a_P(i, 1) = 1;
+    b_P(i, 1) = phi_bot;
 
     % Top row
-    a_E(M+2, i) = 0;
-    a_W(M+2, i) = 0;
-    a_N(M+2, i) = 0;
-    a_S(M+2, i) = 0;
-    a_P(M+2, i) = 1;
-    b_P(M+2, i) = phi_bot + v_in * H;
-end
+    a_E(i, end) = 0;
+    a_W(i, end) = 0;
+    a_N(i, end) = 0;
+    a_S(i, end) = 0;
+    a_P(i, end) = 1;
+    b_P(i, M+2) = phi_bot + Vin * Geometry.H;
 
 for j = 2:M+1
     % Inlet
-    a_E(j, 1) = 0;
-    a_W(j, 1) = 0;
-    a_N(j, 1) = 0;
-    a_S(j, 1) = 0;
-    a_P(j, 1) = 1;
-    b_P(j, 1) = phi_bot + v_in * y_P(j);
+    a_E(1, j) = 0;
+    a_W(1, j) = 0;
+    a_N(1, j) = 0;
+    a_S(1, j) = 0;
+    a_P(1, j) = 1;
+    b_P(1, j) = phi_bot + Vin * Y(j);
     
     % Outlet
-    a_E(j, N+2) = 0;
-    a_W(j, N+2) = 1;
-    a_N(j, N+2) = 0;
-    a_S(j, N+2) = 0;
-    a_P(j, N+2) = 1;
-    b_P(j, N+2) = 0;
+    a_E(N+2, j) = 0;
+    a_W(N+2, j) = 1;
+    a_N(N+2, j) = 0;
+    a_S(N+2, j) = 0;
+    a_P(N+2, j) = 1;
+    b_P(N+2, j) = 0;
 
 end
 
