@@ -10,7 +10,7 @@ function [a_E, a_W, a_N, a_S, b_P, a_P] = evalCoefficients(phi, phi_body, Numeri
 %   N         - Number of grid points in the horizontal direction.
 %   L         - Length of the computational domain.
 %   H         - Height of the computational domain.
-%   v_in      - Free-stream velocity.
+%   Vin      - Free-stream velocity.
 %   y_P, x_P  - Mesh grid points in the y and x directions.
 %   solid     - Matrix indicating solid regions (0 for solid, 1 for fluid).
 %
@@ -52,38 +52,37 @@ end
 
 for i = 1:N+2
     % Bot row
-    a_E(1, i) = 0;
-    a_W(1, i) = 0;
-    a_N(1, i) = 0;
-    a_S(1, i) = 0;
-    a_P(1, i) = 1;
-    b_P(1, i) = phi_bot;
+    a_E(i, 1) = 0;
+    a_W(i, 1) = 0;
+    a_N(i, 1) = 0;
+    a_S(i, 1) = 0;
+    a_P(i, 1) = 1;
+    b_P(i, 1) = phi_bot;
 
     % Top row
-    a_E(M+2, i) = 0;
-    a_W(M+2, i) = 0;
-    a_N(M+2, i) = 0;
-    a_S(M+2, i) = 0;
-    a_P(M+2, i) = 1;
-    b_P(M+2, i) = phi_bot + v_in * H;
-end
+    a_E(i, end) = 0;
+    a_W(i, end) = 0;
+    a_N(i, end) = 0;
+    a_S(i, end) = 0;
+    a_P(i, end) = 1;
+    b_P(i, M+2) = phi_bot + Vin * Geometry.H;
 
 for j = 2:M+1
     % Inlet
-    a_E(j, 1) = 0;
-    a_W(j, 1) = 0;
-    a_N(j, 1) = 0;
-    a_S(j, 1) = 0;
-    a_P(j, 1) = 1;
-    b_P(j, 1) = phi_bot + v_in * Y(j);
+    a_E(1, j) = 0;
+    a_W(1, j) = 0;
+    a_N(1, j) = 0;
+    a_S(1, j) = 0;
+    a_P(1, j) = 1;
+    b_P(1, j) = phi_bot + Vin * Y(j);
     
     % Outlet
-    a_E(j, N+2) = 0;
-    a_W(j, N+2) = 1;
-    a_N(j, N+2) = 0;
-    a_S(j, N+2) = 0;
-    a_P(j, N+2) = 1;
-    b_P(j, N+2) = 0;
+    a_E(N+2, j) = 0;
+    a_W(N+2, j) = 1;
+    a_N(N+2, j) = 0;
+    a_S(N+2, j) = 0;
+    a_P(N+2, j) = 1;
+    b_P(N+2, j) = 0;
 
 end
 
