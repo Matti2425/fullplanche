@@ -4,7 +4,7 @@ function [a_E, a_W, a_N, a_S, b_P, a_P] = evalCoefficients(phi, phi_body, Numeri
 % form of the equation governing the stream function in a potential flow.
 %
 % INPUTS:
-%   psi_start - Initial value of the stream function at the bottom boundary.
+%   psi_start - Initial value of the stream function at the bot boundary.
 %   psi_body  - Stream function value imposed on solid boundaries.
 %   M         - Number of grid points in the vertical direction.
 %   N         - Number of grid points in the horizontal direction.
@@ -20,9 +20,11 @@ function [a_E, a_W, a_N, a_S, b_P, a_P] = evalCoefficients(phi, phi_body, Numeri
 %   b_P                 - Right-hand side term of the equation.
 %--------------------------------------------------------------------------
 
-dx = (L/N);   
-dy = (H/M); 
+% Geometry increments
+dx = (Geometry.L/NumericalParameters.N);   
+dy = (Geometry.H/NumericalParameters.M); 
 
+% Allocating space
 a_E = zeros(N+2, M+2); 
 a_W = zeros(N+2, M+2);
 a_N = zeros(N+2, M+2);
@@ -30,7 +32,8 @@ a_S = zeros(N+2, M+2);
 a_P = zeros(N+2, M+2);
 b_P = zeros(N+2, M+2);
 
-psi_bottom=psi_start;
+% Pre-defining values
+phi_bot=phi;
 
 for i = 2:N+1
     for j = 2:M+1
@@ -50,7 +53,7 @@ for i = 1:N+2
     a_N(1, i) = 0;
     a_S(1, i) = 0;
     a_P(1, i) = 1;
-    b_P(1, i) = psi_bottom;
+    b_P(1, i) = phi_bot;
 
     % Top row
     a_E(M+2, i) = 0;
@@ -58,7 +61,7 @@ for i = 1:N+2
     a_N(M+2, i) = 0;
     a_S(M+2, i) = 0;
     a_P(M+2, i) = 1;
-    b_P(M+2, i) = psi_bottom + v_in * H;
+    b_P(M+2, i) = phi_bot + v_in * H;
 end
 
 for j = 2:M+1
@@ -68,7 +71,7 @@ for j = 2:M+1
     a_N(j, 1) = 0;
     a_S(j, 1) = 0;
     a_P(j, 1) = 1;
-    b_P(j, 1) = psi_bottom + v_in * y_P(j);
+    b_P(j, 1) = phi_bot + v_in * y_P(j);
     
     % Outlet
     a_E(j, N+2) = 0;

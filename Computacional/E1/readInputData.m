@@ -28,12 +28,12 @@ function [Geometry,Vin,Pin,Tin,phi_body,gas,Numerical,Init] = readInputData()
     Numerical.N = 10;
     Numerical.M = 5;
     Numerical.d = 1e-4;
-    Numerical.N_max = 100;
+    Numerical.i_max = 100;
 
     % Initial properties
     Init.T = Tin;
     Init.P = Pin;
     Init.rho = Rho_in;
     Init.V = Vin;
-    
+
 end
