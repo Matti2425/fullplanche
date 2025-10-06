@@ -9,9 +9,12 @@ S = solidMaterial(Geometry,X,Y);
 
 [phi, T, P, rho] = initParams(Init, NumericalParameters, S, phi_body);
 
-%evalCoefficients(System)
+for i = 1:NumericalParameters.N_max
+    %evaluate coefficient
+    evalCoefficients(System)
+    %solve system
 
-
+end
 
 
 
