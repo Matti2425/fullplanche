@@ -20,9 +20,13 @@ function [a_E, a_W, a_N, a_S, b_P, a_P] = evalCoefficients(phi, phi_body, Numeri
 %   b_P                 - Right-hand side term of the equation.
 %--------------------------------------------------------------------------
 
+% Local variables
+N = NumericalParameters.N;
+M = NumericalParameters.M;
+
 % Geometry increments
-dx = (Geometry.L/NumericalParameters.N);   
-dy = (Geometry.H/NumericalParameters.M); 
+dx = (Geometry.L/N);   
+dy = (Geometry.H/M); 
 
 % Allocating space
 a_E = zeros(N+2, M+2); 
@@ -37,10 +41,10 @@ phi_bot=phi;
 
 for i = 2:N+1
     for j = 2:M+1
-        a_E(i, j) = 1 * dy / (x_P(i+1)-x_P(i));
-        a_W(i, j) = 1 * dy / (x_P(i)-x_P(i-1));
-        a_N(i, j) = 1 * dx / (y_P(j+1)-y_P(j));
-        a_S(i, j) = 1 * dx / (y_P(j)-y_P(j-1));
+        a_E(i, j) = 1 * dy / (X(i+1)-X(i));
+        a_W(i, j) = 1 * dy / (X(i)-X(i-1));
+        a_N(i, j) = 1 * dx / (Y(j+1)-Y(j));
+        a_S(i, j) = 1 * dx / (Y(j)-Y(j-1));
         a_P(i, j) = a_E(i, j) + a_W(i, j) + a_N(i, j) + a_S(i, j);
         b_P(i, j) = 0;
     end
@@ -71,7 +75,7 @@ for j = 2:M+1
     a_N(j, 1) = 0;
     a_S(j, 1) = 0;
     a_P(j, 1) = 1;
-    b_P(j, 1) = phi_bot + v_in * y_P(j);
+    b_P(j, 1) = phi_bot + v_in * Y(j);
     
     % Outlet
     a_E(j, N+2) = 0;
