@@ -19,6 +19,12 @@ S = solidMaterial(Geometry,X,Y);
 % Compute velocities at faces and nodes
 [v_x, v_y, v_mag] = compute_vel(phi, X, Y, NumericalParameters, Vin, Geometry, rho);
 
+% Compute thermodynamic properties
+[T, P, rho, cp_mean] = compute_thermo(v_mag, NumericalParameters, Init, gas, S);
+
+% Compute aerodynamic coefficients
+[C_D, C_L, Gamma, D, L, p_cyl, theta] = final_calc(X, Y, P, v_x, v_y, Geometry, Vin, gas);
+
 % plot(X(S),Y(S),"Color",'red')
 % hold on
 % plot(X,Y,'o')
