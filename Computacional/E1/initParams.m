@@ -7,7 +7,7 @@ function [phi, T, P, rho] = initParams(Init, Numerical, S, phi_body)
     T = M1*Init.T;
     P = M1*Init.P;
 
-    phi(logical(S)) = phi_body;
-    rho(logical(S)) = 0;
+    phi(S) = phi_body;
+    rho(S) = 0;
 
 end

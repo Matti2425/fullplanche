@@ -203,6 +203,34 @@ print("Saturn: r_ecliptic [AU] = ", rS_ecliptic)
 print("Saturn: v_ecliptic [AU/day] = ", vS_ecliptic)
 print("----------------------------------------------")
 
+# =======================
+# Step 9: Convert Cartesian to Spherical Ecliptic Coordinates
+# =======================
+def cartesian_to_spherical_ecliptic(r_ecliptic):
+    """
+    Convert heliocentric ecliptic Cartesian coordinates to spherical coordinates
+    r_ecliptic: [X, Y, Z] in AU
+    Returns: lambda (celestial longitude), beta (celestial latitude) in degrees, and distance r in AU
+    """
+    X, Y, Z = r_ecliptic
+    r = np.linalg.norm(r_ecliptic)  # distance
+    lambda_rad = np.arctan2(Y, X)  # celestial longitude
+    beta_rad = np.arctan2(Z, np.sqrt(X**2 + Y**2))  # celestial latitude
+    
+    # Convert to degrees and ensure lambda is in [0, 360)
+    lambda_deg = deg_correction(np.rad2deg(lambda_rad))
+    beta_deg = np.rad2deg(beta_rad)
+    
+    return lambda_deg, beta_deg, r
+
+lambda_E, beta_E, r_E = cartesian_to_spherical_ecliptic(rE_ecliptic)
+lambda_S, beta_S, r_S = cartesian_to_spherical_ecliptic(rS_ecliptic)
+
+print("Spherical Ecliptic Coordinates:")
+print("Earth: λ =", lambda_E, "degrees, β =", beta_E, "degrees, r =", r_E, "AU")
+print("Saturn: λ =", lambda_S, "degrees, β =", beta_S, "degrees, r =", r_S, "AU")
+print("----------------------------------------------")
+
 # |r × v| should be ≈ sin(h)
 hE_num = np.linalg.norm(np.cross(rE_ecliptic, vE_ecliptic))
 hS_num = np.linalg.norm(np.cross(rS_ecliptic, vS_ecliptic))

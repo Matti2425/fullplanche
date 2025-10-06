@@ -11,8 +11,11 @@ S = solidMaterial(Geometry,X,Y);
 
 for i = 1:NumericalParameters.N_max
     %evaluate coefficient
-    evalCoefficients(System)
+    evalCoefficients(phi, phi_body, NumericalParameters,Geometry, Vin, X, Y, S)
     %solve system
+
+    if (X-X_Ans)<error
+        break
 
 end
 

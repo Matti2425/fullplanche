@@ -7,4 +7,7 @@ function S = solidMaterial(Geometry,X,Y)
     % S = 1 si dintre S = 0 si fora
     S = dist < Geometry.D/2;
 
+    % Logical
+    S = logical(S);
+
 end
