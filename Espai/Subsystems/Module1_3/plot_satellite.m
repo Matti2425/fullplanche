@@ -40,6 +40,11 @@ for i = 1:length(shapes)
         case 'cube'
             [vertices, faces] = generate_cube(shape.dims(1));
             geometryType = 'patch';
+
+        case 'tri_prism'
+            [vertices, faces] = generate_tri_prism(shape.dims(1),shape.dims(2),shape.dims(3));
+            geometryType = 'patch';
+
         otherwise
             error('Unknown shape type: %s', shape.type);
     end
@@ -68,7 +73,9 @@ for i = 1:length(shapes)
         end
 
     end
-    
+    R = shape.orientation; %% He hagut de treure aixo fora i aíx si va, revisar if
+    vertices = (R * vertices')';
+
     % Apply translation
     if strcmp(geometryType, 'surf')
         X = X + shape.r_cg(1);

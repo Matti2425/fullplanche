@@ -3,10 +3,18 @@ clear; clc; close all;
 % Definición de los subcuerpos
 
 Bodies = []; % Vector de cuerpos vacío
-Bodies = [Bodies, Body("cube", 200, [0; 0; 0], 2, eye(3))];
-Bodies = [Bodies, Body("box", 50, [3; 0; 0], [4,0.2,2],eye(3))];
-Bodies = [Bodies, Body("box", 50, [-3; 0; 0], [4,0.2,2],eye(3))];
+% Bodies = [Bodies, Body("cube", 200, [0; 0; 0], 2, eye(3))];
+% Bodies = [Bodies, Body("box", 50, [3; 0; 0], [4,0.2,2],eye(3))];
+% Bodies = [Bodies, Body("box", 50, [-3; 0; 0], [4,0.2,2],eye(3))];
 
+Bodies = [Bodies, Body('box', 190.134,[0;0;0],[208.3, 64.5, 68.6], eye(3))];
+Bodies = [Bodies, Body('box', 103.1184,[0;-78.5;0],[78.8, 92.5, 68.6], eye(3))];
+Rz = [
+    -1,  0,  0;
+     0, -1,  0;
+     0,  0,  1
+];
+Bodies = [Bodies, Body('tri_prism', 42.3738,[-60.9833;-63.0833;0],[64.75,92.5,68.6], Rz)];
 
 % Calculamos CG global
 

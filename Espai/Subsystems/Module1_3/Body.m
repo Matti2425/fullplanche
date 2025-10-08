@@ -56,6 +56,18 @@ classdef Body
                         Izz = (1/2) * obj.mass * r^2;
                         obj.I_local = diag([Ixx, Iyy, Izz]);
 
+                    case 'tri_prism'
+                        % prismalado a (x) y lado b (y) altura h (z) 
+                        % dims = [diametro, altura, ~]
+                        a = obj.dims(1); 
+                        b = obj.dims(1);
+                        h = obj.dims(3);       % altura
+                        Ixx = b^2/36 + h^2/12;
+                        Iyy = a^2/36 + h^2/12;
+                        Izz = (a^2+b^2)/36;
+                        obj.I_local = diag([Ixx, Iyy, Izz]);
+                        % Recordar que el cdg se encuentra en (a/3, b/3, h/2)
+
                     otherwise
                         fprintf('Type error')
                 end
