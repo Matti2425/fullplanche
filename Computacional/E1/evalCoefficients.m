@@ -41,10 +41,10 @@ phi_bot=phi;
 
 for i = 2:N+1
     for j = 2:M+1
-        a_E(i, j) = 1 * dy / (X(i+1)-X(i));
-        a_W(i, j) = 1 * dy / (X(i)-X(i-1));
-        a_N(i, j) = 1 * dx / (Y(j+1)-Y(j));
-        a_S(i, j) = 1 * dx / (Y(j)-Y(j-1));
+        a_E(i, j) = 1 * dy / (X(i+1, j)-X(i, j));
+        a_W(i, j) = 1 * dy / (X(i, j)-X(i-1, j));
+        a_N(i, j) = 1 * dx / (Y(i, j+1)-Y(i, j));
+        a_S(i, j) = 1 * dx / (Y(i, j)-Y(i, j-1));
         a_P(i, j) = a_E(i, j) + a_W(i, j) + a_N(i, j) + a_S(i, j);
         b_P(i, j) = 0;
     end

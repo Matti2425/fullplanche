@@ -24,6 +24,7 @@ function M = euler2RotMat(phi,theta,psi)
           sin(psi)  cos(psi)  0;
           0         0         1];
 
-    % Ensamblado final ZYX
-    M = Rz * Ry * Rx;
+    % Ensamblado final ZYX (estaba al revés)
+    % M = Rz * Ry * Rx;
+    M = Rx * Ry * Rz; 
 end
