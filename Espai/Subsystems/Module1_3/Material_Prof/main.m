@@ -10,7 +10,8 @@ shape_body.dimensions.length = 2;
 shape_body.dimensions.width = 2;
 shape_body.dimensions.height = 2;
 shape_body.position = [0, 0, 0];  
-shape_body.orientation = [];  
+shape_body.orientation = []; 
+
 %Solar Arrays
 shape_solarArray1.type = 'box'; 
 shape_solarArray1.mass = 50; 

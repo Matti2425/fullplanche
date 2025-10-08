@@ -1,20 +1,67 @@
 classdef Body
     
     properties
-        name            % Nombre
+        type            % tipo
         mass            % kg
         r_cg            % Vector posición del centro de gravedad en el ref. global [3x1]
+        dims            % Vector con las medidas importantes según tipo
         I_local         % Tensor de inercia respecto al centro de gravedad local [3x3]
+        orientation     % Matriz de rotación SR local → SR global
     end
 
     methods
         % Constructor
-        function obj = Body(name, mass, r_cg, I_local)
-            if nargin > 0
-                obj.name = name;
-                obj.mass = mass;
-                obj.r_cg = r_cg(:);       % Asegura que sea columna
-                obj.I_local = I_local;
+        function obj = Body(type, mass, r_cg, dims, orientation)
+            obj.type = lower(type);
+            obj.mass = mass;
+            obj.r_cg = r_cg(:);
+            obj.orientation = orientation;
+            obj.dims = dims(:).';  % aseguramos formato fila
+    
+            % --- Caso 1: el usuario proporciona su propia matriz de inercia ---
+            if nargin == 6 && ~isempty(I_input)
+                % Se usa directamente la matriz del usuario
+                obj.I_local = I_input;
+            
+            % --- Caso 2: se genera automáticamente según el tipo ---
+            else
+                % --- Calcula el tensor de inercia local según el tipo ---
+                switch obj.type
+                    case 'sphere'
+                        r = obj.dims(1) / 2;  % supondremos que d1 = diámetro
+                        Ival = (2/5) * obj.mass * r^2;
+                        obj.I_local = Ival * eye(3);
+
+                    case 'box'
+                        % d1, d2, d3 son las longitudes de los lados
+                        a = obj.dims(1); b = obj.dims(2); c = obj.dims(3);
+                        Ixx = (1/12) * obj.mass * (b^2 + c^2);
+                        Iyy = (1/12) * obj.mass * (a^2 + c^2);
+                        Izz = (1/12) * obj.mass * (a^2 + b^2);
+                        obj.I_local = diag([Ixx, Iyy, Izz]);
+
+                    case 'cube'
+                        % Ejes principales alineados con los lados 
+                        a = obj.dims(1);
+                        Ival = (1/6) * obj.mass * a^2;
+                        obj.I_local = diag([Ival, Ival, Ival]);
+                    
+                    case 'cylinder'
+                        % Cilindro sólido con eje principal en z
+                        % dims = [diametro, altura, ~]
+                        r = obj.dims(1) / 2;   % radio
+                        h = obj.dims(2);       % altura
+                        Ixx = (1/12) * obj.mass * (3*r^2 + h^2);
+                        Iyy = Ixx;
+                        Izz = (1/2) * obj.mass * r^2;
+                        obj.I_local = diag([Ixx, Iyy, Izz]);
+
+                    otherwise
+                        fprintf('Type error')
+                end
+                % Y rotamos la matriz de inercia al SR global
+                R = obj.orientation;
+                obj.I_local = R * obj.I_local * R.';  % Transformación al sistema global
             end
         end
         

@@ -3,9 +3,9 @@ clear; clc; close all;
 % Definición de los subcuerpos
 
 Bodies = []; % Vector de cuerpos vacío
-Bodies = [Bodies, Body("Cuerpo central", 200, [0; 0; 0], diag([50, 60, 70]))];
-Bodies = [Bodies, Body("Panel izquierdo", 20, [-2; 0; 0], diag([5, 30, 35]))];
-Bodies = [Bodies, Body("Panel derecho", 20, [ 2; 0; 0], diag([5, 30, 35]))];
+Bodies = [Bodies, Body("cube", 200, [0; 0; 0], 2, eye(3))];
+Bodies = [Bodies, Body("box", 50, [3; 0; 0], [4,0.2,2],eye(3))];
+Bodies = [Bodies, Body("box", 50, [-3; 0; 0], [4,0.2,2],eye(3))];
 
 
 % Calculamos CG global
@@ -18,8 +18,8 @@ for i = 1:length(Bodies)
 end
 r_cg_total = r_cg_total / total_mass;
 
-% fprintf('Centro de gravedad global [m]: (%.3f, %.3f, %.3f)\n', ...
-%        r_cg_total(1), r_cg_total(2), r_cg_total(3));
+fprintf('Centro de gravedad global [m]: (%.3f, %.3f, %.3f)\n', ...
+       r_cg_total(1), r_cg_total(2), r_cg_total(3));
 
 
 % Calculamos del tensor de inercia total respecto al CG global
@@ -29,8 +29,18 @@ for i = 1:length(Bodies)
     I_total = I_total + Bodies(i).inertiaAtRef(r_cg_total);
 end
 
-% disp('Tensor de inercia total respecto al CG global [kg·m²]:');
-% disp(I_total);
+disp('Tensor de inercia total respecto al CG global [kg·m²]:');
+disp(I_total);
+
+hold on;
+axis equal;
+grid on;
+view(3);
+xlabel('X (m)');
+ylabel('Y (m)');
+zlabel('Z (m)');
+title('Satellite Geometry');
+plot_satellite(Bodies,gca)
 
 
 
