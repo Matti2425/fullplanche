@@ -18,8 +18,8 @@ for i = 1:length(Bodies)
 end
 r_cg_total = r_cg_total / total_mass;
 
-fprintf('Centro de gravedad global [m]: (%.3f, %.3f, %.3f)\n', ...
-        r_cg_total(1), r_cg_total(2), r_cg_total(3));
+% fprintf('Centro de gravedad global [m]: (%.3f, %.3f, %.3f)\n', ...
+%        r_cg_total(1), r_cg_total(2), r_cg_total(3));
 
 
 % Calculamos del tensor de inercia total respecto al CG global
@@ -29,7 +29,8 @@ for i = 1:length(Bodies)
     I_total = I_total + Bodies(i).inertiaAtRef(r_cg_total);
 end
 
-disp('Tensor de inercia total respecto al CG global [kg·m²]:');
-disp(I_total);
+% disp('Tensor de inercia total respecto al CG global [kg·m²]:');
+% disp(I_total);
+
 
 
