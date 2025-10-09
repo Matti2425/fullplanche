@@ -1,6 +1,7 @@
 close all
 clearvars
 clc
+clear
 
 mu = 3.986e5;
 g0 = 9.81;  %m/s^2
