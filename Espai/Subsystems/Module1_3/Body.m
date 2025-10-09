@@ -66,13 +66,24 @@ classdef Body
                         fprintf('Type error')
                 end
                 % Y rotamos la matriz de inercia al SR global
-                R = obj.orientation;
-                obj.I_local = R * obj.I_local * R.';  % Transformación al sistema global
+                %R = obj.orientation;
+                %obj.I_local = R * obj.I_local * R.';  % Transformación al sistema global
             end
         end
         
-        % ---------- Método: tensor trasladado al sistema de referencia global ----------
+        % SR_Local -> SR_Global : Rotation
+%         function I_oriented = orient_I(obj)
+%             R = obj.orientation;
+%             I_oriented = R * obj.I_local * R.';  % Transformación al sistema global
+%         end
+
+
+        % SR_Local -> SR_Global : Translation orientation
         function I_global = inertiaAtRef(obj, r_ref)
+
+            R = obj.orientation;
+            I_oriented = R * obj.I_local * R.';  % Transformación al sistema global
+
             % Calcula el tensor de inercia respecto a un punto de referencia (r_ref)
             % usando el teorema de ejes paralelos.
             
@@ -81,7 +92,7 @@ classdef Body
 %                        d(3)   0   -d(1);
 %                       -d(2)  d(1)   0  ];
 %           se usa implícitamente
-            I_global = obj.I_local + obj.mass * ( (d.'*d)*eye(3) - (d*d.') );
+            I_global = I_oriented + obj.mass * ( (d.'*d)*eye(3) - (d*d.') );
         end
     end
 end
