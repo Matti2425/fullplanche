@@ -27,8 +27,8 @@ vertices = [-lx*1/3, -ly*1/3, -lz;
 % Define the faces of the box
 faces = [1 2 3 1;  % Bottom face
          4 5 6 1;  % Top face
-         1 2 4 5;  % Side face
-         1 3 4 6;  % Side face
-         2 3 5 6]; % Side face
+         1 2 5 4;  % Side face
+         1 3 6 4;  % Side face
+         2 3 6 5]; % Side face
 
 end

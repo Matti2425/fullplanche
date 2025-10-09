@@ -50,7 +50,7 @@ for i = 1:length(shapes)
     end
     
     % Apply rotation if any
-    if isfield(shape, 'orientation') && ~isempty(shape.orientation)
+%    if isfield(shape, 'orientation') && ~isempty(shape.orientation)
         
         % Obtain rotation matrix
         R = shape.orientation;
@@ -66,15 +66,16 @@ for i = 1:length(shapes)
 %         end
 
         % Apply rotation
-        if strcmp(geometryType, 'surf')
-            [X, Y, Z] = rotate_shape(X, Y, Z, R);
-        elseif strcmp(geometryType, 'patch')
-            vertices = (R * vertices')';
+        switch shape.type
+            case  'cylinder'
+                [X, Y, Z] = rotate_shape(X, Y, Z, R);
+            otherwise
+                vertices = (R * vertices')';
         end
 
-    end
-    R = shape.orientation; %% He hagut de treure aixo fora i aíx si va, revisar if
-    vertices = (R * vertices')';
+%    end
+%    R = shape.orientation; %% He hagut de treure aixo fora i aíx si va, revisar if
+%    vertices = (R * vertices')';
 
     % Apply translation
     if strcmp(geometryType, 'surf')

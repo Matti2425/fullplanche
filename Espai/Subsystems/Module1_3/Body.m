@@ -18,14 +18,8 @@ classdef Body
             obj.orientation = orientation;
             obj.dims = dims(:).';  % aseguramos formato fila
     
-            % --- Caso 1: el usuario proporciona su propia matriz de inercia ---
-            if nargin == 6 && ~isempty(I_input)
-                % Se usa directamente la matriz del usuario
-                obj.I_local = I_input;
-            
-            % --- Caso 2: se genera automáticamente según el tipo ---
-            else
-                % --- Calcula el tensor de inercia local según el tipo ---
+            if nargin > 0
+                                % --- Calcula el tensor de inercia local según el tipo ---
                 switch obj.type
                     case 'sphere'
                         r = obj.dims(1) / 2;  % supondremos que d1 = diámetro
