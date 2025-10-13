@@ -11,7 +11,7 @@ S = solidMaterial(Geometry,X,Y);
 
 
 % evaluate coefficients
-[a_E, a_W, a_N, a_S, b_P, a_P] = evalCoefficients(phi, phi_body, NumericalParameters,Geometry, Vin, X, Y, S);
+[a_E, a_W, a_N, a_S, b_P, a_P] = evalCoefficients(phi, phi_body, NumericalParameters,Geometry, Vin, X, Y, S, Init);
 
 % Solver call
 [phi, i, error] = solveSystem(phi, phi_body, S, a_E, a_W, a_N, a_S, a_P, b_P, Vin, Y, NumericalParameters, Geometry);
@@ -24,6 +24,9 @@ S = solidMaterial(Geometry,X,Y);
 
 % Compute aerodynamic coefficients
 [C_D, C_L, Gamma, D, L, p_cyl, theta] = final_calc(X, Y, P, v_x, v_y, Geometry, Vin, gas);
+figure
+%plotCFD('Title',P,NumericalParameters.N,NumericalParameters.M,dx,dy)
+plotStreamLines(psi,X,Y)
 
 % plot(X(S),Y(S),"Color",'red')
 % hold on

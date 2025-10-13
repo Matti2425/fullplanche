@@ -3,21 +3,21 @@ function [Geometry,Vin,Pin,Tin,phi_body,gas,Numerical,Init] = readInputData()
 %   Detailed explanation goes here
 
     % Geometry properties
-    Geometry.L = 20;
-    Geometry.H = 5;
-    Geometry.D = 1;
-    Geometry.ObjectCenter = [Geometry.L/4,Geometry.H/2];
+    Geometry.L = 2;
+    Geometry.H = 1;
+    Geometry.D = 0.2;
+    Geometry.ObjectCenter = [Geometry.L/2,Geometry.H/2];
 
     % Fluid properties
     gas.cp = 1;
     gas.gamma = 1.4;
-    gas.R = 281;
+    gas.R = 287;
     Geometry.rho_ref = 1.225;
         
     % Input values
     Vin = 1;
     Pin = 101325;
-    Tin = 1;
+    Tin = 300;
     Rho_in = Pin/(gas.R*Tin);
 
     % Body properties
@@ -25,15 +25,16 @@ function [Geometry,Vin,Pin,Tin,phi_body,gas,Numerical,Init] = readInputData()
 
 
     % Numerical system properties
-    Numerical.N = 10;
-    Numerical.M = 5;
-    Numerical.d = 1e-4;
-    Numerical.i_max = 100;
+    Numerical.N = 5;
+    Numerical.M = 7;
+    Numerical.d = 1e-7;
+    Numerical.i_max = 1000;
 
     % Initial properties
     Init.T = Tin;
     Init.P = Pin;
     Init.rho = Rho_in;
     Init.V = Vin;
+    Init.phi_start = 0;
 
 end

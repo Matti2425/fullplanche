@@ -1,4 +1,4 @@
-function [a_E, a_W, a_N, a_S, b_P, a_P] = evalCoefficients(phi, phi_body, NumericalParameters,Geometry, Vin, X, Y, S)
+function [a_E, a_W, a_N, a_S, b_P, a_P] = evalCoefficients(phi, phi_body, NumericalParameters,Geometry, Vin, X, Y, S, Init)
 
 % This function constructs the coefficient matrices required for solving the discretized 
 % form of the equation governing the stream function in a potential flow.
@@ -37,7 +37,9 @@ a_P = zeros(N+2, M+2);
 b_P = zeros(N+2, M+2);
 
 % Pre-defining values
-phi_bot=phi;
+phi_bot=Init.phi_start;
+
+% Incompressible rho/rho_Ref = 1
 
 for i = 2:N+1
     for j = 2:M+1
