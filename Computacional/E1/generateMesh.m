@@ -1,38 +1,33 @@
-function [X,Y] = generateMesh(Geometry, NumericalParameters)
-%UNTITLED3 Summary of this function goes here
-%   Detailed explanation goes here
-    
-    % Reanomenem variables
+function [x_P, y_P] = generateMesh(Geometry, NumericalParameters)
+% MESH_GENERATOR Creates a structured Cartesian mesh for a 2D domain.
+%
+% This function generates a uniform computational grid for a domain 
+% of dimensions L × H, discretized with N points in the x-direction 
+% and M points in the y-direction.
+%
+% Inputs:
+%   Geometry            - Structure containing L (length) and H (height)
+%   NumericalParameters - Structure containing N and M (grid points)
+%
+% Outputs:
+%   x_P - 1D array containing the x-coordinates of the cell centers and boundaries
+%   y_P - 1D array containing the y-coordinates of the cell centers and boundaries
+%--------------------------------------------------------------------------
+
     N = NumericalParameters.N;
     M = NumericalParameters.M;
+    L = Geometry.L;
+    H = Geometry.H;
 
-    % Predef
-    X = zeros(N+2, M+2);
-    Y = zeros(N+2, M+2);
-    
-    % Increments
-    deltaL = Geometry.L / N;
-    deltaH = Geometry.H / M;
+    % Initialize 1D coordinate arrays
+    x_P = zeros(1, N+2);
+    x_P(2:end-1) = (0.5:1:N-0.5) * (L/N);
+    x_P(1) = 0;
+    x_P(end) = L;
 
-    % Saving
-    Geometry.deltaX = deltaL;
-    Geometry.deltaY = deltaH;
-    
-    % Vectors límit
-    xVec = (0.5 : N-0.5) * deltaL;
-    yVec = (0.5 : M-0.5) * deltaH;
-    
-    % Mallat
-    [Xsub, Ysub] = meshgrid(xVec, yVec);
-    X(2:N+1, 2:M+1) = Xsub';
-    Y(2:N+1, 2:M+1) = Ysub';
-
-    % Límits
-    X(:, 1) = [0 xVec Geometry.L];
-    X(:, end) = [0 xVec Geometry.L];
-    X(end,:) = Geometry.L;
-    Y(1, :) = [0 yVec Geometry.H];
-    Y(end, :) = [0 yVec Geometry.H];
-    Y(:,end) = Geometry.H;
+    y_P = zeros(1, M+2);
+    y_P(2:end-1) = (0.5:1:M-0.5) * (H/M);
+    y_P(1) = 0;
+    y_P(end) = H;
 
 end

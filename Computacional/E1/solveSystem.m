@@ -1,71 +1,80 @@
-function [phi, i, error] = solveSystem(phi, phi_body, S, a_E, a_W, a_N, a_S, a_P, b_P, v_in, Y, NumericalParameters, Geometry)
-% GAUSS_SEIDEL Solves the stream function equation using the Gauss-Seidel method.
+function [psi, iter, error] = solveSystem(psi, psi_body, solid, a_E, a_W, a_N, a_S, a_P, b_P, v_in, y_P, NumericalParameters, Geometry)
+% SOLVESYSTEM Solves the stream function equation using the Gauss-Seidel method
 %
 % This function iteratively solves the discretized stream function equation 
 % using the Gauss-Seidel method with Dirichlet boundary conditions and 
 % internal conditions imposed by solid obstacles in the domain.
 %
 % Inputs:
-%   psi       - Initial guess for the stream function.
-%   psi_body  - Stream function value inside solid obstacles.
-%   solid     - Binary matrix indicating solid (0) or fluid (1) regions.
-%   a_E, a_W, a_N, a_S, a_P - Coefficients of the discretized equation.
-%   b_P       - Right-hand side of the equation.
-%   v_in      - Inlet velocity.
-%   y_P       - Array of y-coordinates of the grid points.
-%   M, N      - Number of grid points in the y and x directions.
-%   H         - Channel height.
-%   delta     - Convergence threshold for the iterative solver.
+%   psi                 - Initial guess for the stream function (M+2, N+2)
+%   psi_body            - Stream function value inside solid obstacles
+%   solid               - Binary matrix indicating solid (0) or fluid (1) regions
+%   a_E, a_W, a_N, a_S, a_P - Coefficients of the discretized equation
+%   b_P                 - Right-hand side of the equation
+%   v_in                - Inlet velocity
+%   y_P                 - 1D array of y-coordinates of the grid points
+%   NumericalParameters - Structure with N, M, i_max, d (tolerance)
+%   Geometry            - Structure with H (height)
 %
 % Outputs:
-%   psi       - Computed stream function field.
-%   i      - Number of iterations performed.
-%   error     - Final error value.
-%
-% The solver iterates until convergence is achieved, applying boundary 
-% conditions at the channel walls and enforcing the presence of solid 
-% obstacles. The Gauss-Seidel method is used to update the stream function 
-% values at each iteration. The algorithm stops when the maximum difference 
-% between successive iterations is below the specified tolerance (delta).
+%   psi   - Computed stream function field (M+2, N+2)
+%   iter  - Number of iterations performed
+%   error - Final error value
 %--------------------------------------------------------------------------
-N = NumericalParameters.N;
-M = NumericalParameters.M;
 
-error = Inf; 
+    N = NumericalParameters.N;
+    M = NumericalParameters.M;
+    H = Geometry.H;
+    delta = NumericalParameters.d;
+    max_iter = NumericalParameters.i_max;
 
-for iter = 1:NumericalParameters.i_max
-    phi_old = phi; 
+    error = Inf; 
+    
+    for iter = 1:max_iter
+        psi_old = psi; 
+        
+        % Channel inlet (i = 1)
+        for j = 1:M+2
+            psi(j, 1) = v_in * y_P(j);
+        end
+        
+        % Channel outlet (i = N+2)
+        for j = 1:M+2
+            psi(j, N+2) = psi(j, N+1);
+        end
+        
+        % Bottom wall (j = 1)
+        for i = 1:N+2
+            psi(1, i) = 0;
+        end
+        
+        % Top wall (j = M+2)
+        for i = 1:N+2
+            psi(M+2, i) = v_in * H;
+        end
+        
+        % Solid nodes
+        for j = 1:M+2
+            for i = 1:N+2
+                if solid(j, i) == 0
+                    psi(j, i) = psi_body;
+                end
+            end
+        end
 
-    for i = 1:N+2
-        % Bot row
-        phi(i, 1) = 0;
-
-        % Top row
-        phi(i, M+2) = v_in * Geometry.H;
-    end
-
-    for j = 1:M+2
-        % Inlet
-        phi(1, j) = v_in * Y(j);
-
-        % Outlet
-        phi(N+2, j) = phi(N+1, j);
-    end
-
-    % Solid
-    phi(S) = phi_body;
-
-    for i = 2:N+1
+        % Gauss-Seidel iteration for interior nodes
         for j = 2:M+1
-                phi(i, j) = (a_E(i, j) * phi(i, j+1) + a_W(i, j) * phi(i, j-1) + ...
-                             a_N(i, j) * phi(i+1, j) + a_S(i, j) * phi(i-1, j) + b_P(i, j)) / a_P(i, j);
+            for i = 2:N+1
+                psi(j, i) = (a_E(j, i) * psi(j, i+1) + a_W(j, i) * psi(j, i-1) + ...
+                             a_N(j, i) * psi(j+1, i) + a_S(j, i) * psi(j-1, i) + b_P(j, i)) / a_P(j, i);
+            end
+        end
+        
+        % Check convergence
+        error = max(max(abs(psi - psi_old)));
+        if error < delta
+            break;
         end
     end
-    error = max(max(abs(phi - phi_old)));
-    if error < NumericalParameters.d
-        break;
-    end
-end
-
-% Func end
+    
 end
