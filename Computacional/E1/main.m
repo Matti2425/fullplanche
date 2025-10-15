@@ -1,33 +1,85 @@
-clearvars
+%% CFD Simulation - Potential Flow Around a Cylinder
+% E1 Implementation
+clearvars; close all; clc;
 
-[Geometry,Vin,Pin,Tin,phi_body,gas,NumericalParameters,Init] = readInputData();
+%% Read Input Data
+[Geometry, v_in, p_in, T_in, psi_body, gas, Numerical, Init, w, CASE] = readInputData();
 
-[X,Y] = generateMesh(Geometry, NumericalParameters);
+%% Generate Mesh
+[x_P, y_P] = generateMesh(Geometry, Numerical);
 
-S = solidMaterial(Geometry,X,Y);
- 
+%% Generate Cylinder Geometry and Solid Matrix
+[x_cyl, y_cyl, S, theta] = solidMaterial(Geometry, x_P, y_P, Numerical);
 
-[phi, T, P, rho] = initParams(Init, NumericalParameters, S);
+%% Initialize Fields
+[psi, rho] = initParams(Init, Numerical, S);
 
+%% Evaluate Coefficients
+[a_E, a_W, a_N, a_S, b_P, a_P] = evalCoefficients(psi, psi_body, Numerical, Geometry, v_in, x_P, y_P, S, Init);
 
-% evaluate coefficients
-[a_E, a_W, a_N, a_S, b_P, a_P] = evalCoefficients(phi, phi_body, NumericalParameters,Geometry, Vin, X, Y, S, Init);
+%% Solve System (Gauss-Seidel Iteration)
+fprintf('Starting Gauss-Seidel solver...\n');
+[psi, i, error] = solveSystem(psi, psi_body, S, a_E, a_W, a_N, a_S, a_P, b_P, v_in, y_P, Numerical, Geometry);
+fprintf('Converged after %d iterations with error = %.2e\n', i, error);
 
-% Solver call
-[phi, i, error] = solveSystem(phi, phi_body, S, a_E, a_W, a_N, a_S, a_P, b_P, Vin, Y, NumericalParameters, Geometry);
+%% Compute Velocities
+[v_x, v_y, v_mag] = compute_vel(psi, x_P, y_P, Numerical, v_in, Geometry.rho_ref, rho);
 
-% Compute velocities at faces and nodes
-[v_x, v_y, v_mag] = compute_vel(phi, X, Y, NumericalParameters, Vin, Geometry, rho);
+%% Compute Thermodynamic Properties
+[T, P, rho, cp_mean] = compute_thermo(v_mag, Numerical, Init, gas);
 
-% Compute thermodynamic properties
-[T, P, rho, cp_mean] = compute_thermo(v_mag, NumericalParameters, Init, gas, S);
+%% Compute Aerodynamic Coefficients
+if CASE ~= 1
+    [C_D, C_L, Gamma, D, L, p_cyl] = final_calc(x_P, y_P, P, v_x, v_y, x_cyl, y_cyl, theta, Geometry, w, v_in);
+    
+    % Display results
+    fprintf('\n=== Aerodynamic Results ===\n');
+    fprintf('Drag Coefficient (C_D): %.6f\n', C_D);
+    fprintf('Lift Coefficient (C_L): %.6f\n', C_L);
+    fprintf('Circulation (Gamma): %.6f\n', Gamma);
+    fprintf('Drag Force (D): %.6f N\n', D);
+    fprintf('Lift Force (L): %.6f N\n', L);
+end
 
-% Compute aerodynamic coefficients
-[C_D, C_L, Gamma, D, L, p_cyl, theta] = final_calc(X, Y, P, v_x, v_y, Geometry, Vin, gas);
-figure
-%plotCFD('Title',P,NumericalParameters.N,NumericalParameters.M,dx,dy)
-plotStreamLines(psi,X,Y)
+%% Plotting
+% Calculate grid spacing
+dx = Geometry.L / Numerical.N;
+dy = Geometry.H / Numerical.M;
 
-% plot(X(S),Y(S),"Color",'red')
-% hold on
-% plot(X,Y,'o')
+figure('Name', 'Stream Function Contours', 'NumberTitle', 'off');
+plotStreamLines(psi, x_P, y_P);
+if CASE ~= 1
+    hold on;
+    plot(x_cyl, y_cyl, 'r-', 'LineWidth', 2);
+    hold off;
+end
+xlabel('x [m]'); ylabel('y [m]');
+title('Stream Function Contours');
+axis equal tight;
+
+figure('Name', 'Pressure Field', 'NumberTitle', 'off');
+plotCFD('Pressure', P, Numerical.N, Numerical.M, dx, dy);
+if CASE ~= 1
+    hold on;
+    plot(x_cyl, y_cyl, 'k-', 'LineWidth', 2);
+    hold off;
+end
+
+figure('Name', 'Velocity Magnitude', 'NumberTitle', 'off');
+plotCFD('Velocity Magnitude', v_mag, Numerical.N, Numerical.M, dx, dy);
+if CASE ~= 1
+    hold on;
+    plot(x_cyl, y_cyl, 'k-', 'LineWidth', 2);
+    hold off;
+end
+
+if CASE ~= 1
+    figure('Name', 'Pressure Distribution on Cylinder', 'NumberTitle', 'off');
+    plot(theta * 180/pi, p_cyl, 'b-', 'LineWidth', 2);
+    xlabel('Angle (degrees)');
+    ylabel('Pressure (Pa)');
+    title('Pressure Distribution on Cylinder Surface');
+    grid on;
+end
+
+fprintf('\nSimulation completed successfully!\n');

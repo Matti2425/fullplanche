@@ -1,57 +1,55 @@
-function [v_x, v_y, v_mag] = compute_vel(phi, X, Y, NumericalParameters, Vin, Geometry, rho)
+function [v_xP, v_yP, v_P] = compute_vel(psi, x_P, y_P, NumericalParameters, v_in, rho_ref, rho)
 % COMPUTE_VEL Calculates the velocity field from the stream function
 %
 % This function calculates the velocity field in a computational domain based on the 
-% stream function phi. It determines the velocity components in the x and y directions 
+% stream function psi. It determines the velocity components in the x and y directions 
 % and computes the velocity magnitude at each node.
 %
 % INPUTS:
-%   phi                 - Stream function values at each computational node
-%   X                   - X-coordinates of the grid points (N+2, M+2)
-%   Y                   - Y-coordinates of the grid points (N+2, M+2)
+%   psi                 - Stream function values at each computational node (M+2, N+2)
+%   x_P, y_P            - 1D arrays of grid coordinates
 %   NumericalParameters - Structure containing N and M (number of nodes)
-%   Vin                 - Inlet velocity (free-stream velocity)
-%   Geometry            - Structure containing rho_ref (reference density)
-%   rho                 - Density field (N+2, M+2)
+%   v_in                - Inlet velocity (free-stream velocity)
+%   rho_ref             - Reference density
+%   rho                 - Density field (M+2, N+2)
 %
 % OUTPUTS:
-%   v_x   - Velocity component in the x-direction
-%   v_y   - Velocity component in the y-direction
-%   v_mag - Velocity magnitude at each node
+%   v_xP  - Velocity component in the x-direction (M+2, N+2)
+%   v_yP  - Velocity component in the y-direction (M+2, N+2)
+%   v_P   - Velocity magnitude at each node (M+2, N+2)
 %--------------------------------------------------------------------------
 
     N = NumericalParameters.N;
     M = NumericalParameters.M;
-    rho_ref = Geometry.rho_ref;
 
-    % Initialize velocity arrays
-    v_x = zeros(N+2, M+2); 
-    v_y = zeros(N+2, M+2);
+    % Initialize velocity arrays (M+2, N+2)
+    v_xP = zeros(M+2, N+2); 
+    v_yP = zeros(M+2, N+2);
 
     % Initialize density ratio arrays for blocking-off method
-    rr_re = zeros(N+2, M+2);
-    rr_rw = zeros(N+2, M+2);
-    rr_rn = zeros(N+2, M+2);
-    rr_rs = zeros(N+2, M+2);
+    rr_re = zeros(M+2, N+2);
+    rr_rw = zeros(M+2, N+2);
+    rr_rn = zeros(M+2, N+2);
+    rr_rs = zeros(M+2, N+2);
 
     % Boundary conditions
     
     % Top and bottom walls → Tangential velocity = 0
     for i = 1:N+2
-        v_y(i, 1) = 0;      % Bottom wall
-        v_y(i, M+2) = 0;    % Top wall
+        v_yP(1, i) = 0;      % Bottom wall
+        v_yP(M+2, i) = 0;    % Top wall
     end
 
     % Developed flow at outlet
     for j = 1:M+2
-        v_x(N+2, j) = v_x(N+1, j);
-        v_y(N+2, j) = v_y(N+1, j);
+        v_xP(j, N+2) = v_xP(j, N+1);
+        v_yP(j, N+2) = v_yP(j, N+1);
     end
                 
-    % Channel inlet (x = 0) → Vin
+    % Channel inlet (x = 0) → v_in
     for j = 1:M+2
-        v_x(1, j) = Vin;
-        v_y(1, j) = 0;
+        v_xP(j, 1) = v_in;
+        v_yP(j, 1) = 0;
     end
 
     % Compute velocities at internal nodes
@@ -59,37 +57,37 @@ function [v_x, v_y, v_mag] = compute_vel(phi, X, Y, NumericalParameters, Vin, Ge
         for j = 2:M+1 
             
             % Blocking-off method: compute density ratios
-            rr_re(i,j) = (X(i+1,j) - X(i,j)) / ...
-                (((0.5 * (X(i+1,j) - X(i,j))) / (rho_ref / rho(i,j))) + ...
-                 ((0.5 * (X(i+1,j) - X(i,j))) / (rho_ref / rho(i+1,j))));
+            rr_re(j,i) = (x_P(i+1) - x_P(i)) / ...
+                (((0.5 * (x_P(i+1) - x_P(i))) / (rho_ref / rho(j,i))) + ...
+                 ((0.5 * (x_P(i+1) - x_P(i))) / (rho_ref / rho(j,i+1))));
             
-            rr_rw(i,j) = (X(i,j) - X(i-1,j)) / ...
-                (((0.5 * (X(i,j) - X(i-1,j))) / (rho_ref / rho(i,j))) + ...
-                 ((0.5 * (X(i,j) - X(i-1,j))) / (rho_ref / rho(i-1,j))));
+            rr_rw(j,i) = (x_P(i) - x_P(i-1)) / ...
+                (((0.5 * (x_P(i) - x_P(i-1))) / (rho_ref / rho(j,i))) + ...
+                 ((0.5 * (x_P(i) - x_P(i-1))) / (rho_ref / rho(j,i-1))));
             
-            rr_rn(i,j) = (Y(i,j+1) - Y(i,j)) / ...
-                (((0.5 * (Y(i,j+1) - Y(i,j))) / (rho_ref / rho(i,j))) + ...
-                 ((0.5 * (Y(i,j+1) - Y(i,j))) / (rho_ref / rho(i,j+1))));
+            rr_rn(j,i) = (y_P(j+1) - y_P(j)) / ...
+                (((0.5 * (y_P(j+1) - y_P(j))) / (rho_ref / rho(j,i))) + ...
+                 ((0.5 * (y_P(j+1) - y_P(j))) / (rho_ref / rho(j+1,i))));
             
-            rr_rs(i,j) = (Y(i,j) - Y(i,j-1)) / ...
-                (((0.5 * (Y(i,j) - Y(i,j-1))) / (rho_ref / rho(i,j))) + ...
-                 ((0.5 * (Y(i,j) - Y(i,j-1))) / (rho_ref / rho(i,j-1))));
+            rr_rs(j,i) = (y_P(j) - y_P(j-1)) / ...
+                (((0.5 * (y_P(j) - y_P(j-1))) / (rho_ref / rho(j,i))) + ...
+                 ((0.5 * (y_P(j) - y_P(j-1))) / (rho_ref / rho(j-1,i))));
             
             % Velocity at faces (using stream function derivatives)
-            % v_x = dphi/dy, v_y = -dphi/dx
-            v_xn = +(1/rr_rn(i,j)) * (phi(i,j+1) - phi(i,j)) / (Y(i,j+1) - Y(i,j));
-            v_xs = +(1/rr_rs(i,j)) * (phi(i,j) - phi(i,j-1)) / (Y(i,j) - Y(i,j-1));
-            v_ye = -(1/rr_re(i,j)) * (phi(i+1,j) - phi(i,j)) / (X(i+1,j) - X(i,j));
-            v_yw = -(1/rr_rw(i,j)) * (phi(i,j) - phi(i-1,j)) / (X(i,j) - X(i-1,j));
+            % v_x = dpsi/dy, v_y = -dpsi/dx
+            v_xn = +(1/rr_rn(j,i)) * (psi(j+1, i) - psi(j, i)) / (y_P(j+1) - y_P(j));
+            v_xs = +(1/rr_rs(j,i)) * (psi(j, i) - psi(j-1, i)) / (y_P(j) - y_P(j-1));
+            v_ye = -(1/rr_re(j,i)) * (psi(j, i+1) - psi(j, i)) / (x_P(i+1) - x_P(i));
+            v_yw = -(1/rr_rw(j,i)) * (psi(j, i) - psi(j, i-1)) / (x_P(i) - x_P(i-1));
             
             % Velocity components at nodes (average of face velocities)
-            v_x(i,j) = (v_xn + v_xs) / 2;
-            v_y(i,j) = (v_ye + v_yw) / 2;
+            v_xP(j, i) = (v_xn + v_xs) / 2;
+            v_yP(j, i) = (v_ye + v_yw) / 2;
 
         end
     end
     
-    % Velocity magnitude
-    v_mag = sqrt(v_x.^2 + v_y.^2); 
+    % Velocity magnitude (vectorized)
+    v_P = sqrt(v_xP.^2 + v_yP.^2); 
     
 end
