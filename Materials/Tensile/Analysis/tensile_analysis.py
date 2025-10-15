@@ -9,6 +9,8 @@ from scipy.signal import savgol_filter
 # ---------------- CONFIG ----------------
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, "../data")
+RESULTS_DIR = os.path.join(SCRIPT_DIR, "../results")
+os.makedirs(RESULTS_DIR, exist_ok=True)  # crea la carpeta si no existe
 PATTERN = os.path.join(DATA_DIR, "*.csv")
 
 # Geometría por nombre de fichero (ajusta A0 [mm^2], L0 [mm])
