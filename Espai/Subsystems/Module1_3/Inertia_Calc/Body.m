@@ -11,7 +11,7 @@ classdef Body
 
     methods
         % Constructor
-        function obj = Body(type, mass, r_cg, dims, orientation)
+        function obj = Body(type, mass, r_cg, dims, orientation, I_custom)
             obj.type = lower(type);
             obj.mass = mass;
             obj.r_cg = r_cg(:);
@@ -63,7 +63,11 @@ classdef Body
                         % Recordar que el cdg se encuentra en (a/3, b/3, h/2)
 
                     otherwise
-                        fprintf('Type error')
+                        if nargin  > 5
+                            obj.I_local = I_custom;
+                        else
+                            fprintf('Type error or I not introduced')
+                        end
                 end
                 % Y rotamos la matriz de inercia al SR global
                 %R = obj.orientation;
