@@ -1,0 +1,251 @@
+\input{Meta/PackagesNSetup}
+
+\begin{document}
+\input{Meta/CoverNHeaders}
+
+\newpage
+\tableofcontents
+
+\newpage
+\section{Problem Definition}
+
+The objective of this study is to simulate an incompressible, inviscid, and steady two-dimensional potential flow within a confined channel, analyzing the influence of a cylindrical obstacle on the velocity and pressure distributions. Both stationary and rotating configurations of the cylinder are examined in order to understand the effect of induced circulation on the flow field.
+
+\subsection{Uniform Potential Flow in a Two-Dimensional Channel}
+
+This initial configuration consists of a two-dimensional rectangular domain representing a straight channel. The flow is assumed uniform at the inlet with a prescribed constant velocity \( U \) in the streamwise direction and no normal velocity component at the upper and lower boundaries, which act as impermeable walls. This case serves as a baseline to validate the numerical solver under simple boundary conditions.
+
+% Figure suggestion:
+% \begin{figure}[h]
+% \centering
+% \includegraphics[width=0.7\textwidth]{channel_diagram.pdf}
+% \caption{Schematic of the computational domain for the plain channel.}
+% \end{figure}
+
+\subsection{Potential Flow in a Channel Containing a Stationary Cylinder}
+
+In this case, a solid, non-rotating circular cylinder is introduced at the mid-plane of the channel. The cylinder acts as an impermeable obstacle that modifies the potential flow field by imposing a constant stream function value at its surface, which represents the no-penetration condition.
+
+% Figure suggestion:
+% \begin{figure}[h]
+% \centering
+% \includegraphics[width=0.7\textwidth]{static_cylinder_diagram.pdf}
+% \caption{Configuration with a stationary cylinder inside the channel.}
+% \end{figure}
+
+\subsection{Potential Flow in a Channel with a Rotating Cylinder}
+
+Finally, the case of a rotating cylinder is considered. The angular velocity of the cylinder generates circulation in the surrounding flow field, which induces an asymmetric velocity distribution and produces lift due to the Magnus effect.
+
+% Figure suggestion:
+% \begin{figure}[h]
+% \centering
+% \includegraphics[width=0.7\textwidth]{rotating_cylinder_diagram.pdf}
+% \caption{Schematic of the rotating cylinder configuration.}
+% \end{figure}
+
+
+\section{Theoretical Background}
+
+\subsection{Formulation of Potential Flow}
+
+Potential flow theory describes the motion of an inviscid fluid in regions where viscous effects, heat transfer, and rotational motion are negligible. Under these assumptions, the stress tensor simplifies as:
+\begin{equation}
+\tau_{ij} = 0.
+\end{equation}
+
+Additionally, the flow is considered irrotational:
+\begin{equation}
+\nabla \times \vec{v} = \vec{\omega} = 0,
+\end{equation}
+which implies that the velocity field can be expressed as the gradient of a scalar potential function:
+\begin{equation}
+\vec{v} = \nabla \phi.
+\end{equation}
+
+The velocity potential satisfies Laplace’s equation:
+\begin{equation}
+\nabla^2 \phi = 0,
+\end{equation}
+whose solution fully characterizes the inviscid flow within the domain, subject to appropriate boundary conditions on solid walls and at the inlet/outlet.
+
+% Comment: Potential flow theory neglects viscous boundary layers, making it ideal for understanding flow kinematics rather than real aerodynamic drag.
+
+\subsection{Stream Function Representation}
+
+For two-dimensional, incompressible, and steady flows, it is often convenient to employ the stream function \( \psi(x, y) \), defined such that:
+\begin{equation}
+v_x = \frac{\rho_{ref}}{\rho} \frac{\partial \psi}{\partial y}, \quad
+v_y = -\frac{\rho_{ref}}{\rho} \frac{\partial \psi}{\partial x}.
+\end{equation}
+
+The continuity equation is automatically satisfied by this definition. Applying the irrotationality condition yields:
+\begin{equation}
+\frac{\partial}{\partial x}\left(\frac{\rho_{ref}}{\rho} \frac{\partial \psi}{\partial x}\right)
++ \frac{\partial}{\partial y}\left(\frac{\rho_{ref}}{\rho} \frac{\partial \psi}{\partial y}\right) = 0,
+\end{equation}
+which constitutes the governing equation for the stream function in a potential flow.
+
+
+\section{Numerical Methodology}
+
+The governing Laplace-type equation for the stream function is discretized using a finite volume approach. For each control volume \( P \), Stokes’ theorem is applied, yielding the following flux balance:
+\begin{equation}
+\Gamma = \oint_C \vec{v} \cdot d\vec{\ell} \approx v_y^e \Delta y_P - v_x^n \Delta x_P - v_y^w \Delta y_P + v_x^s \Delta x_P = 0.
+\end{equation}
+
+Substituting the stream function relations and discretizing in both spatial directions:
+\begin{multline}
+-\frac{\rho_{ref}}{\rho_e} \frac{\psi_E - \psi_P}{d_{PE}} \Delta y_P
+-\frac{\rho_{ref}}{\rho_n} \frac{\psi_N - \psi_P}{d_{PN}} \Delta x_P \\
++\frac{\rho_{ref}}{\rho_w} \frac{\psi_P - \psi_W}{d_{PW}} \Delta y_P
++\frac{\rho_{ref}}{\rho_s} \frac{\psi_P - \psi_S}{d_{PS}} \Delta x_P = 0.
+\end{multline}
+
+This discretized equation leads to the following algebraic form:
+\begin{equation}
+a_{P;i,j}\,\psi_{i,j} = a_{E;i,j}\,\psi_{i+1,j} + a_{W;i,j}\,\psi_{i-1,j} +
+a_{N;i,j}\,\psi_{i,j+1} + a_{S;i,j}\,\psi_{i,j-1} + b_{P;i,j}.
+\end{equation}
+
+The resulting linear system formed by one equation per node is solved iteratively using the Gauss–Seidel algorithm until convergence below a specified residual threshold is achieved.
+
+% Comment: Explicitly mention relaxation factors or convergence criteria if implemented.
+% Example: residual < 1e-10 after ~10^5 iterations.
+\section{Code Structure}
+
+\section{Code Verification}
+
+\subsection{Validation Case 1: Uniform Potential Flow}
+
+\subsubsection{Analytical Reference Solution}
+
+For an inviscid and irrotational flow with uniform inlet velocity \( U \), the analytical stream function reads:
+\begin{equation}
+\psi(x, y) = -Vx + Uy,
+\end{equation}
+which represents a purely horizontal flow. This case is used to verify the solver’s ability to reproduce a constant velocity field.
+
+\subsubsection{Numerical Setup and Boundary Conditions}
+
+The computational domain has dimensions \( L \times H = 5 \times 1 \, \mathrm{m} \).
+Boundary conditions are imposed as follows:
+\begin{itemize}
+    \item \textbf{Inlet:} \( \psi(0, y) = Uy \).
+    \item \textbf{Outlet:} \( \frac{\partial \psi}{\partial x} = 0 \).
+    \item \textbf{Walls:} \( \psi = 0 \) at \( y=0 \) and \( y=H \).
+\end{itemize}
+
+A uniform inlet velocity of \( U = 1 \, \mathrm{m/s} \), \( T = 300 \, \mathrm{K} \), and \( p = 101{,}325 \, \mathrm{Pa} \) is prescribed. The numerical mesh consists of \( N = M = 20 \) divisions.
+
+% Figure suggestion: Velocity contour and streamline comparison.
+
+\subsubsection{Results and Discussion}
+
+The computed streamlines show uniform spacing and directionality along the channel.
+The horizontal velocity component \( v_x \) remains approximately constant throughout the domain, while \( v_y \approx 0 \), confirming the one-dimensional character of the flow.
+Temperature and pressure fields remain nearly uniform, as expected for a potential, incompressible flow.
+
+
+\subsection{Validation Case 2: Flow Around a Stationary Cylinder}
+
+\subsubsection{Analytical Solution}
+
+For an ideal potential flow around a stationary cylinder of radius \( R \) centered at \( (x_0, y_0) \), the stream function is given by:
+\begin{equation}
+\psi(x, y) = -Vx + Uy + \frac{\mu}{2\pi}
+\frac{(y - y_0)\cos\alpha - (x - x_0)\sin\alpha}{(x - x_0)^2 + (y - y_0)^2},
+\end{equation}
+representing the superposition of a uniform flow and a dipole potential.
+
+\subsubsection{Numerical Implementation}
+
+A structured Cartesian mesh is used to discretize the channel (\( L \times H = 2 \times 1 \, \mathrm{m} \)).
+Each grid node \( (x_P, y_P) \) is evaluated to determine whether it lies within the cylinder:
+\begin{equation}
+r_P = \sqrt{(x_P - x_c)^2 + (y_P - y_c)^2}.
+\end{equation}
+Nodes satisfying \( r_P < R \) are assigned a constant stream function value \( \psi_P = \psi_{body} = v_{in}(H/2) \), ensuring impermeability.
+The coefficients of solid elements are modified as:
+\begin{equation}
+a_P = 1, \quad a_E = a_W = a_N = a_S = 0, \quad b_P = \psi_{body}.
+\end{equation}
+This treatment ensures that solid nodes do not contribute to the external flow solution.
+
+\subsubsection{Numerical Results and Physical Analysis}
+
+The velocity field exhibits stagnation points at the front and rear of the cylinder, where the local velocity drops to zero, and maximum velocity along the lateral sides, reaching approximately twice the freestream value.
+The flow symmetry with respect to the horizontal axis confirms the irrotational nature of the solution.
+Temperature and pressure variations remain minimal due to the inviscid assumption.
+
+In accordance with d’Alembert’s paradox, both lift and drag coefficients approach zero:
+
+XXXXXXXXXXPOSAR RESULTATS REALSXXXXXXXXXXXXXX
+\begin{equation}
+C_L \approx 0, \quad C_D \approx 0.
+\end{equation}
+
+% Figure suggestion: velocity magnitude contour and streamlines around the cylinder.
+
+
+\subsection{Validation Case 3: Flow Around a Rotating Cylinder}
+
+\subsubsection{Analytical Model}
+
+When the cylinder rotates with angular velocity \( \omega \), the total stream function becomes:
+\begin{equation}
+\psi(x, y) = \psi_{\text{static}} - \frac{\Gamma}{2\pi} \ln\left( \sqrt{(x - x_0)^2 + (y - y_0)^2} \right),
+\end{equation}
+where the circulation \(\Gamma = 2\pi R^2 \omega\).
+
+\subsubsection{Implementation Details}
+
+The value of the stream function inside the rotating body is modified to include the rotational contribution:
+\begin{equation}
+\psi_{body} = v_{in}\left(\frac{H}{2}\right) + R_{cyl}^2 \omega.
+\end{equation}
+The numerical scheme remains identical to that of the stationary cylinder, except for this modification.
+
+\subsubsection{Results and Discussion}
+
+Rotation introduces a distinct asymmetry in the flow field.
+The stagnation points shift along the cylinder surface, and velocity increases on the side where the rotational motion aligns with the freestream velocity.
+Pressure decreases in these high-speed regions, giving rise to a net lift force consistent with the Magnus effect:
+\begin{equation}
+C_L \approx -\frac{\Gamma}{v_\infty R_{cyl}}, \qquad C_D \approx 0.
+\end{equation}
+This confirms that rotation induces circulation and consequently lift, while drag remains negligible in potential flow.
+
+% Figure suggestion: asymmetric pressure and velocity distributions around the rotating cylinder.
+
+
+\section{Numerical Analysis}
+
+\subsection{Grid Convergence Study}
+
+To evaluate numerical accuracy, the velocity field computed around a stationary cylinder is compared with the analytical solution for increasing mesh resolutions.
+The pointwise difference between both fields defines the local error, which is filtered to remove outliers.
+As shown by the trend, the global error decreases monotonically with finer mesh discretization, confirming the consistency and convergence of the implemented method.
+
+% Figure suggestion: log-log plot of velocity error vs. grid size.
+
+\subsection{Normalized Error as a Function of the Relaxation Parameter \texorpdfstring{$\delta$}{δ}}
+
+The normalized error of the velocity magnitude \( v_P \) is analyzed as a function of the convergence parameter \( \delta \) for different grid densities.
+Each error curve is normalized by its maximum to facilitate comparison.
+Results show that smaller \(\delta\) values yield higher accuracy, though with diminishing returns beyond a certain threshold.
+Finer meshes consistently exhibit lower errors across all \(\delta\), confirming the numerical stability of the method.
+
+% Figure suggestion: error vs. delta in linear and logarithmic scales.
+
+
+\section{Conclusions}
+
+A numerical model for two-dimensional potential flow in a channel has been successfully implemented and validated.
+The solver accurately reproduces theoretical results for uniform flow, flow around a stationary cylinder, and flow around a rotating cylinder.
+The inclusion of rotation correctly induces circulation and lift, consistent with the Magnus effect, while drag remains negligible.
+
+Mesh refinement studies confirm numerical convergence, and the method demonstrates robustness and reliability for analyzing inviscid, incompressible flows around bluff bodies.
+The developed framework can serve as a foundation for more complex simulations, such as compressible or viscous flow extensions.
+
+\end{document}

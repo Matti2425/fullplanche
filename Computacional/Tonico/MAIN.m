@@ -17,7 +17,7 @@ close all;
 %MESH=1 -->Plot the mesh(NOT RECOMENDED); MESH=0 -->Don't plot the mesh
 %PLOT=1 for v_P, 2 for v_xP, 3 for v_yP, 4 for p_P, 5 for T_P-->Plot the variable field in a colormap.
 
-CASE=2; SLINES=1; MESH=0; PLOT=1;
+CASE=3; SLINES=1; MESH=0; PLOT=5;
 
 %--------------------------------------------------------------------------
 
