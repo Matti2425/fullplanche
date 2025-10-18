@@ -152,13 +152,11 @@ end
 
 %% Plotting - Convergence Study
 
-% Figure 1: L2-norm convergence
-figure('Name', 'Convergence Study - L2-norm', 'NumberTitle', 'off', 'Position', [100, 100, 800, 600]);
+% Figure 1: L2-norm convergence (Case 1)
+figure('Name', 'Convergence Study - L2-norm (Case 1)', 'NumberTitle', 'off', 'Position', [100, 100, 800, 600]);
 hold on;
 dx_ref = convergence_data.dx;
-for case_idx = 1:num_cases
-    loglog(convergence_data.dx, convergence_data.L2_error(case_idx, :), '-', 'LineWidth', 2);
-end
+loglog(convergence_data.dx, convergence_data.L2_error(1, :), '-', 'LineWidth', 2);
 % Plot reference lines (1st and 2nd order convergence)
 e_ref_1st = convergence_data.L2_error(1, 1) * (dx_ref / dx_ref(1)).^1;
 e_ref_2nd = convergence_data.L2_error(1, 1) * (dx_ref / dx_ref(1)).^2;
@@ -167,17 +165,15 @@ loglog(dx_ref, e_ref_2nd, 'k:', 'LineWidth', 1.5, 'DisplayName', '2nd Order');
 hold off;
 xlabel('Grid Spacing (dx)');
 ylabel('L2-norm Error');
-title('L2-norm Convergence');
-legend('Case 1', 'Case 2', 'Case 3', '1st Order', '2nd Order');
+title('L2-norm Convergence (Case 1 - Channel Flow)');
+legend('Case 1', '1st Order', '2nd Order');
 grid on;
 set(gca, 'XDir', 'reverse');
 
-% Figure 2: L-infinity norm convergence
-figure('Name', 'Convergence Study - L∞-norm', 'NumberTitle', 'off', 'Position', [950, 100, 800, 600]);
+% Figure 2: L-infinity norm convergence (Case 1)
+figure('Name', 'Convergence Study - L∞-norm (Case 1)', 'NumberTitle', 'off', 'Position', [950, 100, 800, 600]);
 hold on;
-for case_idx = 1:num_cases
-    loglog(convergence_data.dx, convergence_data.Linf_error(case_idx, :), '-', 'LineWidth', 2);
-end
+loglog(convergence_data.dx, convergence_data.Linf_error(1, :), '-', 'LineWidth', 2);
 % Plot reference lines
 e_ref_1st_inf = convergence_data.Linf_error(1, 1) * (dx_ref / dx_ref(1)).^1;
 e_ref_2nd_inf = convergence_data.Linf_error(1, 1) * (dx_ref / dx_ref(1)).^2;
@@ -186,36 +182,28 @@ loglog(dx_ref, e_ref_2nd_inf, 'k:', 'LineWidth', 1.5, 'DisplayName', '2nd Order'
 hold off;
 xlabel('Grid Spacing (dx)');
 ylabel('L∞-norm Error');
-title('L∞-norm Convergence');
-legend('Case 1', 'Case 2', 'Case 3', '1st Order', '2nd Order');
+title('L∞-norm Convergence (Case 1 - Channel Flow)');
+legend('Case 1', '1st Order', '2nd Order');
 grid on;
 set(gca, 'XDir', 'reverse');
 
-% Figure 3: Iterations vs Mesh Size
-figure('Name', 'Convergence Study - Iterations', 'NumberTitle', 'off', 'Position', [100, 750, 800, 600]);
-hold on;
-for case_idx = 1:num_cases
-    semilogy(mesh_sizes, convergence_data.iterations(case_idx, :), '-', 'LineWidth', 2);
-end
-hold off;
+% Figure 3: Iterations vs Mesh Size (Case 1)
+figure('Name', 'Convergence Study - Iterations (Case 1)', 'NumberTitle', 'off', 'Position', [100, 750, 800, 600]);
+semilogy(mesh_sizes, convergence_data.iterations(1, :), '-', 'LineWidth', 2);
 xlabel('Mesh Size (N = M)');
 ylabel('Number of Iterations');
-title('Solver Iterations vs Mesh Refinement');
-legend('Case 1', 'Case 2', 'Case 3');
+title('Solver Iterations vs Mesh Refinement (Case 1 - Channel Flow)');
+legend('Case 1');
 grid on;
 set(gca, 'XScale', 'log');
 
-% Figure 4: Solver Residual vs Mesh Size
-figure('Name', 'Convergence Study - Residual', 'NumberTitle', 'off', 'Position', [950, 750, 800, 600]);
-hold on;
-for case_idx = 1:num_cases
-    loglog(mesh_sizes, convergence_data.convergence_error(case_idx, :), '-', 'LineWidth', 2);
-end
-hold off;
+% Figure 4: Solver Residual vs Mesh Size (Case 1)
+figure('Name', 'Convergence Study - Residual (Case 1)', 'NumberTitle', 'off', 'Position', [950, 750, 800, 600]);
+loglog(mesh_sizes, convergence_data.convergence_error(1, :), '-', 'LineWidth', 2);
 xlabel('Mesh Size (N = M)');
 ylabel('Solver Residual');
-title('Solver Residual vs Mesh Refinement');
-legend('Case 1', 'Case 2', 'Case 3');
+title('Solver Residual vs Mesh Refinement (Case 1 - Channel Flow)');
+legend('Case 1');
 grid on;
 set(gca, 'XScale', 'log');
 
@@ -354,56 +342,40 @@ end
 
 %% Plotting - Tolerance Sensitivity Study
 
-% Figure 1: Absolute L2-norm error vs Tolerance
-figure('Name', 'Tolerance Study - Absolute L2-norm Error', 'NumberTitle', 'off', 'Position', [100, 100, 800, 600]);
-hold on;
-for case_idx = 1:num_cases
-    semilogx(tolerance_values, tolerance_data.L2_error(case_idx, :), '-', 'LineWidth', 2);
-end
-hold off;
+% Figure 1: Absolute L2-norm error vs Tolerance (Case 1)
+figure('Name', 'Tolerance Study - Absolute L2-norm Error (Case 1)', 'NumberTitle', 'off', 'Position', [100, 100, 800, 600]);
+semilogx(tolerance_values, tolerance_data.L2_error(1, :), '-', 'LineWidth', 2);
 xlabel('Solver Tolerance (Numerical.d)');
 ylabel('L2-norm Error');
-title('Absolute L2-norm Error vs Tolerance (Fixed Mesh 32×32)');
-legend('Case 1', 'Case 2', 'Case 3');
+title('Absolute L2-norm Error vs Tolerance (Case 1 - Channel Flow, Fixed Mesh 32×32)');
+legend('Case 1');
 grid on;
 
-% Figure 2: Absolute L∞-norm error vs Tolerance
-figure('Name', 'Tolerance Study - Absolute L∞-norm Error', 'NumberTitle', 'off', 'Position', [950, 100, 800, 600]);
-hold on;
-for case_idx = 1:num_cases
-    semilogx(tolerance_values, tolerance_data.Linf_error(case_idx, :), '-', 'LineWidth', 2);
-end
-hold off;
+% Figure 2: Absolute L∞-norm error vs Tolerance (Case 1)
+figure('Name', 'Tolerance Study - Absolute L∞-norm Error (Case 1)', 'NumberTitle', 'off', 'Position', [950, 100, 800, 600]);
+semilogx(tolerance_values, tolerance_data.Linf_error(1, :), '-', 'LineWidth', 2);
 xlabel('Solver Tolerance (Numerical.d)');
 ylabel('L∞-norm Error');
-title('Absolute L∞-norm Error vs Tolerance (Fixed Mesh 32×32)');
-legend('Case 1', 'Case 2', 'Case 3');
+title('Absolute L∞-norm Error vs Tolerance (Case 1 - Channel Flow, Fixed Mesh 32×32)');
+legend('Case 1');
 grid on;
 
-% Figure 3: Normalized L2-norm error vs Tolerance
-figure('Name', 'Tolerance Study - Normalized L2-norm Error', 'NumberTitle', 'off', 'Position', [100, 750, 800, 600]);
-hold on;
-for case_idx = 1:num_cases
-    semilogx(tolerance_values, tolerance_data.normalized_L2_error(case_idx, :), '-', 'LineWidth', 2);
-end
-hold off;
+% Figure 3: Normalized L2-norm error vs Tolerance (Case 1)
+figure('Name', 'Tolerance Study - Normalized L2-norm Error (Case 1)', 'NumberTitle', 'off', 'Position', [100, 750, 800, 600]);
+semilogx(tolerance_values, tolerance_data.normalized_L2_error(1, :), '-', 'LineWidth', 2);
 xlabel('Solver Tolerance (Numerical.d)');
 ylabel('Normalized L2-norm Error');
-title('Normalized L2-norm Error vs Tolerance (Fixed Mesh 32×32)');
-legend('Case 1', 'Case 2', 'Case 3');
+title('Normalized L2-norm Error vs Tolerance (Case 1 - Channel Flow, Fixed Mesh 32×32)');
+legend('Case 1');
 grid on;
 
-% Figure 4: Normalized L∞-norm error vs Tolerance
-figure('Name', 'Tolerance Study - Normalized L∞-norm Error', 'NumberTitle', 'off', 'Position', [950, 750, 800, 600]);
-hold on;
-for case_idx = 1:num_cases
-    semilogx(tolerance_values, tolerance_data.normalized_Linf_error(case_idx, :), '-', 'LineWidth', 2);
-end
-hold off;
+% Figure 4: Normalized L∞-norm error vs Tolerance (Case 1)
+figure('Name', 'Tolerance Study - Normalized L∞-norm Error (Case 1)', 'NumberTitle', 'off', 'Position', [950, 750, 800, 600]);
+semilogx(tolerance_values, tolerance_data.normalized_Linf_error(1, :), '-', 'LineWidth', 2);
 xlabel('Solver Tolerance (Numerical.d)');
 ylabel('Normalized L∞-norm Error');
-title('Normalized L∞-norm Error vs Tolerance (Fixed Mesh 32×32)');
-legend('Case 1', 'Case 2', 'Case 3');
+title('Normalized L∞-norm Error vs Tolerance (Case 1 - Channel Flow, Fixed Mesh 32×32)');
+legend('Case 1');
 grid on;
 
 %% Print Tolerance Study Summary Table
