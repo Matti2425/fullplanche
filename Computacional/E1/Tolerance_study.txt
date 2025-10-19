@@ -1,0 +1,1216 @@
+=== TOLERANCE SENSITIVITY STUDY ===
+Fixed mesh size: 32 x 32
+Tolerance values: 1e-08 5e-06 1e-05 2e-05 2e-05 3e-05 3e-05 4e-05 4e-05 5e-05 5e-05 6e-05 6e-05 7e-05 7e-05 8e-05 8e-05 9e-05 9e-05 1e-04 1e-04 1e-04 1e-04 1e-04 1e-04 1e-04 1e-04 1e-04 1e-04 1e-04 2e-04 2e-04 2e-04 2e-04 2e-04 2e-04 2e-04 2e-04 2e-04 2e-04 2e-04 2e-04 2e-04 2e-04 2e-04 2e-04 2e-04 2e-04 2e-04 2e-04 3e-04 3e-04 3e-04 3e-04 3e-04 3e-04 3e-04 3e-04 3e-04 3e-04 3e-04 3e-04 3e-04 3e-04 3e-04 3e-04 3e-04 3e-04 3e-04 3e-04 4e-04 4e-04 4e-04 4e-04 4e-04 4e-04 4e-04 4e-04 4e-04 4e-04 4e-04 4e-04 4e-04 4e-04 4e-04 4e-04 4e-04 4e-04 4e-04 4e-04 5e-04 5e-04 5e-04 5e-04 5e-04 5e-04 5e-04 5e-04 5e-04 5e-04 5e-04 5e-04 5e-04 5e-04 5e-04 5e-04 5e-04 5e-04 5e-04 5e-04 6e-04 6e-04 6e-04 6e-04 6e-04 6e-04 6e-04 6e-04 6e-04 6e-04 6e-04 6e-04 6e-04 6e-04 6e-04 6e-04 6e-04 6e-04 6e-04 6e-04 7e-04 7e-04 7e-04 7e-04 7e-04 7e-04 7e-04 7e-04 7e-04 7e-04 7e-04 7e-04 7e-04 7e-04 7e-04 7e-04 7e-04 7e-04 7e-04 7e-04 8e-04 8e-04 8e-04 8e-04 8e-04 8e-04 8e-04 8e-04 8e-04 8e-04 8e-04 8e-04 8e-04 8e-04 8e-04 8e-04 8e-04 8e-04 8e-04 8e-04 9e-04 9e-04 9e-04 9e-04 9e-04 9e-04 9e-04 9e-04 9e-04 9e-04 9e-04 9e-04 9e-04 9e-04 9e-04 9e-04 9e-04 9e-04 9e-04 9e-04 1e-03 1e-03 1e-03 1e-03 1e-03 1e-03 1e-03 1e-03 1e-03 1e-03 
+
+---------- CASE 1 (Tolerance Study) ----------
+Tolerance: 1e-08 ... L2=5.74e-07, L∞=1.23e-06, Norm L2=5.74e-07, Iter=1676, Time=0.05s
+Tolerance: 5e-06 ... L2=2.94e-04, L∞=6.26e-04, Norm L2=2.94e-04, Iter=900, Time=0.03s
+Tolerance: 1e-05 ... L2=5.87e-04, L∞=1.25e-03, Norm L2=5.87e-04, Iter=814, Time=0.03s
+Tolerance: 2e-05 ... L2=8.85e-04, L∞=1.87e-03, Norm L2=8.85e-04, Iter=763, Time=0.02s
+Tolerance: 2e-05 ... L2=1.19e-03, L∞=2.51e-03, Norm L2=1.19e-03, Iter=726, Time=0.03s
+Tolerance: 3e-05 ... L2=1.49e-03, L∞=3.14e-03, Norm L2=1.49e-03, Iter=698, Time=0.02s
+Tolerance: 3e-05 ... L2=1.80e-03, L∞=3.77e-03, Norm L2=1.80e-03, Iter=675, Time=0.02s
+Tolerance: 4e-05 ... L2=2.09e-03, L∞=4.39e-03, Norm L2=2.09e-03, Iter=656, Time=0.02s
+Tolerance: 4e-05 ... L2=2.40e-03, L∞=5.02e-03, Norm L2=2.40e-03, Iter=639, Time=0.02s
+Tolerance: 5e-05 ... L2=2.71e-03, L∞=5.66e-03, Norm L2=2.71e-03, Iter=624, Time=0.02s
+Tolerance: 5e-05 ... L2=3.01e-03, L∞=6.27e-03, Norm L2=3.01e-03, Iter=611, Time=0.02s
+Tolerance: 6e-05 ... L2=3.34e-03, L∞=6.95e-03, Norm L2=3.34e-03, Iter=598, Time=0.02s
+Tolerance: 6e-05 ... L2=3.65e-03, L∞=7.58e-03, Norm L2=3.65e-03, Iter=587, Time=0.01s
+Tolerance: 7e-05 ... L2=3.95e-03, L∞=8.21e-03, Norm L2=3.95e-03, Iter=577, Time=0.01s
+Tolerance: 7e-05 ... L2=4.25e-03, L∞=8.81e-03, Norm L2=4.25e-03, Iter=568, Time=0.01s
+Tolerance: 8e-05 ... L2=4.57e-03, L∞=9.46e-03, Norm L2=4.57e-03, Iter=559, Time=0.01s
+Tolerance: 8e-05 ... L2=4.87e-03, L∞=1.01e-02, Norm L2=4.87e-03, Iter=551, Time=0.01s
+Tolerance: 9e-05 ... L2=5.20e-03, L∞=1.07e-02, Norm L2=5.20e-03, Iter=543, Time=0.01s
+Tolerance: 9e-05 ... L2=5.50e-03, L∞=1.13e-02, Norm L2=5.50e-03, Iter=536, Time=0.01s
+Tolerance: 1e-04 ... L2=5.82e-03, L∞=1.20e-02, Norm L2=5.82e-03, Iter=529, Time=0.01s
+Tolerance: 1e-04 ... L2=6.15e-03, L∞=1.27e-02, Norm L2=6.15e-03, Iter=522, Time=0.01s
+Tolerance: 1e-04 ... L2=6.46e-03, L∞=1.33e-02, Norm L2=6.46e-03, Iter=516, Time=0.01s
+Tolerance: 1e-04 ... L2=6.78e-03, L∞=1.39e-02, Norm L2=6.78e-03, Iter=510, Time=0.01s
+Tolerance: 1e-04 ... L2=7.11e-03, L∞=1.46e-02, Norm L2=7.11e-03, Iter=504, Time=0.01s
+Tolerance: 1e-04 ... L2=7.40e-03, L∞=1.52e-02, Norm L2=7.40e-03, Iter=499, Time=0.01s
+Tolerance: 1e-04 ... L2=7.77e-03, L∞=1.59e-02, Norm L2=7.77e-03, Iter=493, Time=0.01s
+Tolerance: 1e-04 ... L2=8.09e-03, L∞=1.66e-02, Norm L2=8.09e-03, Iter=488, Time=0.01s
+Tolerance: 1e-04 ... L2=8.36e-03, L∞=1.71e-02, Norm L2=8.36e-03, Iter=484, Time=0.01s
+Tolerance: 1e-04 ... L2=8.70e-03, L∞=1.78e-02, Norm L2=8.70e-03, Iter=479, Time=0.01s
+Tolerance: 1e-04 ... L2=9.06e-03, L∞=1.85e-02, Norm L2=9.06e-03, Iter=474, Time=0.01s
+Tolerance: 2e-04 ... L2=9.35e-03, L∞=1.91e-02, Norm L2=9.35e-03, Iter=470, Time=0.01s
+Tolerance: 2e-04 ... L2=9.66e-03, L∞=1.97e-02, Norm L2=9.66e-03, Iter=466, Time=0.01s
+Tolerance: 2e-04 ... L2=9.98e-03, L∞=2.03e-02, Norm L2=9.98e-03, Iter=462, Time=0.01s
+Tolerance: 2e-04 ... L2=1.03e-02, L∞=2.09e-02, Norm L2=1.03e-02, Iter=458, Time=0.01s
+Tolerance: 2e-04 ... L2=1.06e-02, L∞=2.16e-02, Norm L2=1.06e-02, Iter=454, Time=0.01s
+Tolerance: 2e-04 ... L2=1.10e-02, L∞=2.23e-02, Norm L2=1.10e-02, Iter=450, Time=0.01s
+Tolerance: 2e-04 ... L2=1.13e-02, L∞=2.30e-02, Norm L2=1.13e-02, Iter=446, Time=0.01s
+Tolerance: 2e-04 ... L2=1.16e-02, L∞=2.36e-02, Norm L2=1.16e-02, Iter=443, Time=0.01s
+Tolerance: 2e-04 ... L2=1.20e-02, L∞=2.43e-02, Norm L2=1.20e-02, Iter=439, Time=0.01s
+Tolerance: 2e-04 ... L2=1.23e-02, L∞=2.49e-02, Norm L2=1.23e-02, Iter=436, Time=0.01s
+Tolerance: 2e-04 ... L2=1.26e-02, L∞=2.55e-02, Norm L2=1.26e-02, Iter=433, Time=0.01s
+Tolerance: 2e-04 ... L2=1.29e-02, L∞=2.61e-02, Norm L2=1.29e-02, Iter=430, Time=0.01s
+Tolerance: 2e-04 ... L2=1.33e-02, L∞=2.69e-02, Norm L2=1.33e-02, Iter=426, Time=0.01s
+Tolerance: 2e-04 ... L2=1.37e-02, L∞=2.75e-02, Norm L2=1.37e-02, Iter=423, Time=0.01s
+Tolerance: 2e-04 ... L2=1.40e-02, L∞=2.82e-02, Norm L2=1.40e-02, Iter=420, Time=0.01s
+Tolerance: 2e-04 ... L2=1.42e-02, L∞=2.86e-02, Norm L2=1.42e-02, Iter=418, Time=0.01s
+Tolerance: 2e-04 ... L2=1.46e-02, L∞=2.93e-02, Norm L2=1.46e-02, Iter=415, Time=0.01s
+Tolerance: 2e-04 ... L2=1.49e-02, L∞=3.00e-02, Norm L2=1.49e-02, Iter=412, Time=0.01s
+Tolerance: 2e-04 ... L2=1.53e-02, L∞=3.07e-02, Norm L2=1.53e-02, Iter=409, Time=0.01s
+Tolerance: 2e-04 ... L2=1.57e-02, L∞=3.15e-02, Norm L2=1.57e-02, Iter=406, Time=0.01s
+Tolerance: 3e-04 ... L2=1.59e-02, L∞=3.19e-02, Norm L2=1.59e-02, Iter=404, Time=0.01s
+Tolerance: 3e-04 ... L2=1.63e-02, L∞=3.27e-02, Norm L2=1.63e-02, Iter=401, Time=0.01s
+Tolerance: 3e-04 ... L2=1.66e-02, L∞=3.32e-02, Norm L2=1.66e-02, Iter=399, Time=0.01s
+Tolerance: 3e-04 ... L2=1.70e-02, L∞=3.40e-02, Norm L2=1.70e-02, Iter=396, Time=0.01s
+Tolerance: 3e-04 ... L2=1.73e-02, L∞=3.45e-02, Norm L2=1.73e-02, Iter=394, Time=0.01s
+Tolerance: 3e-04 ... L2=1.77e-02, L∞=3.54e-02, Norm L2=1.77e-02, Iter=391, Time=0.01s
+Tolerance: 3e-04 ... L2=1.80e-02, L∞=3.59e-02, Norm L2=1.80e-02, Iter=389, Time=0.01s
+Tolerance: 3e-04 ... L2=1.83e-02, L∞=3.65e-02, Norm L2=1.83e-02, Iter=387, Time=0.01s
+Tolerance: 3e-04 ... L2=1.87e-02, L∞=3.73e-02, Norm L2=1.87e-02, Iter=384, Time=0.01s
+Tolerance: 3e-04 ... L2=1.90e-02, L∞=3.79e-02, Norm L2=1.90e-02, Iter=382, Time=0.01s
+Tolerance: 3e-04 ... L2=1.93e-02, L∞=3.85e-02, Norm L2=1.93e-02, Iter=380, Time=0.01s
+Tolerance: 3e-04 ... L2=1.96e-02, L∞=3.91e-02, Norm L2=1.96e-02, Iter=378, Time=0.01s
+Tolerance: 3e-04 ... L2=2.00e-02, L∞=3.97e-02, Norm L2=2.00e-02, Iter=376, Time=0.01s
+Tolerance: 3e-04 ... L2=2.03e-02, L∞=4.03e-02, Norm L2=2.03e-02, Iter=374, Time=0.01s
+Tolerance: 3e-04 ... L2=2.06e-02, L∞=4.10e-02, Norm L2=2.06e-02, Iter=372, Time=0.01s
+Tolerance: 3e-04 ... L2=2.09e-02, L∞=4.16e-02, Norm L2=2.09e-02, Iter=370, Time=0.01s
+Tolerance: 3e-04 ... L2=2.13e-02, L∞=4.23e-02, Norm L2=2.13e-02, Iter=368, Time=0.01s
+Tolerance: 3e-04 ... L2=2.16e-02, L∞=4.29e-02, Norm L2=2.16e-02, Iter=366, Time=0.01s
+Tolerance: 3e-04 ... L2=2.20e-02, L∞=4.36e-02, Norm L2=2.20e-02, Iter=364, Time=0.01s
+Tolerance: 3e-04 ... L2=2.23e-02, L∞=4.43e-02, Norm L2=2.23e-02, Iter=362, Time=0.01s
+Tolerance: 4e-04 ... L2=2.27e-02, L∞=4.50e-02, Norm L2=2.27e-02, Iter=360, Time=0.01s
+Tolerance: 4e-04 ... L2=2.31e-02, L∞=4.57e-02, Norm L2=2.31e-02, Iter=358, Time=0.01s
+Tolerance: 4e-04 ... L2=2.35e-02, L∞=4.64e-02, Norm L2=2.35e-02, Iter=356, Time=0.01s
+Tolerance: 4e-04 ... L2=2.38e-02, L∞=4.71e-02, Norm L2=2.38e-02, Iter=354, Time=0.01s
+Tolerance: 4e-04 ... L2=2.40e-02, L∞=4.75e-02, Norm L2=2.40e-02, Iter=353, Time=0.01s
+Tolerance: 4e-04 ... L2=2.44e-02, L∞=4.82e-02, Norm L2=2.44e-02, Iter=351, Time=0.01s
+Tolerance: 4e-04 ... L2=2.48e-02, L∞=4.90e-02, Norm L2=2.48e-02, Iter=349, Time=0.01s
+Tolerance: 4e-04 ... L2=2.52e-02, L∞=4.97e-02, Norm L2=2.52e-02, Iter=347, Time=0.01s
+Tolerance: 4e-04 ... L2=2.54e-02, L∞=5.01e-02, Norm L2=2.54e-02, Iter=346, Time=0.01s
+Tolerance: 4e-04 ... L2=2.58e-02, L∞=5.09e-02, Norm L2=2.58e-02, Iter=344, Time=0.01s
+Tolerance: 4e-04 ... L2=2.63e-02, L∞=5.17e-02, Norm L2=2.63e-02, Iter=342, Time=0.01s
+Tolerance: 4e-04 ... L2=2.65e-02, L∞=5.21e-02, Norm L2=2.65e-02, Iter=341, Time=0.01s
+Tolerance: 4e-04 ... L2=2.69e-02, L∞=5.29e-02, Norm L2=2.69e-02, Iter=339, Time=0.01s
+Tolerance: 4e-04 ... L2=2.73e-02, L∞=5.37e-02, Norm L2=2.73e-02, Iter=337, Time=0.01s
+Tolerance: 4e-04 ... L2=2.76e-02, L∞=5.42e-02, Norm L2=2.76e-02, Iter=336, Time=0.01s
+Tolerance: 4e-04 ... L2=2.80e-02, L∞=5.50e-02, Norm L2=2.80e-02, Iter=334, Time=0.01s
+Tolerance: 4e-04 ... L2=2.82e-02, L∞=5.54e-02, Norm L2=2.82e-02, Iter=333, Time=0.01s
+Tolerance: 4e-04 ... L2=2.87e-02, L∞=5.63e-02, Norm L2=2.87e-02, Iter=331, Time=0.01s
+Tolerance: 4e-04 ... L2=2.89e-02, L∞=5.67e-02, Norm L2=2.89e-02, Iter=330, Time=0.01s
+Tolerance: 4e-04 ... L2=2.94e-02, L∞=5.76e-02, Norm L2=2.94e-02, Iter=328, Time=0.01s
+Tolerance: 5e-04 ... L2=2.96e-02, L∞=5.81e-02, Norm L2=2.96e-02, Iter=327, Time=0.01s
+Tolerance: 5e-04 ... L2=3.01e-02, L∞=5.90e-02, Norm L2=3.01e-02, Iter=325, Time=0.01s
+Tolerance: 5e-04 ... L2=3.04e-02, L∞=5.94e-02, Norm L2=3.04e-02, Iter=324, Time=0.01s
+Tolerance: 5e-04 ... L2=3.09e-02, L∞=6.03e-02, Norm L2=3.09e-02, Iter=322, Time=0.01s
+Tolerance: 5e-04 ... L2=3.11e-02, L∞=6.08e-02, Norm L2=3.11e-02, Iter=321, Time=0.01s
+Tolerance: 5e-04 ... L2=3.14e-02, L∞=6.13e-02, Norm L2=3.14e-02, Iter=320, Time=0.01s
+Tolerance: 5e-04 ... L2=3.19e-02, L∞=6.22e-02, Norm L2=3.19e-02, Iter=318, Time=0.01s
+Tolerance: 5e-04 ... L2=3.21e-02, L∞=6.27e-02, Norm L2=3.21e-02, Iter=317, Time=0.01s
+Tolerance: 5e-04 ... L2=3.24e-02, L∞=6.32e-02, Norm L2=3.24e-02, Iter=316, Time=0.01s
+Tolerance: 5e-04 ... L2=3.29e-02, L∞=6.42e-02, Norm L2=3.29e-02, Iter=314, Time=0.01s
+Tolerance: 5e-04 ... L2=3.32e-02, L∞=6.47e-02, Norm L2=3.32e-02, Iter=313, Time=0.01s
+Tolerance: 5e-04 ... L2=3.35e-02, L∞=6.52e-02, Norm L2=3.35e-02, Iter=312, Time=0.01s
+Tolerance: 5e-04 ... L2=3.40e-02, L∞=6.62e-02, Norm L2=3.40e-02, Iter=310, Time=0.01s
+Tolerance: 5e-04 ... L2=3.43e-02, L∞=6.67e-02, Norm L2=3.43e-02, Iter=309, Time=0.01s
+Tolerance: 5e-04 ... L2=3.46e-02, L∞=6.72e-02, Norm L2=3.46e-02, Iter=308, Time=0.01s
+Tolerance: 5e-04 ... L2=3.51e-02, L∞=6.83e-02, Norm L2=3.51e-02, Iter=306, Time=0.01s
+Tolerance: 5e-04 ... L2=3.54e-02, L∞=6.88e-02, Norm L2=3.54e-02, Iter=305, Time=0.01s
+Tolerance: 5e-04 ... L2=3.57e-02, L∞=6.93e-02, Norm L2=3.57e-02, Iter=304, Time=0.01s
+Tolerance: 5e-04 ... L2=3.60e-02, L∞=6.99e-02, Norm L2=3.60e-02, Iter=303, Time=0.01s
+Tolerance: 5e-04 ... L2=3.66e-02, L∞=7.09e-02, Norm L2=3.66e-02, Iter=301, Time=0.01s
+Tolerance: 6e-04 ... L2=3.69e-02, L∞=7.15e-02, Norm L2=3.69e-02, Iter=300, Time=0.01s
+Tolerance: 6e-04 ... L2=3.72e-02, L∞=7.20e-02, Norm L2=3.72e-02, Iter=299, Time=0.01s
+Tolerance: 6e-04 ... L2=3.75e-02, L∞=7.26e-02, Norm L2=3.75e-02, Iter=298, Time=0.01s
+Tolerance: 6e-04 ... L2=3.78e-02, L∞=7.32e-02, Norm L2=3.78e-02, Iter=297, Time=0.01s
+Tolerance: 6e-04 ... L2=3.81e-02, L∞=7.37e-02, Norm L2=3.81e-02, Iter=296, Time=0.01s
+Tolerance: 6e-04 ... L2=3.87e-02, L∞=7.49e-02, Norm L2=3.87e-02, Iter=294, Time=0.01s
+Tolerance: 6e-04 ... L2=3.90e-02, L∞=7.54e-02, Norm L2=3.90e-02, Iter=293, Time=0.01s
+Tolerance: 6e-04 ... L2=3.94e-02, L∞=7.60e-02, Norm L2=3.94e-02, Iter=292, Time=0.01s
+Tolerance: 6e-04 ... L2=3.97e-02, L∞=7.66e-02, Norm L2=3.97e-02, Iter=291, Time=0.01s
+Tolerance: 6e-04 ... L2=4.00e-02, L∞=7.72e-02, Norm L2=4.00e-02, Iter=290, Time=0.01s
+Tolerance: 6e-04 ... L2=4.03e-02, L∞=7.78e-02, Norm L2=4.03e-02, Iter=289, Time=0.01s
+Tolerance: 6e-04 ... L2=4.06e-02, L∞=7.84e-02, Norm L2=4.06e-02, Iter=288, Time=0.01s
+Tolerance: 6e-04 ... L2=4.10e-02, L∞=7.90e-02, Norm L2=4.10e-02, Iter=287, Time=0.01s
+Tolerance: 6e-04 ... L2=4.16e-02, L∞=8.02e-02, Norm L2=4.16e-02, Iter=285, Time=0.01s
+Tolerance: 6e-04 ... L2=4.20e-02, L∞=8.08e-02, Norm L2=4.20e-02, Iter=284, Time=0.01s
+Tolerance: 6e-04 ... L2=4.23e-02, L∞=8.15e-02, Norm L2=4.23e-02, Iter=283, Time=0.01s
+Tolerance: 6e-04 ... L2=4.27e-02, L∞=8.21e-02, Norm L2=4.27e-02, Iter=282, Time=0.01s
+Tolerance: 6e-04 ... L2=4.30e-02, L∞=8.27e-02, Norm L2=4.30e-02, Iter=281, Time=0.01s
+Tolerance: 6e-04 ... L2=4.34e-02, L∞=8.34e-02, Norm L2=4.34e-02, Iter=280, Time=0.01s
+Tolerance: 6e-04 ... L2=4.37e-02, L∞=8.40e-02, Norm L2=4.37e-02, Iter=279, Time=0.01s
+Tolerance: 7e-04 ... L2=4.41e-02, L∞=8.46e-02, Norm L2=4.41e-02, Iter=278, Time=0.01s
+Tolerance: 7e-04 ... L2=4.44e-02, L∞=8.53e-02, Norm L2=4.44e-02, Iter=277, Time=0.01s
+Tolerance: 7e-04 ... L2=4.48e-02, L∞=8.59e-02, Norm L2=4.48e-02, Iter=276, Time=0.01s
+Tolerance: 7e-04 ... L2=4.52e-02, L∞=8.66e-02, Norm L2=4.52e-02, Iter=275, Time=0.01s
+Tolerance: 7e-04 ... L2=4.55e-02, L∞=8.73e-02, Norm L2=4.55e-02, Iter=274, Time=0.01s
+Tolerance: 7e-04 ... L2=4.59e-02, L∞=8.79e-02, Norm L2=4.59e-02, Iter=273, Time=0.01s
+Tolerance: 7e-04 ... L2=4.63e-02, L∞=8.86e-02, Norm L2=4.63e-02, Iter=272, Time=0.01s
+Tolerance: 7e-04 ... L2=4.67e-02, L∞=8.93e-02, Norm L2=4.67e-02, Iter=271, Time=0.01s
+Tolerance: 7e-04 ... L2=4.70e-02, L∞=9.00e-02, Norm L2=4.70e-02, Iter=270, Time=0.01s
+Tolerance: 7e-04 ... L2=4.74e-02, L∞=9.07e-02, Norm L2=4.74e-02, Iter=269, Time=0.01s
+Tolerance: 7e-04 ... L2=4.78e-02, L∞=9.14e-02, Norm L2=4.78e-02, Iter=268, Time=0.01s
+Tolerance: 7e-04 ... L2=4.82e-02, L∞=9.21e-02, Norm L2=4.82e-02, Iter=267, Time=0.01s
+Tolerance: 7e-04 ... L2=4.86e-02, L∞=9.28e-02, Norm L2=4.86e-02, Iter=266, Time=0.01s
+Tolerance: 7e-04 ... L2=4.90e-02, L∞=9.35e-02, Norm L2=4.90e-02, Iter=265, Time=0.01s
+Tolerance: 7e-04 ... L2=4.94e-02, L∞=9.42e-02, Norm L2=4.94e-02, Iter=264, Time=0.01s
+Tolerance: 7e-04 ... L2=4.94e-02, L∞=9.42e-02, Norm L2=4.94e-02, Iter=264, Time=0.01s
+Tolerance: 7e-04 ... L2=4.98e-02, L∞=9.49e-02, Norm L2=4.98e-02, Iter=263, Time=0.01s
+Tolerance: 7e-04 ... L2=5.02e-02, L∞=9.57e-02, Norm L2=5.02e-02, Iter=262, Time=0.01s
+Tolerance: 7e-04 ... L2=5.06e-02, L∞=9.64e-02, Norm L2=5.06e-02, Iter=261, Time=0.01s
+Tolerance: 7e-04 ... L2=5.10e-02, L∞=9.71e-02, Norm L2=5.10e-02, Iter=260, Time=0.01s
+Tolerance: 8e-04 ... L2=5.14e-02, L∞=9.79e-02, Norm L2=5.14e-02, Iter=259, Time=0.01s
+Tolerance: 8e-04 ... L2=5.18e-02, L∞=9.86e-02, Norm L2=5.18e-02, Iter=258, Time=0.01s
+Tolerance: 8e-04 ... L2=5.23e-02, L∞=9.94e-02, Norm L2=5.23e-02, Iter=257, Time=0.01s
+Tolerance: 8e-04 ... L2=5.27e-02, L∞=1.00e-01, Norm L2=5.27e-02, Iter=256, Time=0.01s
+Tolerance: 8e-04 ... L2=5.27e-02, L∞=1.00e-01, Norm L2=5.27e-02, Iter=256, Time=0.01s
+Tolerance: 8e-04 ... L2=5.31e-02, L∞=1.01e-01, Norm L2=5.31e-02, Iter=255, Time=0.01s
+Tolerance: 8e-04 ... L2=5.35e-02, L∞=1.02e-01, Norm L2=5.35e-02, Iter=254, Time=0.01s
+Tolerance: 8e-04 ... L2=5.40e-02, L∞=1.02e-01, Norm L2=5.40e-02, Iter=253, Time=0.01s
+Tolerance: 8e-04 ... L2=5.44e-02, L∞=1.03e-01, Norm L2=5.44e-02, Iter=252, Time=0.01s
+Tolerance: 8e-04 ... L2=5.49e-02, L∞=1.04e-01, Norm L2=5.49e-02, Iter=251, Time=0.01s
+Tolerance: 8e-04 ... L2=5.53e-02, L∞=1.05e-01, Norm L2=5.53e-02, Iter=250, Time=0.01s
+Tolerance: 8e-04 ... L2=5.53e-02, L∞=1.05e-01, Norm L2=5.53e-02, Iter=250, Time=0.01s
+Tolerance: 8e-04 ... L2=5.58e-02, L∞=1.06e-01, Norm L2=5.58e-02, Iter=249, Time=0.01s
+Tolerance: 8e-04 ... L2=5.62e-02, L∞=1.06e-01, Norm L2=5.62e-02, Iter=248, Time=0.01s
+Tolerance: 8e-04 ... L2=5.67e-02, L∞=1.07e-01, Norm L2=5.67e-02, Iter=247, Time=0.01s
+Tolerance: 8e-04 ... L2=5.71e-02, L∞=1.08e-01, Norm L2=5.71e-02, Iter=246, Time=0.01s
+Tolerance: 8e-04 ... L2=5.71e-02, L∞=1.08e-01, Norm L2=5.71e-02, Iter=246, Time=0.01s
+Tolerance: 8e-04 ... L2=5.76e-02, L∞=1.09e-01, Norm L2=5.76e-02, Iter=245, Time=0.01s
+Tolerance: 8e-04 ... L2=5.81e-02, L∞=1.10e-01, Norm L2=5.81e-02, Iter=244, Time=0.01s
+Tolerance: 8e-04 ... L2=5.85e-02, L∞=1.11e-01, Norm L2=5.85e-02, Iter=243, Time=0.01s
+Tolerance: 9e-04 ... L2=5.90e-02, L∞=1.11e-01, Norm L2=5.90e-02, Iter=242, Time=0.01s
+Tolerance: 9e-04 ... L2=5.90e-02, L∞=1.11e-01, Norm L2=5.90e-02, Iter=242, Time=0.01s
+Tolerance: 9e-04 ... L2=5.95e-02, L∞=1.12e-01, Norm L2=5.95e-02, Iter=241, Time=0.01s
+Tolerance: 9e-04 ... L2=6.00e-02, L∞=1.13e-01, Norm L2=6.00e-02, Iter=240, Time=0.01s
+Tolerance: 9e-04 ... L2=6.05e-02, L∞=1.14e-01, Norm L2=6.05e-02, Iter=239, Time=0.01s
+Tolerance: 9e-04 ... L2=6.10e-02, L∞=1.15e-01, Norm L2=6.10e-02, Iter=238, Time=0.01s
+Tolerance: 9e-04 ... L2=6.10e-02, L∞=1.15e-01, Norm L2=6.10e-02, Iter=238, Time=0.01s
+Tolerance: 9e-04 ... L2=6.15e-02, L∞=1.16e-01, Norm L2=6.15e-02, Iter=237, Time=0.01s
+Tolerance: 9e-04 ... L2=6.20e-02, L∞=1.17e-01, Norm L2=6.20e-02, Iter=236, Time=0.01s
+Tolerance: 9e-04 ... L2=6.25e-02, L∞=1.18e-01, Norm L2=6.25e-02, Iter=235, Time=0.01s
+Tolerance: 9e-04 ... L2=6.25e-02, L∞=1.18e-01, Norm L2=6.25e-02, Iter=235, Time=0.01s
+Tolerance: 9e-04 ... L2=6.30e-02, L∞=1.18e-01, Norm L2=6.30e-02, Iter=234, Time=0.01s
+Tolerance: 9e-04 ... L2=6.35e-02, L∞=1.19e-01, Norm L2=6.35e-02, Iter=233, Time=0.01s
+Tolerance: 9e-04 ... L2=6.40e-02, L∞=1.20e-01, Norm L2=6.40e-02, Iter=232, Time=0.01s
+Tolerance: 9e-04 ... L2=6.40e-02, L∞=1.20e-01, Norm L2=6.40e-02, Iter=232, Time=0.01s
+Tolerance: 9e-04 ... L2=6.45e-02, L∞=1.21e-01, Norm L2=6.45e-02, Iter=231, Time=0.01s
+Tolerance: 9e-04 ... L2=6.51e-02, L∞=1.22e-01, Norm L2=6.51e-02, Iter=230, Time=0.01s
+Tolerance: 9e-04 ... L2=6.51e-02, L∞=1.22e-01, Norm L2=6.51e-02, Iter=230, Time=0.01s
+Tolerance: 9e-04 ... L2=6.56e-02, L∞=1.23e-01, Norm L2=6.56e-02, Iter=229, Time=0.01s
+Tolerance: 9e-04 ... L2=6.61e-02, L∞=1.24e-01, Norm L2=6.61e-02, Iter=228, Time=0.01s
+Tolerance: 1e-03 ... L2=6.67e-02, L∞=1.25e-01, Norm L2=6.67e-02, Iter=227, Time=0.01s
+Tolerance: 1e-03 ... L2=6.67e-02, L∞=1.25e-01, Norm L2=6.67e-02, Iter=227, Time=0.01s
+Tolerance: 1e-03 ... L2=6.72e-02, L∞=1.26e-01, Norm L2=6.72e-02, Iter=226, Time=0.01s
+Tolerance: 1e-03 ... L2=6.78e-02, L∞=1.27e-01, Norm L2=6.78e-02, Iter=225, Time=0.01s
+Tolerance: 1e-03 ... L2=6.78e-02, L∞=1.27e-01, Norm L2=6.78e-02, Iter=225, Time=0.01s
+Tolerance: 1e-03 ... L2=6.83e-02, L∞=1.28e-01, Norm L2=6.83e-02, Iter=224, Time=0.01s
+Tolerance: 1e-03 ... L2=6.89e-02, L∞=1.29e-01, Norm L2=6.89e-02, Iter=223, Time=0.01s
+Tolerance: 1e-03 ... L2=6.89e-02, L∞=1.29e-01, Norm L2=6.89e-02, Iter=223, Time=0.01s
+Tolerance: 1e-03 ... L2=6.94e-02, L∞=1.30e-01, Norm L2=6.94e-02, Iter=222, Time=0.01s
+Tolerance: 1e-03 ... L2=7.00e-02, L∞=1.31e-01, Norm L2=7.00e-02, Iter=221, Time=0.01s
+
+---------- CASE 2 (Tolerance Study) ----------
+Tolerance: 1e-08 ... L2=2.41e-02, L∞=1.43e-01, Norm L2=2.36e-02, Iter=1459, Time=0.04s
+Tolerance: 5e-06 ... L2=2.41e-02, L∞=1.43e-01, Norm L2=2.36e-02, Iter=794, Time=0.02s
+Tolerance: 1e-05 ... L2=2.41e-02, L∞=1.43e-01, Norm L2=2.36e-02, Iter=720, Time=0.02s
+Tolerance: 2e-05 ... L2=2.41e-02, L∞=1.43e-01, Norm L2=2.36e-02, Iter=677, Time=0.02s
+Tolerance: 2e-05 ... L2=2.41e-02, L∞=1.43e-01, Norm L2=2.37e-02, Iter=646, Time=0.02s
+Tolerance: 3e-05 ... L2=2.41e-02, L∞=1.43e-01, Norm L2=2.37e-02, Iter=622, Time=0.02s
+Tolerance: 3e-05 ... L2=2.41e-02, L∞=1.43e-01, Norm L2=2.37e-02, Iter=603, Time=0.02s
+Tolerance: 4e-05 ... L2=2.41e-02, L∞=1.43e-01, Norm L2=2.37e-02, Iter=586, Time=0.02s
+Tolerance: 4e-05 ... L2=2.42e-02, L∞=1.43e-01, Norm L2=2.37e-02, Iter=572, Time=0.02s
+Tolerance: 5e-05 ... L2=2.42e-02, L∞=1.43e-01, Norm L2=2.37e-02, Iter=559, Time=0.02s
+Tolerance: 5e-05 ... L2=2.42e-02, L∞=1.43e-01, Norm L2=2.37e-02, Iter=548, Time=0.01s
+Tolerance: 6e-05 ... L2=2.42e-02, L∞=1.43e-01, Norm L2=2.37e-02, Iter=538, Time=0.01s
+Tolerance: 6e-05 ... L2=2.42e-02, L∞=1.43e-01, Norm L2=2.37e-02, Iter=528, Time=0.01s
+Tolerance: 7e-05 ... L2=2.42e-02, L∞=1.43e-01, Norm L2=2.37e-02, Iter=520, Time=0.01s
+Tolerance: 7e-05 ... L2=2.42e-02, L∞=1.43e-01, Norm L2=2.38e-02, Iter=512, Time=0.01s
+Tolerance: 8e-05 ... L2=2.43e-02, L∞=1.43e-01, Norm L2=2.38e-02, Iter=504, Time=0.01s
+Tolerance: 8e-05 ... L2=2.43e-02, L∞=1.44e-01, Norm L2=2.38e-02, Iter=498, Time=0.01s
+Tolerance: 9e-05 ... L2=2.43e-02, L∞=1.44e-01, Norm L2=2.38e-02, Iter=491, Time=0.01s
+Tolerance: 9e-05 ... L2=2.43e-02, L∞=1.44e-01, Norm L2=2.38e-02, Iter=485, Time=0.01s
+Tolerance: 1e-04 ... L2=2.43e-02, L∞=1.44e-01, Norm L2=2.39e-02, Iter=479, Time=0.01s
+Tolerance: 1e-04 ... L2=2.44e-02, L∞=1.44e-01, Norm L2=2.39e-02, Iter=474, Time=0.01s
+Tolerance: 1e-04 ... L2=2.44e-02, L∞=1.44e-01, Norm L2=2.39e-02, Iter=468, Time=0.01s
+Tolerance: 1e-04 ... L2=2.44e-02, L∞=1.44e-01, Norm L2=2.40e-02, Iter=463, Time=0.01s
+Tolerance: 1e-04 ... L2=2.45e-02, L∞=1.44e-01, Norm L2=2.40e-02, Iter=459, Time=0.01s
+Tolerance: 1e-04 ... L2=2.45e-02, L∞=1.44e-01, Norm L2=2.40e-02, Iter=454, Time=0.01s
+Tolerance: 1e-04 ... L2=2.45e-02, L∞=1.44e-01, Norm L2=2.40e-02, Iter=450, Time=0.01s
+Tolerance: 1e-04 ... L2=2.46e-02, L∞=1.44e-01, Norm L2=2.41e-02, Iter=445, Time=0.01s
+Tolerance: 1e-04 ... L2=2.46e-02, L∞=1.44e-01, Norm L2=2.41e-02, Iter=441, Time=0.01s
+Tolerance: 1e-04 ... L2=2.46e-02, L∞=1.44e-01, Norm L2=2.42e-02, Iter=437, Time=0.01s
+Tolerance: 1e-04 ... L2=2.47e-02, L∞=1.44e-01, Norm L2=2.42e-02, Iter=434, Time=0.01s
+Tolerance: 2e-04 ... L2=2.47e-02, L∞=1.44e-01, Norm L2=2.42e-02, Iter=430, Time=0.01s
+Tolerance: 2e-04 ... L2=2.48e-02, L∞=1.44e-01, Norm L2=2.43e-02, Iter=426, Time=0.01s
+Tolerance: 2e-04 ... L2=2.48e-02, L∞=1.44e-01, Norm L2=2.43e-02, Iter=423, Time=0.01s
+Tolerance: 2e-04 ... L2=2.48e-02, L∞=1.44e-01, Norm L2=2.43e-02, Iter=420, Time=0.01s
+Tolerance: 2e-04 ... L2=2.49e-02, L∞=1.44e-01, Norm L2=2.44e-02, Iter=417, Time=0.01s
+Tolerance: 2e-04 ... L2=2.49e-02, L∞=1.44e-01, Norm L2=2.44e-02, Iter=413, Time=0.01s
+Tolerance: 2e-04 ... L2=2.50e-02, L∞=1.44e-01, Norm L2=2.45e-02, Iter=410, Time=0.01s
+Tolerance: 2e-04 ... L2=2.50e-02, L∞=1.44e-01, Norm L2=2.45e-02, Iter=407, Time=0.01s
+Tolerance: 2e-04 ... L2=2.51e-02, L∞=1.44e-01, Norm L2=2.46e-02, Iter=405, Time=0.01s
+Tolerance: 2e-04 ... L2=2.51e-02, L∞=1.44e-01, Norm L2=2.46e-02, Iter=402, Time=0.01s
+Tolerance: 2e-04 ... L2=2.52e-02, L∞=1.44e-01, Norm L2=2.47e-02, Iter=399, Time=0.01s
+Tolerance: 2e-04 ... L2=2.52e-02, L∞=1.44e-01, Norm L2=2.47e-02, Iter=396, Time=0.01s
+Tolerance: 2e-04 ... L2=2.53e-02, L∞=1.44e-01, Norm L2=2.48e-02, Iter=394, Time=0.01s
+Tolerance: 2e-04 ... L2=2.54e-02, L∞=1.44e-01, Norm L2=2.49e-02, Iter=391, Time=0.01s
+Tolerance: 2e-04 ... L2=2.54e-02, L∞=1.44e-01, Norm L2=2.49e-02, Iter=389, Time=0.01s
+Tolerance: 2e-04 ... L2=2.55e-02, L∞=1.44e-01, Norm L2=2.50e-02, Iter=386, Time=0.01s
+Tolerance: 2e-04 ... L2=2.55e-02, L∞=1.44e-01, Norm L2=2.50e-02, Iter=384, Time=0.01s
+Tolerance: 2e-04 ... L2=2.56e-02, L∞=1.44e-01, Norm L2=2.51e-02, Iter=382, Time=0.01s
+Tolerance: 2e-04 ... L2=2.57e-02, L∞=1.44e-01, Norm L2=2.52e-02, Iter=379, Time=0.01s
+Tolerance: 2e-04 ... L2=2.57e-02, L∞=1.44e-01, Norm L2=2.52e-02, Iter=377, Time=0.01s
+Tolerance: 3e-04 ... L2=2.58e-02, L∞=1.44e-01, Norm L2=2.53e-02, Iter=375, Time=0.01s
+Tolerance: 3e-04 ... L2=2.58e-02, L∞=1.44e-01, Norm L2=2.53e-02, Iter=373, Time=0.01s
+Tolerance: 3e-04 ... L2=2.59e-02, L∞=1.44e-01, Norm L2=2.54e-02, Iter=371, Time=0.01s
+Tolerance: 3e-04 ... L2=2.60e-02, L∞=1.44e-01, Norm L2=2.55e-02, Iter=369, Time=0.01s
+Tolerance: 3e-04 ... L2=2.61e-02, L∞=1.44e-01, Norm L2=2.55e-02, Iter=367, Time=0.01s
+Tolerance: 3e-04 ... L2=2.61e-02, L∞=1.44e-01, Norm L2=2.56e-02, Iter=365, Time=0.01s
+Tolerance: 3e-04 ... L2=2.62e-02, L∞=1.44e-01, Norm L2=2.57e-02, Iter=363, Time=0.01s
+Tolerance: 3e-04 ... L2=2.63e-02, L∞=1.44e-01, Norm L2=2.58e-02, Iter=361, Time=0.01s
+Tolerance: 3e-04 ... L2=2.64e-02, L∞=1.44e-01, Norm L2=2.58e-02, Iter=359, Time=0.01s
+Tolerance: 3e-04 ... L2=2.64e-02, L∞=1.45e-01, Norm L2=2.59e-02, Iter=357, Time=0.01s
+Tolerance: 3e-04 ... L2=2.65e-02, L∞=1.45e-01, Norm L2=2.60e-02, Iter=355, Time=0.01s
+Tolerance: 3e-04 ... L2=2.66e-02, L∞=1.45e-01, Norm L2=2.61e-02, Iter=353, Time=0.01s
+Tolerance: 3e-04 ... L2=2.67e-02, L∞=1.45e-01, Norm L2=2.61e-02, Iter=352, Time=0.01s
+Tolerance: 3e-04 ... L2=2.68e-02, L∞=1.45e-01, Norm L2=2.62e-02, Iter=350, Time=0.01s
+Tolerance: 3e-04 ... L2=2.69e-02, L∞=1.45e-01, Norm L2=2.63e-02, Iter=348, Time=0.01s
+Tolerance: 3e-04 ... L2=2.70e-02, L∞=1.45e-01, Norm L2=2.64e-02, Iter=346, Time=0.01s
+Tolerance: 3e-04 ... L2=2.70e-02, L∞=1.45e-01, Norm L2=2.65e-02, Iter=345, Time=0.01s
+Tolerance: 3e-04 ... L2=2.71e-02, L∞=1.45e-01, Norm L2=2.66e-02, Iter=343, Time=0.01s
+Tolerance: 3e-04 ... L2=2.72e-02, L∞=1.45e-01, Norm L2=2.66e-02, Iter=342, Time=0.01s
+Tolerance: 3e-04 ... L2=2.73e-02, L∞=1.45e-01, Norm L2=2.68e-02, Iter=340, Time=0.01s
+Tolerance: 4e-04 ... L2=2.74e-02, L∞=1.45e-01, Norm L2=2.69e-02, Iter=338, Time=0.01s
+Tolerance: 4e-04 ... L2=2.75e-02, L∞=1.45e-01, Norm L2=2.69e-02, Iter=337, Time=0.01s
+Tolerance: 4e-04 ... L2=2.76e-02, L∞=1.45e-01, Norm L2=2.70e-02, Iter=335, Time=0.01s
+Tolerance: 4e-04 ... L2=2.76e-02, L∞=1.45e-01, Norm L2=2.71e-02, Iter=334, Time=0.01s
+Tolerance: 4e-04 ... L2=2.78e-02, L∞=1.45e-01, Norm L2=2.72e-02, Iter=332, Time=0.01s
+Tolerance: 4e-04 ... L2=2.78e-02, L∞=1.45e-01, Norm L2=2.73e-02, Iter=331, Time=0.01s
+Tolerance: 4e-04 ... L2=2.80e-02, L∞=1.45e-01, Norm L2=2.74e-02, Iter=329, Time=0.01s
+Tolerance: 4e-04 ... L2=2.80e-02, L∞=1.45e-01, Norm L2=2.75e-02, Iter=328, Time=0.01s
+Tolerance: 4e-04 ... L2=2.81e-02, L∞=1.45e-01, Norm L2=2.76e-02, Iter=327, Time=0.01s
+Tolerance: 4e-04 ... L2=2.83e-02, L∞=1.45e-01, Norm L2=2.77e-02, Iter=325, Time=0.01s
+Tolerance: 4e-04 ... L2=2.83e-02, L∞=1.45e-01, Norm L2=2.78e-02, Iter=324, Time=0.01s
+Tolerance: 4e-04 ... L2=2.84e-02, L∞=1.45e-01, Norm L2=2.79e-02, Iter=323, Time=0.01s
+Tolerance: 4e-04 ... L2=2.86e-02, L∞=1.45e-01, Norm L2=2.80e-02, Iter=321, Time=0.01s
+Tolerance: 4e-04 ... L2=2.86e-02, L∞=1.45e-01, Norm L2=2.81e-02, Iter=320, Time=0.01s
+Tolerance: 4e-04 ... L2=2.87e-02, L∞=1.45e-01, Norm L2=2.82e-02, Iter=319, Time=0.01s
+Tolerance: 4e-04 ... L2=2.89e-02, L∞=1.45e-01, Norm L2=2.83e-02, Iter=317, Time=0.01s
+Tolerance: 4e-04 ... L2=2.90e-02, L∞=1.45e-01, Norm L2=2.84e-02, Iter=316, Time=0.01s
+Tolerance: 4e-04 ... L2=2.91e-02, L∞=1.45e-01, Norm L2=2.85e-02, Iter=315, Time=0.01s
+Tolerance: 4e-04 ... L2=2.92e-02, L∞=1.45e-01, Norm L2=2.87e-02, Iter=313, Time=0.01s
+Tolerance: 4e-04 ... L2=2.93e-02, L∞=1.45e-01, Norm L2=2.88e-02, Iter=312, Time=0.01s
+Tolerance: 5e-04 ... L2=2.94e-02, L∞=1.45e-01, Norm L2=2.88e-02, Iter=311, Time=0.01s
+Tolerance: 5e-04 ... L2=2.95e-02, L∞=1.45e-01, Norm L2=2.89e-02, Iter=310, Time=0.01s
+Tolerance: 5e-04 ... L2=2.96e-02, L∞=1.45e-01, Norm L2=2.90e-02, Iter=309, Time=0.01s
+Tolerance: 5e-04 ... L2=2.98e-02, L∞=1.45e-01, Norm L2=2.92e-02, Iter=307, Time=0.01s
+Tolerance: 5e-04 ... L2=2.99e-02, L∞=1.45e-01, Norm L2=2.93e-02, Iter=306, Time=0.01s
+Tolerance: 5e-04 ... L2=3.00e-02, L∞=1.45e-01, Norm L2=2.94e-02, Iter=305, Time=0.01s
+Tolerance: 5e-04 ... L2=3.01e-02, L∞=1.45e-01, Norm L2=2.95e-02, Iter=304, Time=0.01s
+Tolerance: 5e-04 ... L2=3.02e-02, L∞=1.45e-01, Norm L2=2.96e-02, Iter=303, Time=0.01s
+Tolerance: 5e-04 ... L2=3.03e-02, L∞=1.46e-01, Norm L2=2.97e-02, Iter=302, Time=0.01s
+Tolerance: 5e-04 ... L2=3.04e-02, L∞=1.46e-01, Norm L2=2.98e-02, Iter=301, Time=0.01s
+Tolerance: 5e-04 ... L2=3.06e-02, L∞=1.46e-01, Norm L2=3.00e-02, Iter=299, Time=0.01s
+Tolerance: 5e-04 ... L2=3.08e-02, L∞=1.46e-01, Norm L2=3.02e-02, Iter=298, Time=0.01s
+Tolerance: 5e-04 ... L2=3.09e-02, L∞=1.46e-01, Norm L2=3.03e-02, Iter=297, Time=0.01s
+Tolerance: 5e-04 ... L2=3.10e-02, L∞=1.46e-01, Norm L2=3.04e-02, Iter=296, Time=0.01s
+Tolerance: 5e-04 ... L2=3.11e-02, L∞=1.46e-01, Norm L2=3.05e-02, Iter=295, Time=0.01s
+Tolerance: 5e-04 ... L2=3.12e-02, L∞=1.46e-01, Norm L2=3.06e-02, Iter=294, Time=0.01s
+Tolerance: 5e-04 ... L2=3.13e-02, L∞=1.46e-01, Norm L2=3.07e-02, Iter=293, Time=0.01s
+Tolerance: 5e-04 ... L2=3.15e-02, L∞=1.46e-01, Norm L2=3.09e-02, Iter=292, Time=0.01s
+Tolerance: 5e-04 ... L2=3.16e-02, L∞=1.46e-01, Norm L2=3.10e-02, Iter=291, Time=0.01s
+Tolerance: 5e-04 ... L2=3.17e-02, L∞=1.46e-01, Norm L2=3.11e-02, Iter=290, Time=0.01s
+Tolerance: 6e-04 ... L2=3.18e-02, L∞=1.46e-01, Norm L2=3.12e-02, Iter=289, Time=0.01s
+Tolerance: 6e-04 ... L2=3.20e-02, L∞=1.46e-01, Norm L2=3.14e-02, Iter=288, Time=0.01s
+Tolerance: 6e-04 ... L2=3.21e-02, L∞=1.46e-01, Norm L2=3.15e-02, Iter=287, Time=0.01s
+Tolerance: 6e-04 ... L2=3.22e-02, L∞=1.46e-01, Norm L2=3.16e-02, Iter=286, Time=0.01s
+Tolerance: 6e-04 ... L2=3.24e-02, L∞=1.46e-01, Norm L2=3.18e-02, Iter=285, Time=0.01s
+Tolerance: 6e-04 ... L2=3.25e-02, L∞=1.46e-01, Norm L2=3.19e-02, Iter=284, Time=0.01s
+Tolerance: 6e-04 ... L2=3.27e-02, L∞=1.46e-01, Norm L2=3.20e-02, Iter=283, Time=0.01s
+Tolerance: 6e-04 ... L2=3.28e-02, L∞=1.46e-01, Norm L2=3.22e-02, Iter=282, Time=0.01s
+Tolerance: 6e-04 ... L2=3.30e-02, L∞=1.46e-01, Norm L2=3.23e-02, Iter=281, Time=0.01s
+Tolerance: 6e-04 ... L2=3.31e-02, L∞=1.46e-01, Norm L2=3.25e-02, Iter=280, Time=0.01s
+Tolerance: 6e-04 ... L2=3.33e-02, L∞=1.46e-01, Norm L2=3.26e-02, Iter=279, Time=0.01s
+Tolerance: 6e-04 ... L2=3.34e-02, L∞=1.46e-01, Norm L2=3.28e-02, Iter=278, Time=0.01s
+Tolerance: 6e-04 ... L2=3.34e-02, L∞=1.46e-01, Norm L2=3.28e-02, Iter=278, Time=0.01s
+Tolerance: 6e-04 ... L2=3.36e-02, L∞=1.46e-01, Norm L2=3.29e-02, Iter=277, Time=0.01s
+Tolerance: 6e-04 ... L2=3.37e-02, L∞=1.46e-01, Norm L2=3.31e-02, Iter=276, Time=0.01s
+Tolerance: 6e-04 ... L2=3.39e-02, L∞=1.46e-01, Norm L2=3.32e-02, Iter=275, Time=0.01s
+Tolerance: 6e-04 ... L2=3.40e-02, L∞=1.46e-01, Norm L2=3.34e-02, Iter=274, Time=0.01s
+Tolerance: 6e-04 ... L2=3.42e-02, L∞=1.46e-01, Norm L2=3.35e-02, Iter=273, Time=0.01s
+Tolerance: 6e-04 ... L2=3.44e-02, L∞=1.46e-01, Norm L2=3.37e-02, Iter=272, Time=0.01s
+Tolerance: 6e-04 ... L2=3.45e-02, L∞=1.46e-01, Norm L2=3.39e-02, Iter=271, Time=0.01s
+Tolerance: 7e-04 ... L2=3.45e-02, L∞=1.46e-01, Norm L2=3.39e-02, Iter=271, Time=0.01s
+Tolerance: 7e-04 ... L2=3.47e-02, L∞=1.46e-01, Norm L2=3.40e-02, Iter=270, Time=0.01s
+Tolerance: 7e-04 ... L2=3.49e-02, L∞=1.47e-01, Norm L2=3.42e-02, Iter=269, Time=0.01s
+Tolerance: 7e-04 ... L2=3.51e-02, L∞=1.47e-01, Norm L2=3.44e-02, Iter=268, Time=0.01s
+Tolerance: 7e-04 ... L2=3.52e-02, L∞=1.47e-01, Norm L2=3.46e-02, Iter=267, Time=0.01s
+Tolerance: 7e-04 ... L2=3.54e-02, L∞=1.47e-01, Norm L2=3.47e-02, Iter=266, Time=0.01s
+Tolerance: 7e-04 ... L2=3.56e-02, L∞=1.47e-01, Norm L2=3.49e-02, Iter=265, Time=0.01s
+Tolerance: 7e-04 ... L2=3.56e-02, L∞=1.47e-01, Norm L2=3.49e-02, Iter=265, Time=0.01s
+Tolerance: 7e-04 ... L2=3.58e-02, L∞=1.47e-01, Norm L2=3.51e-02, Iter=264, Time=0.01s
+Tolerance: 7e-04 ... L2=3.60e-02, L∞=1.47e-01, Norm L2=3.53e-02, Iter=263, Time=0.01s
+Tolerance: 7e-04 ... L2=3.62e-02, L∞=1.47e-01, Norm L2=3.55e-02, Iter=262, Time=0.01s
+Tolerance: 7e-04 ... L2=3.64e-02, L∞=1.47e-01, Norm L2=3.57e-02, Iter=261, Time=0.01s
+Tolerance: 7e-04 ... L2=3.64e-02, L∞=1.47e-01, Norm L2=3.57e-02, Iter=261, Time=0.01s
+Tolerance: 7e-04 ... L2=3.66e-02, L∞=1.47e-01, Norm L2=3.59e-02, Iter=260, Time=0.01s
+Tolerance: 7e-04 ... L2=3.68e-02, L∞=1.47e-01, Norm L2=3.61e-02, Iter=259, Time=0.01s
+Tolerance: 7e-04 ... L2=3.70e-02, L∞=1.47e-01, Norm L2=3.63e-02, Iter=258, Time=0.01s
+Tolerance: 7e-04 ... L2=3.70e-02, L∞=1.47e-01, Norm L2=3.63e-02, Iter=258, Time=0.01s
+Tolerance: 7e-04 ... L2=3.72e-02, L∞=1.47e-01, Norm L2=3.65e-02, Iter=257, Time=0.01s
+Tolerance: 7e-04 ... L2=3.74e-02, L∞=1.47e-01, Norm L2=3.67e-02, Iter=256, Time=0.01s
+Tolerance: 7e-04 ... L2=3.76e-02, L∞=1.47e-01, Norm L2=3.69e-02, Iter=255, Time=0.01s
+Tolerance: 8e-04 ... L2=3.76e-02, L∞=1.47e-01, Norm L2=3.69e-02, Iter=255, Time=0.01s
+Tolerance: 8e-04 ... L2=3.78e-02, L∞=1.47e-01, Norm L2=3.71e-02, Iter=254, Time=0.01s
+Tolerance: 8e-04 ... L2=3.80e-02, L∞=1.47e-01, Norm L2=3.73e-02, Iter=253, Time=0.01s
+Tolerance: 8e-04 ... L2=3.83e-02, L∞=1.47e-01, Norm L2=3.75e-02, Iter=252, Time=0.01s
+Tolerance: 8e-04 ... L2=3.83e-02, L∞=1.47e-01, Norm L2=3.75e-02, Iter=252, Time=0.01s
+Tolerance: 8e-04 ... L2=3.85e-02, L∞=1.47e-01, Norm L2=3.77e-02, Iter=251, Time=0.01s
+Tolerance: 8e-04 ... L2=3.87e-02, L∞=1.47e-01, Norm L2=3.80e-02, Iter=250, Time=0.01s
+Tolerance: 8e-04 ... L2=3.89e-02, L∞=1.47e-01, Norm L2=3.82e-02, Iter=249, Time=0.01s
+Tolerance: 8e-04 ... L2=3.89e-02, L∞=1.47e-01, Norm L2=3.82e-02, Iter=249, Time=0.01s
+Tolerance: 8e-04 ... L2=3.92e-02, L∞=1.47e-01, Norm L2=3.84e-02, Iter=248, Time=0.01s
+Tolerance: 8e-04 ... L2=3.94e-02, L∞=1.47e-01, Norm L2=3.86e-02, Iter=247, Time=0.01s
+Tolerance: 8e-04 ... L2=3.94e-02, L∞=1.47e-01, Norm L2=3.86e-02, Iter=247, Time=0.01s
+Tolerance: 8e-04 ... L2=3.97e-02, L∞=1.47e-01, Norm L2=3.89e-02, Iter=246, Time=0.01s
+Tolerance: 8e-04 ... L2=3.99e-02, L∞=1.48e-01, Norm L2=3.91e-02, Iter=245, Time=0.01s
+Tolerance: 8e-04 ... L2=3.99e-02, L∞=1.48e-01, Norm L2=3.91e-02, Iter=245, Time=0.01s
+Tolerance: 8e-04 ... L2=4.01e-02, L∞=1.48e-01, Norm L2=3.94e-02, Iter=244, Time=0.01s
+Tolerance: 8e-04 ... L2=4.04e-02, L∞=1.48e-01, Norm L2=3.96e-02, Iter=243, Time=0.01s
+Tolerance: 8e-04 ... L2=4.04e-02, L∞=1.48e-01, Norm L2=3.96e-02, Iter=243, Time=0.01s
+Tolerance: 8e-04 ... L2=4.06e-02, L∞=1.48e-01, Norm L2=3.99e-02, Iter=242, Time=0.01s
+Tolerance: 8e-04 ... L2=4.09e-02, L∞=1.48e-01, Norm L2=4.01e-02, Iter=241, Time=0.01s
+Tolerance: 9e-04 ... L2=4.12e-02, L∞=1.48e-01, Norm L2=4.04e-02, Iter=240, Time=0.01s
+Tolerance: 9e-04 ... L2=4.12e-02, L∞=1.48e-01, Norm L2=4.04e-02, Iter=240, Time=0.04s
+Tolerance: 9e-04 ... L2=4.14e-02, L∞=1.48e-01, Norm L2=4.06e-02, Iter=239, Time=0.01s
+Tolerance: 9e-04 ... L2=4.14e-02, L∞=1.48e-01, Norm L2=4.06e-02, Iter=239, Time=0.01s
+Tolerance: 9e-04 ... L2=4.17e-02, L∞=1.48e-01, Norm L2=4.09e-02, Iter=238, Time=0.01s
+Tolerance: 9e-04 ... L2=4.20e-02, L∞=1.48e-01, Norm L2=4.11e-02, Iter=237, Time=0.01s
+Tolerance: 9e-04 ... L2=4.20e-02, L∞=1.48e-01, Norm L2=4.11e-02, Iter=237, Time=0.01s
+Tolerance: 9e-04 ... L2=4.22e-02, L∞=1.48e-01, Norm L2=4.14e-02, Iter=236, Time=0.01s
+Tolerance: 9e-04 ... L2=4.25e-02, L∞=1.48e-01, Norm L2=4.17e-02, Iter=235, Time=0.01s
+Tolerance: 9e-04 ... L2=4.25e-02, L∞=1.48e-01, Norm L2=4.17e-02, Iter=235, Time=0.01s
+Tolerance: 9e-04 ... L2=4.28e-02, L∞=1.48e-01, Norm L2=4.20e-02, Iter=234, Time=0.01s
+Tolerance: 9e-04 ... L2=4.31e-02, L∞=1.48e-01, Norm L2=4.22e-02, Iter=233, Time=0.01s
+Tolerance: 9e-04 ... L2=4.31e-02, L∞=1.48e-01, Norm L2=4.22e-02, Iter=233, Time=0.01s
+Tolerance: 9e-04 ... L2=4.34e-02, L∞=1.48e-01, Norm L2=4.25e-02, Iter=232, Time=0.01s
+Tolerance: 9e-04 ... L2=4.34e-02, L∞=1.48e-01, Norm L2=4.25e-02, Iter=232, Time=0.01s
+Tolerance: 9e-04 ... L2=4.37e-02, L∞=1.48e-01, Norm L2=4.28e-02, Iter=231, Time=0.02s
+Tolerance: 9e-04 ... L2=4.40e-02, L∞=1.48e-01, Norm L2=4.31e-02, Iter=230, Time=0.01s
+Tolerance: 9e-04 ... L2=4.40e-02, L∞=1.48e-01, Norm L2=4.31e-02, Iter=230, Time=0.01s
+Tolerance: 9e-04 ... L2=4.43e-02, L∞=1.48e-01, Norm L2=4.34e-02, Iter=229, Time=0.01s
+Tolerance: 9e-04 ... L2=4.46e-02, L∞=1.48e-01, Norm L2=4.37e-02, Iter=228, Time=0.01s
+Tolerance: 1e-03 ... L2=4.46e-02, L∞=1.48e-01, Norm L2=4.37e-02, Iter=228, Time=0.01s
+Tolerance: 1e-03 ... L2=4.49e-02, L∞=1.48e-01, Norm L2=4.40e-02, Iter=227, Time=0.01s
+Tolerance: 1e-03 ... L2=4.49e-02, L∞=1.48e-01, Norm L2=4.40e-02, Iter=227, Time=0.01s
+Tolerance: 1e-03 ... L2=4.52e-02, L∞=1.49e-01, Norm L2=4.43e-02, Iter=226, Time=0.01s
+Tolerance: 1e-03 ... L2=4.55e-02, L∞=1.49e-01, Norm L2=4.46e-02, Iter=225, Time=0.01s
+Tolerance: 1e-03 ... L2=4.55e-02, L∞=1.49e-01, Norm L2=4.46e-02, Iter=225, Time=0.01s
+Tolerance: 1e-03 ... L2=4.58e-02, L∞=1.49e-01, Norm L2=4.49e-02, Iter=224, Time=0.01s
+Tolerance: 1e-03 ... L2=4.58e-02, L∞=1.49e-01, Norm L2=4.49e-02, Iter=224, Time=0.01s
+Tolerance: 1e-03 ... L2=4.62e-02, L∞=1.49e-01, Norm L2=4.53e-02, Iter=223, Time=0.01s
+Tolerance: 1e-03 ... L2=4.62e-02, L∞=1.49e-01, Norm L2=4.53e-02, Iter=223, Time=0.01s
+
+---------- CASE 3 (Tolerance Study) ----------
+Tolerance: 1e-08 ... L2=2.41e-02, L∞=1.43e-01, Norm L2=2.36e-02, Iter=1459, Time=0.04s
+Tolerance: 5e-06 ... L2=2.41e-02, L∞=1.43e-01, Norm L2=2.36e-02, Iter=794, Time=0.02s
+Tolerance: 1e-05 ... L2=2.41e-02, L∞=1.43e-01, Norm L2=2.36e-02, Iter=720, Time=0.02s
+Tolerance: 2e-05 ... L2=2.41e-02, L∞=1.43e-01, Norm L2=2.36e-02, Iter=677, Time=0.02s
+Tolerance: 2e-05 ... L2=2.41e-02, L∞=1.43e-01, Norm L2=2.37e-02, Iter=646, Time=0.02s
+Tolerance: 3e-05 ... L2=2.41e-02, L∞=1.43e-01, Norm L2=2.37e-02, Iter=622, Time=0.02s
+Tolerance: 3e-05 ... L2=2.41e-02, L∞=1.43e-01, Norm L2=2.37e-02, Iter=603, Time=0.02s
+Tolerance: 4e-05 ... L2=2.41e-02, L∞=1.43e-01, Norm L2=2.37e-02, Iter=586, Time=0.02s
+Tolerance: 4e-05 ... L2=2.42e-02, L∞=1.43e-01, Norm L2=2.37e-02, Iter=572, Time=0.02s
+Tolerance: 5e-05 ... L2=2.42e-02, L∞=1.43e-01, Norm L2=2.37e-02, Iter=559, Time=0.02s
+Tolerance: 5e-05 ... L2=2.42e-02, L∞=1.43e-01, Norm L2=2.37e-02, Iter=548, Time=0.02s
+Tolerance: 6e-05 ... L2=2.42e-02, L∞=1.43e-01, Norm L2=2.37e-02, Iter=538, Time=0.02s
+Tolerance: 6e-05 ... L2=2.42e-02, L∞=1.43e-01, Norm L2=2.37e-02, Iter=528, Time=0.02s
+Tolerance: 7e-05 ... L2=2.42e-02, L∞=1.43e-01, Norm L2=2.37e-02, Iter=520, Time=0.01s
+Tolerance: 7e-05 ... L2=2.42e-02, L∞=1.43e-01, Norm L2=2.38e-02, Iter=512, Time=0.01s
+Tolerance: 8e-05 ... L2=2.43e-02, L∞=1.43e-01, Norm L2=2.38e-02, Iter=504, Time=0.01s
+Tolerance: 8e-05 ... L2=2.43e-02, L∞=1.44e-01, Norm L2=2.38e-02, Iter=498, Time=0.01s
+Tolerance: 9e-05 ... L2=2.43e-02, L∞=1.44e-01, Norm L2=2.38e-02, Iter=491, Time=0.01s
+Tolerance: 9e-05 ... L2=2.43e-02, L∞=1.44e-01, Norm L2=2.38e-02, Iter=485, Time=0.01s
+Tolerance: 1e-04 ... L2=2.43e-02, L∞=1.44e-01, Norm L2=2.39e-02, Iter=479, Time=0.01s
+Tolerance: 1e-04 ... L2=2.44e-02, L∞=1.44e-01, Norm L2=2.39e-02, Iter=474, Time=0.01s
+Tolerance: 1e-04 ... L2=2.44e-02, L∞=1.44e-01, Norm L2=2.39e-02, Iter=468, Time=0.01s
+Tolerance: 1e-04 ... L2=2.44e-02, L∞=1.44e-01, Norm L2=2.40e-02, Iter=463, Time=0.01s
+Tolerance: 1e-04 ... L2=2.45e-02, L∞=1.44e-01, Norm L2=2.40e-02, Iter=459, Time=0.01s
+Tolerance: 1e-04 ... L2=2.45e-02, L∞=1.44e-01, Norm L2=2.40e-02, Iter=454, Time=0.01s
+Tolerance: 1e-04 ... L2=2.45e-02, L∞=1.44e-01, Norm L2=2.40e-02, Iter=450, Time=0.01s
+Tolerance: 1e-04 ... L2=2.46e-02, L∞=1.44e-01, Norm L2=2.41e-02, Iter=445, Time=0.01s
+Tolerance: 1e-04 ... L2=2.46e-02, L∞=1.44e-01, Norm L2=2.41e-02, Iter=441, Time=0.01s
+Tolerance: 1e-04 ... L2=2.46e-02, L∞=1.44e-01, Norm L2=2.42e-02, Iter=437, Time=0.01s
+Tolerance: 1e-04 ... L2=2.47e-02, L∞=1.44e-01, Norm L2=2.42e-02, Iter=434, Time=0.01s
+Tolerance: 2e-04 ... L2=2.47e-02, L∞=1.44e-01, Norm L2=2.42e-02, Iter=430, Time=0.01s
+Tolerance: 2e-04 ... L2=2.48e-02, L∞=1.44e-01, Norm L2=2.43e-02, Iter=426, Time=0.01s
+Tolerance: 2e-04 ... L2=2.48e-02, L∞=1.44e-01, Norm L2=2.43e-02, Iter=423, Time=0.02s
+Tolerance: 2e-04 ... L2=2.48e-02, L∞=1.44e-01, Norm L2=2.43e-02, Iter=420, Time=0.01s
+Tolerance: 2e-04 ... L2=2.49e-02, L∞=1.44e-01, Norm L2=2.44e-02, Iter=417, Time=0.01s
+Tolerance: 2e-04 ... L2=2.49e-02, L∞=1.44e-01, Norm L2=2.44e-02, Iter=413, Time=0.01s
+Tolerance: 2e-04 ... L2=2.50e-02, L∞=1.44e-01, Norm L2=2.45e-02, Iter=410, Time=0.01s
+Tolerance: 2e-04 ... L2=2.50e-02, L∞=1.44e-01, Norm L2=2.45e-02, Iter=407, Time=0.01s
+Tolerance: 2e-04 ... L2=2.51e-02, L∞=1.44e-01, Norm L2=2.46e-02, Iter=405, Time=0.01s
+Tolerance: 2e-04 ... L2=2.51e-02, L∞=1.44e-01, Norm L2=2.46e-02, Iter=402, Time=0.01s
+Tolerance: 2e-04 ... L2=2.52e-02, L∞=1.44e-01, Norm L2=2.47e-02, Iter=399, Time=0.01s
+Tolerance: 2e-04 ... L2=2.52e-02, L∞=1.44e-01, Norm L2=2.47e-02, Iter=396, Time=0.01s
+Tolerance: 2e-04 ... L2=2.53e-02, L∞=1.44e-01, Norm L2=2.48e-02, Iter=394, Time=0.01s
+Tolerance: 2e-04 ... L2=2.54e-02, L∞=1.44e-01, Norm L2=2.49e-02, Iter=391, Time=0.01s
+Tolerance: 2e-04 ... L2=2.54e-02, L∞=1.44e-01, Norm L2=2.49e-02, Iter=389, Time=0.01s
+Tolerance: 2e-04 ... L2=2.55e-02, L∞=1.44e-01, Norm L2=2.50e-02, Iter=386, Time=0.01s
+Tolerance: 2e-04 ... L2=2.55e-02, L∞=1.44e-01, Norm L2=2.50e-02, Iter=384, Time=0.01s
+Tolerance: 2e-04 ... L2=2.56e-02, L∞=1.44e-01, Norm L2=2.51e-02, Iter=382, Time=0.01s
+Tolerance: 2e-04 ... L2=2.57e-02, L∞=1.44e-01, Norm L2=2.52e-02, Iter=379, Time=0.01s
+Tolerance: 2e-04 ... L2=2.57e-02, L∞=1.44e-01, Norm L2=2.52e-02, Iter=377, Time=0.01s
+Tolerance: 3e-04 ... L2=2.58e-02, L∞=1.44e-01, Norm L2=2.53e-02, Iter=375, Time=0.01s
+Tolerance: 3e-04 ... L2=2.58e-02, L∞=1.44e-01, Norm L2=2.53e-02, Iter=373, Time=0.01s
+Tolerance: 3e-04 ... L2=2.59e-02, L∞=1.44e-01, Norm L2=2.54e-02, Iter=371, Time=0.01s
+Tolerance: 3e-04 ... L2=2.60e-02, L∞=1.44e-01, Norm L2=2.55e-02, Iter=369, Time=0.01s
+Tolerance: 3e-04 ... L2=2.61e-02, L∞=1.44e-01, Norm L2=2.55e-02, Iter=367, Time=0.01s
+Tolerance: 3e-04 ... L2=2.61e-02, L∞=1.44e-01, Norm L2=2.56e-02, Iter=365, Time=0.01s
+Tolerance: 3e-04 ... L2=2.62e-02, L∞=1.44e-01, Norm L2=2.57e-02, Iter=363, Time=0.01s
+Tolerance: 3e-04 ... L2=2.63e-02, L∞=1.44e-01, Norm L2=2.58e-02, Iter=361, Time=0.01s
+Tolerance: 3e-04 ... L2=2.64e-02, L∞=1.44e-01, Norm L2=2.58e-02, Iter=359, Time=0.01s
+Tolerance: 3e-04 ... L2=2.64e-02, L∞=1.45e-01, Norm L2=2.59e-02, Iter=357, Time=0.01s
+Tolerance: 3e-04 ... L2=2.65e-02, L∞=1.45e-01, Norm L2=2.60e-02, Iter=355, Time=0.01s
+Tolerance: 3e-04 ... L2=2.66e-02, L∞=1.45e-01, Norm L2=2.61e-02, Iter=353, Time=0.01s
+Tolerance: 3e-04 ... L2=2.67e-02, L∞=1.45e-01, Norm L2=2.61e-02, Iter=352, Time=0.01s
+Tolerance: 3e-04 ... L2=2.68e-02, L∞=1.45e-01, Norm L2=2.62e-02, Iter=350, Time=0.01s
+Tolerance: 3e-04 ... L2=2.69e-02, L∞=1.45e-01, Norm L2=2.63e-02, Iter=348, Time=0.01s
+Tolerance: 3e-04 ... L2=2.70e-02, L∞=1.45e-01, Norm L2=2.64e-02, Iter=346, Time=0.01s
+Tolerance: 3e-04 ... L2=2.70e-02, L∞=1.45e-01, Norm L2=2.65e-02, Iter=345, Time=0.01s
+Tolerance: 3e-04 ... L2=2.71e-02, L∞=1.45e-01, Norm L2=2.66e-02, Iter=343, Time=0.01s
+Tolerance: 3e-04 ... L2=2.72e-02, L∞=1.45e-01, Norm L2=2.66e-02, Iter=342, Time=0.01s
+Tolerance: 3e-04 ... L2=2.73e-02, L∞=1.45e-01, Norm L2=2.68e-02, Iter=340, Time=0.01s
+Tolerance: 4e-04 ... L2=2.74e-02, L∞=1.45e-01, Norm L2=2.69e-02, Iter=338, Time=0.01s
+Tolerance: 4e-04 ... L2=2.75e-02, L∞=1.45e-01, Norm L2=2.69e-02, Iter=337, Time=0.01s
+Tolerance: 4e-04 ... L2=2.76e-02, L∞=1.45e-01, Norm L2=2.70e-02, Iter=335, Time=0.01s
+Tolerance: 4e-04 ... L2=2.76e-02, L∞=1.45e-01, Norm L2=2.71e-02, Iter=334, Time=0.01s
+Tolerance: 4e-04 ... L2=2.78e-02, L∞=1.45e-01, Norm L2=2.72e-02, Iter=332, Time=0.01s
+Tolerance: 4e-04 ... L2=2.78e-02, L∞=1.45e-01, Norm L2=2.73e-02, Iter=331, Time=0.01s
+Tolerance: 4e-04 ... L2=2.80e-02, L∞=1.45e-01, Norm L2=2.74e-02, Iter=329, Time=0.01s
+Tolerance: 4e-04 ... L2=2.80e-02, L∞=1.45e-01, Norm L2=2.75e-02, Iter=328, Time=0.01s
+Tolerance: 4e-04 ... L2=2.81e-02, L∞=1.45e-01, Norm L2=2.76e-02, Iter=327, Time=0.01s
+Tolerance: 4e-04 ... L2=2.83e-02, L∞=1.45e-01, Norm L2=2.77e-02, Iter=325, Time=0.01s
+Tolerance: 4e-04 ... L2=2.83e-02, L∞=1.45e-01, Norm L2=2.78e-02, Iter=324, Time=0.01s
+Tolerance: 4e-04 ... L2=2.84e-02, L∞=1.45e-01, Norm L2=2.79e-02, Iter=323, Time=0.01s
+Tolerance: 4e-04 ... L2=2.86e-02, L∞=1.45e-01, Norm L2=2.80e-02, Iter=321, Time=0.01s
+Tolerance: 4e-04 ... L2=2.86e-02, L∞=1.45e-01, Norm L2=2.81e-02, Iter=320, Time=0.01s
+Tolerance: 4e-04 ... L2=2.87e-02, L∞=1.45e-01, Norm L2=2.82e-02, Iter=319, Time=0.01s
+Tolerance: 4e-04 ... L2=2.89e-02, L∞=1.45e-01, Norm L2=2.83e-02, Iter=317, Time=0.01s
+Tolerance: 4e-04 ... L2=2.90e-02, L∞=1.45e-01, Norm L2=2.84e-02, Iter=316, Time=0.01s
+Tolerance: 4e-04 ... L2=2.91e-02, L∞=1.45e-01, Norm L2=2.85e-02, Iter=315, Time=0.01s
+Tolerance: 4e-04 ... L2=2.92e-02, L∞=1.45e-01, Norm L2=2.87e-02, Iter=313, Time=0.01s
+Tolerance: 4e-04 ... L2=2.93e-02, L∞=1.45e-01, Norm L2=2.88e-02, Iter=312, Time=0.01s
+Tolerance: 5e-04 ... L2=2.94e-02, L∞=1.45e-01, Norm L2=2.88e-02, Iter=311, Time=0.01s
+Tolerance: 5e-04 ... L2=2.95e-02, L∞=1.45e-01, Norm L2=2.89e-02, Iter=310, Time=0.01s
+Tolerance: 5e-04 ... L2=2.96e-02, L∞=1.45e-01, Norm L2=2.90e-02, Iter=309, Time=0.01s
+Tolerance: 5e-04 ... L2=2.98e-02, L∞=1.45e-01, Norm L2=2.92e-02, Iter=307, Time=0.01s
+Tolerance: 5e-04 ... L2=2.99e-02, L∞=1.45e-01, Norm L2=2.93e-02, Iter=306, Time=0.01s
+Tolerance: 5e-04 ... L2=3.00e-02, L∞=1.45e-01, Norm L2=2.94e-02, Iter=305, Time=0.01s
+Tolerance: 5e-04 ... L2=3.01e-02, L∞=1.45e-01, Norm L2=2.95e-02, Iter=304, Time=0.01s
+Tolerance: 5e-04 ... L2=3.02e-02, L∞=1.45e-01, Norm L2=2.96e-02, Iter=303, Time=0.01s
+Tolerance: 5e-04 ... L2=3.03e-02, L∞=1.46e-01, Norm L2=2.97e-02, Iter=302, Time=0.01s
+Tolerance: 5e-04 ... L2=3.04e-02, L∞=1.46e-01, Norm L2=2.98e-02, Iter=301, Time=0.01s
+Tolerance: 5e-04 ... L2=3.06e-02, L∞=1.46e-01, Norm L2=3.00e-02, Iter=299, Time=0.01s
+Tolerance: 5e-04 ... L2=3.08e-02, L∞=1.46e-01, Norm L2=3.02e-02, Iter=298, Time=0.01s
+Tolerance: 5e-04 ... L2=3.09e-02, L∞=1.46e-01, Norm L2=3.03e-02, Iter=297, Time=0.01s
+Tolerance: 5e-04 ... L2=3.10e-02, L∞=1.46e-01, Norm L2=3.04e-02, Iter=296, Time=0.01s
+Tolerance: 5e-04 ... L2=3.11e-02, L∞=1.46e-01, Norm L2=3.05e-02, Iter=295, Time=0.01s
+Tolerance: 5e-04 ... L2=3.12e-02, L∞=1.46e-01, Norm L2=3.06e-02, Iter=294, Time=0.01s
+Tolerance: 5e-04 ... L2=3.13e-02, L∞=1.46e-01, Norm L2=3.07e-02, Iter=293, Time=0.01s
+Tolerance: 5e-04 ... L2=3.15e-02, L∞=1.46e-01, Norm L2=3.09e-02, Iter=292, Time=0.01s
+Tolerance: 5e-04 ... L2=3.16e-02, L∞=1.46e-01, Norm L2=3.10e-02, Iter=291, Time=0.01s
+Tolerance: 5e-04 ... L2=3.17e-02, L∞=1.46e-01, Norm L2=3.11e-02, Iter=290, Time=0.01s
+Tolerance: 6e-04 ... L2=3.18e-02, L∞=1.46e-01, Norm L2=3.12e-02, Iter=289, Time=0.01s
+Tolerance: 6e-04 ... L2=3.20e-02, L∞=1.46e-01, Norm L2=3.14e-02, Iter=288, Time=0.01s
+Tolerance: 6e-04 ... L2=3.21e-02, L∞=1.46e-01, Norm L2=3.15e-02, Iter=287, Time=0.01s
+Tolerance: 6e-04 ... L2=3.22e-02, L∞=1.46e-01, Norm L2=3.16e-02, Iter=286, Time=0.01s
+Tolerance: 6e-04 ... L2=3.24e-02, L∞=1.46e-01, Norm L2=3.18e-02, Iter=285, Time=0.01s
+Tolerance: 6e-04 ... L2=3.25e-02, L∞=1.46e-01, Norm L2=3.19e-02, Iter=284, Time=0.01s
+Tolerance: 6e-04 ... L2=3.27e-02, L∞=1.46e-01, Norm L2=3.20e-02, Iter=283, Time=0.01s
+Tolerance: 6e-04 ... L2=3.28e-02, L∞=1.46e-01, Norm L2=3.22e-02, Iter=282, Time=0.01s
+Tolerance: 6e-04 ... L2=3.30e-02, L∞=1.46e-01, Norm L2=3.23e-02, Iter=281, Time=0.01s
+Tolerance: 6e-04 ... L2=3.31e-02, L∞=1.46e-01, Norm L2=3.25e-02, Iter=280, Time=0.01s
+Tolerance: 6e-04 ... L2=3.33e-02, L∞=1.46e-01, Norm L2=3.26e-02, Iter=279, Time=0.01s
+Tolerance: 6e-04 ... L2=3.34e-02, L∞=1.46e-01, Norm L2=3.28e-02, Iter=278, Time=0.01s
+Tolerance: 6e-04 ... L2=3.34e-02, L∞=1.46e-01, Norm L2=3.28e-02, Iter=278, Time=0.01s
+Tolerance: 6e-04 ... L2=3.36e-02, L∞=1.46e-01, Norm L2=3.29e-02, Iter=277, Time=0.01s
+Tolerance: 6e-04 ... L2=3.37e-02, L∞=1.46e-01, Norm L2=3.31e-02, Iter=276, Time=0.01s
+Tolerance: 6e-04 ... L2=3.39e-02, L∞=1.46e-01, Norm L2=3.32e-02, Iter=275, Time=0.01s
+Tolerance: 6e-04 ... L2=3.40e-02, L∞=1.46e-01, Norm L2=3.34e-02, Iter=274, Time=0.01s
+Tolerance: 6e-04 ... L2=3.42e-02, L∞=1.46e-01, Norm L2=3.35e-02, Iter=273, Time=0.01s
+Tolerance: 6e-04 ... L2=3.44e-02, L∞=1.46e-01, Norm L2=3.37e-02, Iter=272, Time=0.01s
+Tolerance: 6e-04 ... L2=3.45e-02, L∞=1.46e-01, Norm L2=3.39e-02, Iter=271, Time=0.01s
+Tolerance: 7e-04 ... L2=3.45e-02, L∞=1.46e-01, Norm L2=3.39e-02, Iter=271, Time=0.01s
+Tolerance: 7e-04 ... L2=3.47e-02, L∞=1.46e-01, Norm L2=3.40e-02, Iter=270, Time=0.01s
+Tolerance: 7e-04 ... L2=3.49e-02, L∞=1.47e-01, Norm L2=3.42e-02, Iter=269, Time=0.01s
+Tolerance: 7e-04 ... L2=3.51e-02, L∞=1.47e-01, Norm L2=3.44e-02, Iter=268, Time=0.01s
+Tolerance: 7e-04 ... L2=3.52e-02, L∞=1.47e-01, Norm L2=3.46e-02, Iter=267, Time=0.01s
+Tolerance: 7e-04 ... L2=3.54e-02, L∞=1.47e-01, Norm L2=3.47e-02, Iter=266, Time=0.01s
+Tolerance: 7e-04 ... L2=3.56e-02, L∞=1.47e-01, Norm L2=3.49e-02, Iter=265, Time=0.01s
+Tolerance: 7e-04 ... L2=3.56e-02, L∞=1.47e-01, Norm L2=3.49e-02, Iter=265, Time=0.01s
+Tolerance: 7e-04 ... L2=3.58e-02, L∞=1.47e-01, Norm L2=3.51e-02, Iter=264, Time=0.01s
+Tolerance: 7e-04 ... L2=3.60e-02, L∞=1.47e-01, Norm L2=3.53e-02, Iter=263, Time=0.01s
+Tolerance: 7e-04 ... L2=3.62e-02, L∞=1.47e-01, Norm L2=3.55e-02, Iter=262, Time=0.01s
+Tolerance: 7e-04 ... L2=3.64e-02, L∞=1.47e-01, Norm L2=3.57e-02, Iter=261, Time=0.01s
+Tolerance: 7e-04 ... L2=3.64e-02, L∞=1.47e-01, Norm L2=3.57e-02, Iter=261, Time=0.01s
+Tolerance: 7e-04 ... L2=3.66e-02, L∞=1.47e-01, Norm L2=3.59e-02, Iter=260, Time=0.01s
+Tolerance: 7e-04 ... L2=3.68e-02, L∞=1.47e-01, Norm L2=3.61e-02, Iter=259, Time=0.01s
+Tolerance: 7e-04 ... L2=3.70e-02, L∞=1.47e-01, Norm L2=3.63e-02, Iter=258, Time=0.01s
+Tolerance: 7e-04 ... L2=3.70e-02, L∞=1.47e-01, Norm L2=3.63e-02, Iter=258, Time=0.01s
+Tolerance: 7e-04 ... L2=3.72e-02, L∞=1.47e-01, Norm L2=3.65e-02, Iter=257, Time=0.01s
+Tolerance: 7e-04 ... L2=3.74e-02, L∞=1.47e-01, Norm L2=3.67e-02, Iter=256, Time=0.01s
+Tolerance: 7e-04 ... L2=3.76e-02, L∞=1.47e-01, Norm L2=3.69e-02, Iter=255, Time=0.01s
+Tolerance: 8e-04 ... L2=3.76e-02, L∞=1.47e-01, Norm L2=3.69e-02, Iter=255, Time=0.01s
+Tolerance: 8e-04 ... L2=3.78e-02, L∞=1.47e-01, Norm L2=3.71e-02, Iter=254, Time=0.01s
+Tolerance: 8e-04 ... L2=3.80e-02, L∞=1.47e-01, Norm L2=3.73e-02, Iter=253, Time=0.01s
+Tolerance: 8e-04 ... L2=3.83e-02, L∞=1.47e-01, Norm L2=3.75e-02, Iter=252, Time=0.01s
+Tolerance: 8e-04 ... L2=3.83e-02, L∞=1.47e-01, Norm L2=3.75e-02, Iter=252, Time=0.01s
+Tolerance: 8e-04 ... L2=3.85e-02, L∞=1.47e-01, Norm L2=3.77e-02, Iter=251, Time=0.01s
+Tolerance: 8e-04 ... L2=3.87e-02, L∞=1.47e-01, Norm L2=3.80e-02, Iter=250, Time=0.01s
+Tolerance: 8e-04 ... L2=3.89e-02, L∞=1.47e-01, Norm L2=3.82e-02, Iter=249, Time=0.01s
+Tolerance: 8e-04 ... L2=3.89e-02, L∞=1.47e-01, Norm L2=3.82e-02, Iter=249, Time=0.01s
+Tolerance: 8e-04 ... L2=3.92e-02, L∞=1.47e-01, Norm L2=3.84e-02, Iter=248, Time=0.01s
+Tolerance: 8e-04 ... L2=3.94e-02, L∞=1.47e-01, Norm L2=3.86e-02, Iter=247, Time=0.01s
+Tolerance: 8e-04 ... L2=3.94e-02, L∞=1.47e-01, Norm L2=3.86e-02, Iter=247, Time=0.01s
+Tolerance: 8e-04 ... L2=3.97e-02, L∞=1.47e-01, Norm L2=3.89e-02, Iter=246, Time=0.01s
+Tolerance: 8e-04 ... L2=3.99e-02, L∞=1.48e-01, Norm L2=3.91e-02, Iter=245, Time=0.01s
+Tolerance: 8e-04 ... L2=3.99e-02, L∞=1.48e-01, Norm L2=3.91e-02, Iter=245, Time=0.01s
+Tolerance: 8e-04 ... L2=4.01e-02, L∞=1.48e-01, Norm L2=3.94e-02, Iter=244, Time=0.01s
+Tolerance: 8e-04 ... L2=4.04e-02, L∞=1.48e-01, Norm L2=3.96e-02, Iter=243, Time=0.01s
+Tolerance: 8e-04 ... L2=4.04e-02, L∞=1.48e-01, Norm L2=3.96e-02, Iter=243, Time=0.01s
+Tolerance: 8e-04 ... L2=4.06e-02, L∞=1.48e-01, Norm L2=3.99e-02, Iter=242, Time=0.01s
+Tolerance: 8e-04 ... L2=4.09e-02, L∞=1.48e-01, Norm L2=4.01e-02, Iter=241, Time=0.01s
+Tolerance: 9e-04 ... L2=4.12e-02, L∞=1.48e-01, Norm L2=4.04e-02, Iter=240, Time=0.01s
+Tolerance: 9e-04 ... L2=4.12e-02, L∞=1.48e-01, Norm L2=4.04e-02, Iter=240, Time=0.01s
+Tolerance: 9e-04 ... L2=4.14e-02, L∞=1.48e-01, Norm L2=4.06e-02, Iter=239, Time=0.01s
+Tolerance: 9e-04 ... L2=4.14e-02, L∞=1.48e-01, Norm L2=4.06e-02, Iter=239, Time=0.01s
+Tolerance: 9e-04 ... L2=4.17e-02, L∞=1.48e-01, Norm L2=4.09e-02, Iter=238, Time=0.01s
+Tolerance: 9e-04 ... L2=4.20e-02, L∞=1.48e-01, Norm L2=4.11e-02, Iter=237, Time=0.01s
+Tolerance: 9e-04 ... L2=4.20e-02, L∞=1.48e-01, Norm L2=4.11e-02, Iter=237, Time=0.01s
+Tolerance: 9e-04 ... L2=4.22e-02, L∞=1.48e-01, Norm L2=4.14e-02, Iter=236, Time=0.01s
+Tolerance: 9e-04 ... L2=4.25e-02, L∞=1.48e-01, Norm L2=4.17e-02, Iter=235, Time=0.01s
+Tolerance: 9e-04 ... L2=4.25e-02, L∞=1.48e-01, Norm L2=4.17e-02, Iter=235, Time=0.01s
+Tolerance: 9e-04 ... L2=4.28e-02, L∞=1.48e-01, Norm L2=4.20e-02, Iter=234, Time=0.01s
+Tolerance: 9e-04 ... L2=4.31e-02, L∞=1.48e-01, Norm L2=4.22e-02, Iter=233, Time=0.01s
+Tolerance: 9e-04 ... L2=4.31e-02, L∞=1.48e-01, Norm L2=4.22e-02, Iter=233, Time=0.01s
+Tolerance: 9e-04 ... L2=4.34e-02, L∞=1.48e-01, Norm L2=4.25e-02, Iter=232, Time=0.01s
+Tolerance: 9e-04 ... L2=4.34e-02, L∞=1.48e-01, Norm L2=4.25e-02, Iter=232, Time=0.01s
+Tolerance: 9e-04 ... L2=4.37e-02, L∞=1.48e-01, Norm L2=4.28e-02, Iter=231, Time=0.01s
+Tolerance: 9e-04 ... L2=4.40e-02, L∞=1.48e-01, Norm L2=4.31e-02, Iter=230, Time=0.01s
+Tolerance: 9e-04 ... L2=4.40e-02, L∞=1.48e-01, Norm L2=4.31e-02, Iter=230, Time=0.01s
+Tolerance: 9e-04 ... L2=4.43e-02, L∞=1.48e-01, Norm L2=4.34e-02, Iter=229, Time=0.01s
+Tolerance: 9e-04 ... L2=4.46e-02, L∞=1.48e-01, Norm L2=4.37e-02, Iter=228, Time=0.01s
+Tolerance: 1e-03 ... L2=4.46e-02, L∞=1.48e-01, Norm L2=4.37e-02, Iter=228, Time=0.01s
+Tolerance: 1e-03 ... L2=4.49e-02, L∞=1.48e-01, Norm L2=4.40e-02, Iter=227, Time=0.01s
+Tolerance: 1e-03 ... L2=4.49e-02, L∞=1.48e-01, Norm L2=4.40e-02, Iter=227, Time=0.01s
+Tolerance: 1e-03 ... L2=4.52e-02, L∞=1.49e-01, Norm L2=4.43e-02, Iter=226, Time=0.01s
+Tolerance: 1e-03 ... L2=4.55e-02, L∞=1.49e-01, Norm L2=4.46e-02, Iter=225, Time=0.01s
+Tolerance: 1e-03 ... L2=4.55e-02, L∞=1.49e-01, Norm L2=4.46e-02, Iter=225, Time=0.01s
+Tolerance: 1e-03 ... L2=4.58e-02, L∞=1.49e-01, Norm L2=4.49e-02, Iter=224, Time=0.01s
+Tolerance: 1e-03 ... L2=4.58e-02, L∞=1.49e-01, Norm L2=4.49e-02, Iter=224, Time=0.01s
+Tolerance: 1e-03 ... L2=4.62e-02, L∞=1.49e-01, Norm L2=4.53e-02, Iter=223, Time=0.01s
+Tolerance: 1e-03 ... L2=4.62e-02, L∞=1.49e-01, Norm L2=4.53e-02, Iter=223, Time=0.01s
+
+=== TOLERANCE SENSITIVITY SUMMARY ===
+Case | Tolerance  | L2-Error   | L∞-Error   | Norm L2    | Norm L∞    | Iterations
+-----|------------|------------|------------|------------|------------|------------
+1    | 1e-08 | 5.74e-07 | 1.23e-06 | 5.74e-07 | 1.23e-06 |    1676
+1    | 5e-06 | 2.94e-04 | 6.26e-04 | 2.94e-04 | 6.26e-04 |    900
+1    | 1e-05 | 5.87e-04 | 1.25e-03 | 5.87e-04 | 1.25e-03 |    814
+1    | 2e-05 | 8.85e-04 | 1.87e-03 | 8.85e-04 | 1.87e-03 |    763
+1    | 2e-05 | 1.19e-03 | 2.51e-03 | 1.19e-03 | 2.51e-03 |    726
+1    | 3e-05 | 1.49e-03 | 3.14e-03 | 1.49e-03 | 3.14e-03 |    698
+1    | 3e-05 | 1.80e-03 | 3.77e-03 | 1.80e-03 | 3.77e-03 |    675
+1    | 4e-05 | 2.09e-03 | 4.39e-03 | 2.09e-03 | 4.39e-03 |    656
+1    | 4e-05 | 2.40e-03 | 5.02e-03 | 2.40e-03 | 5.02e-03 |    639
+1    | 5e-05 | 2.71e-03 | 5.66e-03 | 2.71e-03 | 5.66e-03 |    624
+1    | 5e-05 | 3.01e-03 | 6.27e-03 | 3.01e-03 | 6.27e-03 |    611
+1    | 6e-05 | 3.34e-03 | 6.95e-03 | 3.34e-03 | 6.95e-03 |    598
+1    | 6e-05 | 3.65e-03 | 7.58e-03 | 3.65e-03 | 7.58e-03 |    587
+1    | 7e-05 | 3.95e-03 | 8.21e-03 | 3.95e-03 | 8.21e-03 |    577
+1    | 7e-05 | 4.25e-03 | 8.81e-03 | 4.25e-03 | 8.81e-03 |    568
+1    | 8e-05 | 4.57e-03 | 9.46e-03 | 4.57e-03 | 9.46e-03 |    559
+1    | 8e-05 | 4.87e-03 | 1.01e-02 | 4.87e-03 | 1.01e-02 |    551
+1    | 9e-05 | 5.20e-03 | 1.07e-02 | 5.20e-03 | 1.07e-02 |    543
+1    | 9e-05 | 5.50e-03 | 1.13e-02 | 5.50e-03 | 1.13e-02 |    536
+1    | 1e-04 | 5.82e-03 | 1.20e-02 | 5.82e-03 | 1.20e-02 |    529
+1    | 1e-04 | 6.15e-03 | 1.27e-02 | 6.15e-03 | 1.27e-02 |    522
+1    | 1e-04 | 6.46e-03 | 1.33e-02 | 6.46e-03 | 1.33e-02 |    516
+1    | 1e-04 | 6.78e-03 | 1.39e-02 | 6.78e-03 | 1.39e-02 |    510
+1    | 1e-04 | 7.11e-03 | 1.46e-02 | 7.11e-03 | 1.46e-02 |    504
+1    | 1e-04 | 7.40e-03 | 1.52e-02 | 7.40e-03 | 1.52e-02 |    499
+1    | 1e-04 | 7.77e-03 | 1.59e-02 | 7.77e-03 | 1.59e-02 |    493
+1    | 1e-04 | 8.09e-03 | 1.66e-02 | 8.09e-03 | 1.66e-02 |    488
+1    | 1e-04 | 8.36e-03 | 1.71e-02 | 8.36e-03 | 1.71e-02 |    484
+1    | 1e-04 | 8.70e-03 | 1.78e-02 | 8.70e-03 | 1.78e-02 |    479
+1    | 1e-04 | 9.06e-03 | 1.85e-02 | 9.06e-03 | 1.85e-02 |    474
+1    | 2e-04 | 9.35e-03 | 1.91e-02 | 9.35e-03 | 1.91e-02 |    470
+1    | 2e-04 | 9.66e-03 | 1.97e-02 | 9.66e-03 | 1.97e-02 |    466
+1    | 2e-04 | 9.98e-03 | 2.03e-02 | 9.98e-03 | 2.03e-02 |    462
+1    | 2e-04 | 1.03e-02 | 2.09e-02 | 1.03e-02 | 2.09e-02 |    458
+1    | 2e-04 | 1.06e-02 | 2.16e-02 | 1.06e-02 | 2.16e-02 |    454
+1    | 2e-04 | 1.10e-02 | 2.23e-02 | 1.10e-02 | 2.23e-02 |    450
+1    | 2e-04 | 1.13e-02 | 2.30e-02 | 1.13e-02 | 2.30e-02 |    446
+1    | 2e-04 | 1.16e-02 | 2.36e-02 | 1.16e-02 | 2.36e-02 |    443
+1    | 2e-04 | 1.20e-02 | 2.43e-02 | 1.20e-02 | 2.43e-02 |    439
+1    | 2e-04 | 1.23e-02 | 2.49e-02 | 1.23e-02 | 2.49e-02 |    436
+1    | 2e-04 | 1.26e-02 | 2.55e-02 | 1.26e-02 | 2.55e-02 |    433
+1    | 2e-04 | 1.29e-02 | 2.61e-02 | 1.29e-02 | 2.61e-02 |    430
+1    | 2e-04 | 1.33e-02 | 2.69e-02 | 1.33e-02 | 2.69e-02 |    426
+1    | 2e-04 | 1.37e-02 | 2.75e-02 | 1.37e-02 | 2.75e-02 |    423
+1    | 2e-04 | 1.40e-02 | 2.82e-02 | 1.40e-02 | 2.82e-02 |    420
+1    | 2e-04 | 1.42e-02 | 2.86e-02 | 1.42e-02 | 2.86e-02 |    418
+1    | 2e-04 | 1.46e-02 | 2.93e-02 | 1.46e-02 | 2.93e-02 |    415
+1    | 2e-04 | 1.49e-02 | 3.00e-02 | 1.49e-02 | 3.00e-02 |    412
+1    | 2e-04 | 1.53e-02 | 3.07e-02 | 1.53e-02 | 3.07e-02 |    409
+1    | 2e-04 | 1.57e-02 | 3.15e-02 | 1.57e-02 | 3.15e-02 |    406
+1    | 3e-04 | 1.59e-02 | 3.19e-02 | 1.59e-02 | 3.19e-02 |    404
+1    | 3e-04 | 1.63e-02 | 3.27e-02 | 1.63e-02 | 3.27e-02 |    401
+1    | 3e-04 | 1.66e-02 | 3.32e-02 | 1.66e-02 | 3.32e-02 |    399
+1    | 3e-04 | 1.70e-02 | 3.40e-02 | 1.70e-02 | 3.40e-02 |    396
+1    | 3e-04 | 1.73e-02 | 3.45e-02 | 1.73e-02 | 3.45e-02 |    394
+1    | 3e-04 | 1.77e-02 | 3.54e-02 | 1.77e-02 | 3.54e-02 |    391
+1    | 3e-04 | 1.80e-02 | 3.59e-02 | 1.80e-02 | 3.59e-02 |    389
+1    | 3e-04 | 1.83e-02 | 3.65e-02 | 1.83e-02 | 3.65e-02 |    387
+1    | 3e-04 | 1.87e-02 | 3.73e-02 | 1.87e-02 | 3.73e-02 |    384
+1    | 3e-04 | 1.90e-02 | 3.79e-02 | 1.90e-02 | 3.79e-02 |    382
+1    | 3e-04 | 1.93e-02 | 3.85e-02 | 1.93e-02 | 3.85e-02 |    380
+1    | 3e-04 | 1.96e-02 | 3.91e-02 | 1.96e-02 | 3.91e-02 |    378
+1    | 3e-04 | 2.00e-02 | 3.97e-02 | 2.00e-02 | 3.97e-02 |    376
+1    | 3e-04 | 2.03e-02 | 4.03e-02 | 2.03e-02 | 4.03e-02 |    374
+1    | 3e-04 | 2.06e-02 | 4.10e-02 | 2.06e-02 | 4.10e-02 |    372
+1    | 3e-04 | 2.09e-02 | 4.16e-02 | 2.09e-02 | 4.16e-02 |    370
+1    | 3e-04 | 2.13e-02 | 4.23e-02 | 2.13e-02 | 4.23e-02 |    368
+1    | 3e-04 | 2.16e-02 | 4.29e-02 | 2.16e-02 | 4.29e-02 |    366
+1    | 3e-04 | 2.20e-02 | 4.36e-02 | 2.20e-02 | 4.36e-02 |    364
+1    | 3e-04 | 2.23e-02 | 4.43e-02 | 2.23e-02 | 4.43e-02 |    362
+1    | 4e-04 | 2.27e-02 | 4.50e-02 | 2.27e-02 | 4.50e-02 |    360
+1    | 4e-04 | 2.31e-02 | 4.57e-02 | 2.31e-02 | 4.57e-02 |    358
+1    | 4e-04 | 2.35e-02 | 4.64e-02 | 2.35e-02 | 4.64e-02 |    356
+1    | 4e-04 | 2.38e-02 | 4.71e-02 | 2.38e-02 | 4.71e-02 |    354
+1    | 4e-04 | 2.40e-02 | 4.75e-02 | 2.40e-02 | 4.75e-02 |    353
+1    | 4e-04 | 2.44e-02 | 4.82e-02 | 2.44e-02 | 4.82e-02 |    351
+1    | 4e-04 | 2.48e-02 | 4.90e-02 | 2.48e-02 | 4.90e-02 |    349
+1    | 4e-04 | 2.52e-02 | 4.97e-02 | 2.52e-02 | 4.97e-02 |    347
+1    | 4e-04 | 2.54e-02 | 5.01e-02 | 2.54e-02 | 5.01e-02 |    346
+1    | 4e-04 | 2.58e-02 | 5.09e-02 | 2.58e-02 | 5.09e-02 |    344
+1    | 4e-04 | 2.63e-02 | 5.17e-02 | 2.63e-02 | 5.17e-02 |    342
+1    | 4e-04 | 2.65e-02 | 5.21e-02 | 2.65e-02 | 5.21e-02 |    341
+1    | 4e-04 | 2.69e-02 | 5.29e-02 | 2.69e-02 | 5.29e-02 |    339
+1    | 4e-04 | 2.73e-02 | 5.37e-02 | 2.73e-02 | 5.37e-02 |    337
+1    | 4e-04 | 2.76e-02 | 5.42e-02 | 2.76e-02 | 5.42e-02 |    336
+1    | 4e-04 | 2.80e-02 | 5.50e-02 | 2.80e-02 | 5.50e-02 |    334
+1    | 4e-04 | 2.82e-02 | 5.54e-02 | 2.82e-02 | 5.54e-02 |    333
+1    | 4e-04 | 2.87e-02 | 5.63e-02 | 2.87e-02 | 5.63e-02 |    331
+1    | 4e-04 | 2.89e-02 | 5.67e-02 | 2.89e-02 | 5.67e-02 |    330
+1    | 4e-04 | 2.94e-02 | 5.76e-02 | 2.94e-02 | 5.76e-02 |    328
+1    | 5e-04 | 2.96e-02 | 5.81e-02 | 2.96e-02 | 5.81e-02 |    327
+1    | 5e-04 | 3.01e-02 | 5.90e-02 | 3.01e-02 | 5.90e-02 |    325
+1    | 5e-04 | 3.04e-02 | 5.94e-02 | 3.04e-02 | 5.94e-02 |    324
+1    | 5e-04 | 3.09e-02 | 6.03e-02 | 3.09e-02 | 6.03e-02 |    322
+1    | 5e-04 | 3.11e-02 | 6.08e-02 | 3.11e-02 | 6.08e-02 |    321
+1    | 5e-04 | 3.14e-02 | 6.13e-02 | 3.14e-02 | 6.13e-02 |    320
+1    | 5e-04 | 3.19e-02 | 6.22e-02 | 3.19e-02 | 6.22e-02 |    318
+1    | 5e-04 | 3.21e-02 | 6.27e-02 | 3.21e-02 | 6.27e-02 |    317
+1    | 5e-04 | 3.24e-02 | 6.32e-02 | 3.24e-02 | 6.32e-02 |    316
+1    | 5e-04 | 3.29e-02 | 6.42e-02 | 3.29e-02 | 6.42e-02 |    314
+1    | 5e-04 | 3.32e-02 | 6.47e-02 | 3.32e-02 | 6.47e-02 |    313
+1    | 5e-04 | 3.35e-02 | 6.52e-02 | 3.35e-02 | 6.52e-02 |    312
+1    | 5e-04 | 3.40e-02 | 6.62e-02 | 3.40e-02 | 6.62e-02 |    310
+1    | 5e-04 | 3.43e-02 | 6.67e-02 | 3.43e-02 | 6.67e-02 |    309
+1    | 5e-04 | 3.46e-02 | 6.72e-02 | 3.46e-02 | 6.72e-02 |    308
+1    | 5e-04 | 3.51e-02 | 6.83e-02 | 3.51e-02 | 6.83e-02 |    306
+1    | 5e-04 | 3.54e-02 | 6.88e-02 | 3.54e-02 | 6.88e-02 |    305
+1    | 5e-04 | 3.57e-02 | 6.93e-02 | 3.57e-02 | 6.93e-02 |    304
+1    | 5e-04 | 3.60e-02 | 6.99e-02 | 3.60e-02 | 6.99e-02 |    303
+1    | 5e-04 | 3.66e-02 | 7.09e-02 | 3.66e-02 | 7.09e-02 |    301
+1    | 6e-04 | 3.69e-02 | 7.15e-02 | 3.69e-02 | 7.15e-02 |    300
+1    | 6e-04 | 3.72e-02 | 7.20e-02 | 3.72e-02 | 7.20e-02 |    299
+1    | 6e-04 | 3.75e-02 | 7.26e-02 | 3.75e-02 | 7.26e-02 |    298
+1    | 6e-04 | 3.78e-02 | 7.32e-02 | 3.78e-02 | 7.32e-02 |    297
+1    | 6e-04 | 3.81e-02 | 7.37e-02 | 3.81e-02 | 7.37e-02 |    296
+1    | 6e-04 | 3.87e-02 | 7.49e-02 | 3.87e-02 | 7.49e-02 |    294
+1    | 6e-04 | 3.90e-02 | 7.54e-02 | 3.90e-02 | 7.54e-02 |    293
+1    | 6e-04 | 3.94e-02 | 7.60e-02 | 3.94e-02 | 7.60e-02 |    292
+1    | 6e-04 | 3.97e-02 | 7.66e-02 | 3.97e-02 | 7.66e-02 |    291
+1    | 6e-04 | 4.00e-02 | 7.72e-02 | 4.00e-02 | 7.72e-02 |    290
+1    | 6e-04 | 4.03e-02 | 7.78e-02 | 4.03e-02 | 7.78e-02 |    289
+1    | 6e-04 | 4.06e-02 | 7.84e-02 | 4.06e-02 | 7.84e-02 |    288
+1    | 6e-04 | 4.10e-02 | 7.90e-02 | 4.10e-02 | 7.90e-02 |    287
+1    | 6e-04 | 4.16e-02 | 8.02e-02 | 4.16e-02 | 8.02e-02 |    285
+1    | 6e-04 | 4.20e-02 | 8.08e-02 | 4.20e-02 | 8.08e-02 |    284
+1    | 6e-04 | 4.23e-02 | 8.15e-02 | 4.23e-02 | 8.15e-02 |    283
+1    | 6e-04 | 4.27e-02 | 8.21e-02 | 4.27e-02 | 8.21e-02 |    282
+1    | 6e-04 | 4.30e-02 | 8.27e-02 | 4.30e-02 | 8.27e-02 |    281
+1    | 6e-04 | 4.34e-02 | 8.34e-02 | 4.34e-02 | 8.34e-02 |    280
+1    | 6e-04 | 4.37e-02 | 8.40e-02 | 4.37e-02 | 8.40e-02 |    279
+1    | 7e-04 | 4.41e-02 | 8.46e-02 | 4.41e-02 | 8.46e-02 |    278
+1    | 7e-04 | 4.44e-02 | 8.53e-02 | 4.44e-02 | 8.53e-02 |    277
+1    | 7e-04 | 4.48e-02 | 8.59e-02 | 4.48e-02 | 8.59e-02 |    276
+1    | 7e-04 | 4.52e-02 | 8.66e-02 | 4.52e-02 | 8.66e-02 |    275
+1    | 7e-04 | 4.55e-02 | 8.73e-02 | 4.55e-02 | 8.73e-02 |    274
+1    | 7e-04 | 4.59e-02 | 8.79e-02 | 4.59e-02 | 8.79e-02 |    273
+1    | 7e-04 | 4.63e-02 | 8.86e-02 | 4.63e-02 | 8.86e-02 |    272
+1    | 7e-04 | 4.67e-02 | 8.93e-02 | 4.67e-02 | 8.93e-02 |    271
+1    | 7e-04 | 4.70e-02 | 9.00e-02 | 4.70e-02 | 9.00e-02 |    270
+1    | 7e-04 | 4.74e-02 | 9.07e-02 | 4.74e-02 | 9.07e-02 |    269
+1    | 7e-04 | 4.78e-02 | 9.14e-02 | 4.78e-02 | 9.14e-02 |    268
+1    | 7e-04 | 4.82e-02 | 9.21e-02 | 4.82e-02 | 9.21e-02 |    267
+1    | 7e-04 | 4.86e-02 | 9.28e-02 | 4.86e-02 | 9.28e-02 |    266
+1    | 7e-04 | 4.90e-02 | 9.35e-02 | 4.90e-02 | 9.35e-02 |    265
+1    | 7e-04 | 4.94e-02 | 9.42e-02 | 4.94e-02 | 9.42e-02 |    264
+1    | 7e-04 | 4.94e-02 | 9.42e-02 | 4.94e-02 | 9.42e-02 |    264
+1    | 7e-04 | 4.98e-02 | 9.49e-02 | 4.98e-02 | 9.49e-02 |    263
+1    | 7e-04 | 5.02e-02 | 9.57e-02 | 5.02e-02 | 9.57e-02 |    262
+1    | 7e-04 | 5.06e-02 | 9.64e-02 | 5.06e-02 | 9.64e-02 |    261
+1    | 7e-04 | 5.10e-02 | 9.71e-02 | 5.10e-02 | 9.71e-02 |    260
+1    | 8e-04 | 5.14e-02 | 9.79e-02 | 5.14e-02 | 9.79e-02 |    259
+1    | 8e-04 | 5.18e-02 | 9.86e-02 | 5.18e-02 | 9.86e-02 |    258
+1    | 8e-04 | 5.23e-02 | 9.94e-02 | 5.23e-02 | 9.94e-02 |    257
+1    | 8e-04 | 5.27e-02 | 1.00e-01 | 5.27e-02 | 1.00e-01 |    256
+1    | 8e-04 | 5.27e-02 | 1.00e-01 | 5.27e-02 | 1.00e-01 |    256
+1    | 8e-04 | 5.31e-02 | 1.01e-01 | 5.31e-02 | 1.01e-01 |    255
+1    | 8e-04 | 5.35e-02 | 1.02e-01 | 5.35e-02 | 1.02e-01 |    254
+1    | 8e-04 | 5.40e-02 | 1.02e-01 | 5.40e-02 | 1.02e-01 |    253
+1    | 8e-04 | 5.44e-02 | 1.03e-01 | 5.44e-02 | 1.03e-01 |    252
+1    | 8e-04 | 5.49e-02 | 1.04e-01 | 5.49e-02 | 1.04e-01 |    251
+1    | 8e-04 | 5.53e-02 | 1.05e-01 | 5.53e-02 | 1.05e-01 |    250
+1    | 8e-04 | 5.53e-02 | 1.05e-01 | 5.53e-02 | 1.05e-01 |    250
+1    | 8e-04 | 5.58e-02 | 1.06e-01 | 5.58e-02 | 1.06e-01 |    249
+1    | 8e-04 | 5.62e-02 | 1.06e-01 | 5.62e-02 | 1.06e-01 |    248
+1    | 8e-04 | 5.67e-02 | 1.07e-01 | 5.67e-02 | 1.07e-01 |    247
+1    | 8e-04 | 5.71e-02 | 1.08e-01 | 5.71e-02 | 1.08e-01 |    246
+1    | 8e-04 | 5.71e-02 | 1.08e-01 | 5.71e-02 | 1.08e-01 |    246
+1    | 8e-04 | 5.76e-02 | 1.09e-01 | 5.76e-02 | 1.09e-01 |    245
+1    | 8e-04 | 5.81e-02 | 1.10e-01 | 5.81e-02 | 1.10e-01 |    244
+1    | 8e-04 | 5.85e-02 | 1.11e-01 | 5.85e-02 | 1.11e-01 |    243
+1    | 9e-04 | 5.90e-02 | 1.11e-01 | 5.90e-02 | 1.11e-01 |    242
+1    | 9e-04 | 5.90e-02 | 1.11e-01 | 5.90e-02 | 1.11e-01 |    242
+1    | 9e-04 | 5.95e-02 | 1.12e-01 | 5.95e-02 | 1.12e-01 |    241
+1    | 9e-04 | 6.00e-02 | 1.13e-01 | 6.00e-02 | 1.13e-01 |    240
+1    | 9e-04 | 6.05e-02 | 1.14e-01 | 6.05e-02 | 1.14e-01 |    239
+1    | 9e-04 | 6.10e-02 | 1.15e-01 | 6.10e-02 | 1.15e-01 |    238
+1    | 9e-04 | 6.10e-02 | 1.15e-01 | 6.10e-02 | 1.15e-01 |    238
+1    | 9e-04 | 6.15e-02 | 1.16e-01 | 6.15e-02 | 1.16e-01 |    237
+1    | 9e-04 | 6.20e-02 | 1.17e-01 | 6.20e-02 | 1.17e-01 |    236
+1    | 9e-04 | 6.25e-02 | 1.18e-01 | 6.25e-02 | 1.18e-01 |    235
+1    | 9e-04 | 6.25e-02 | 1.18e-01 | 6.25e-02 | 1.18e-01 |    235
+1    | 9e-04 | 6.30e-02 | 1.18e-01 | 6.30e-02 | 1.18e-01 |    234
+1    | 9e-04 | 6.35e-02 | 1.19e-01 | 6.35e-02 | 1.19e-01 |    233
+1    | 9e-04 | 6.40e-02 | 1.20e-01 | 6.40e-02 | 1.20e-01 |    232
+1    | 9e-04 | 6.40e-02 | 1.20e-01 | 6.40e-02 | 1.20e-01 |    232
+1    | 9e-04 | 6.45e-02 | 1.21e-01 | 6.45e-02 | 1.21e-01 |    231
+1    | 9e-04 | 6.51e-02 | 1.22e-01 | 6.51e-02 | 1.22e-01 |    230
+1    | 9e-04 | 6.51e-02 | 1.22e-01 | 6.51e-02 | 1.22e-01 |    230
+1    | 9e-04 | 6.56e-02 | 1.23e-01 | 6.56e-02 | 1.23e-01 |    229
+1    | 9e-04 | 6.61e-02 | 1.24e-01 | 6.61e-02 | 1.24e-01 |    228
+1    | 1e-03 | 6.67e-02 | 1.25e-01 | 6.67e-02 | 1.25e-01 |    227
+1    | 1e-03 | 6.67e-02 | 1.25e-01 | 6.67e-02 | 1.25e-01 |    227
+1    | 1e-03 | 6.72e-02 | 1.26e-01 | 6.72e-02 | 1.26e-01 |    226
+1    | 1e-03 | 6.78e-02 | 1.27e-01 | 6.78e-02 | 1.27e-01 |    225
+1    | 1e-03 | 6.78e-02 | 1.27e-01 | 6.78e-02 | 1.27e-01 |    225
+1    | 1e-03 | 6.83e-02 | 1.28e-01 | 6.83e-02 | 1.28e-01 |    224
+1    | 1e-03 | 6.89e-02 | 1.29e-01 | 6.89e-02 | 1.29e-01 |    223
+1    | 1e-03 | 6.89e-02 | 1.29e-01 | 6.89e-02 | 1.29e-01 |    223
+1    | 1e-03 | 6.94e-02 | 1.30e-01 | 6.94e-02 | 1.30e-01 |    222
+1    | 1e-03 | 7.00e-02 | 1.31e-01 | 7.00e-02 | 1.31e-01 |    221
+-----|------------|------------|------------|------------|------------|------------
+2    | 1e-08 | 2.41e-02 | 1.43e-01 | 2.36e-02 | 1.40e-01 |    1459
+2    | 5e-06 | 2.41e-02 | 1.43e-01 | 2.36e-02 | 1.40e-01 |    794
+2    | 1e-05 | 2.41e-02 | 1.43e-01 | 2.36e-02 | 1.40e-01 |    720
+2    | 2e-05 | 2.41e-02 | 1.43e-01 | 2.36e-02 | 1.40e-01 |    677
+2    | 2e-05 | 2.41e-02 | 1.43e-01 | 2.37e-02 | 1.40e-01 |    646
+2    | 3e-05 | 2.41e-02 | 1.43e-01 | 2.37e-02 | 1.40e-01 |    622
+2    | 3e-05 | 2.41e-02 | 1.43e-01 | 2.37e-02 | 1.41e-01 |    603
+2    | 4e-05 | 2.41e-02 | 1.43e-01 | 2.37e-02 | 1.41e-01 |    586
+2    | 4e-05 | 2.42e-02 | 1.43e-01 | 2.37e-02 | 1.41e-01 |    572
+2    | 5e-05 | 2.42e-02 | 1.43e-01 | 2.37e-02 | 1.41e-01 |    559
+2    | 5e-05 | 2.42e-02 | 1.43e-01 | 2.37e-02 | 1.41e-01 |    548
+2    | 6e-05 | 2.42e-02 | 1.43e-01 | 2.37e-02 | 1.41e-01 |    538
+2    | 6e-05 | 2.42e-02 | 1.43e-01 | 2.37e-02 | 1.41e-01 |    528
+2    | 7e-05 | 2.42e-02 | 1.43e-01 | 2.37e-02 | 1.41e-01 |    520
+2    | 7e-05 | 2.42e-02 | 1.43e-01 | 2.38e-02 | 1.41e-01 |    512
+2    | 8e-05 | 2.43e-02 | 1.43e-01 | 2.38e-02 | 1.41e-01 |    504
+2    | 8e-05 | 2.43e-02 | 1.44e-01 | 2.38e-02 | 1.41e-01 |    498
+2    | 9e-05 | 2.43e-02 | 1.44e-01 | 2.38e-02 | 1.41e-01 |    491
+2    | 9e-05 | 2.43e-02 | 1.44e-01 | 2.38e-02 | 1.41e-01 |    485
+2    | 1e-04 | 2.43e-02 | 1.44e-01 | 2.39e-02 | 1.41e-01 |    479
+2    | 1e-04 | 2.44e-02 | 1.44e-01 | 2.39e-02 | 1.41e-01 |    474
+2    | 1e-04 | 2.44e-02 | 1.44e-01 | 2.39e-02 | 1.41e-01 |    468
+2    | 1e-04 | 2.44e-02 | 1.44e-01 | 2.40e-02 | 1.41e-01 |    463
+2    | 1e-04 | 2.45e-02 | 1.44e-01 | 2.40e-02 | 1.41e-01 |    459
+2    | 1e-04 | 2.45e-02 | 1.44e-01 | 2.40e-02 | 1.41e-01 |    454
+2    | 1e-04 | 2.45e-02 | 1.44e-01 | 2.40e-02 | 1.41e-01 |    450
+2    | 1e-04 | 2.46e-02 | 1.44e-01 | 2.41e-02 | 1.41e-01 |    445
+2    | 1e-04 | 2.46e-02 | 1.44e-01 | 2.41e-02 | 1.41e-01 |    441
+2    | 1e-04 | 2.46e-02 | 1.44e-01 | 2.42e-02 | 1.41e-01 |    437
+2    | 1e-04 | 2.47e-02 | 1.44e-01 | 2.42e-02 | 1.41e-01 |    434
+2    | 2e-04 | 2.47e-02 | 1.44e-01 | 2.42e-02 | 1.41e-01 |    430
+2    | 2e-04 | 2.48e-02 | 1.44e-01 | 2.43e-02 | 1.41e-01 |    426
+2    | 2e-04 | 2.48e-02 | 1.44e-01 | 2.43e-02 | 1.41e-01 |    423
+2    | 2e-04 | 2.48e-02 | 1.44e-01 | 2.43e-02 | 1.41e-01 |    420
+2    | 2e-04 | 2.49e-02 | 1.44e-01 | 2.44e-02 | 1.41e-01 |    417
+2    | 2e-04 | 2.49e-02 | 1.44e-01 | 2.44e-02 | 1.41e-01 |    413
+2    | 2e-04 | 2.50e-02 | 1.44e-01 | 2.45e-02 | 1.41e-01 |    410
+2    | 2e-04 | 2.50e-02 | 1.44e-01 | 2.45e-02 | 1.41e-01 |    407
+2    | 2e-04 | 2.51e-02 | 1.44e-01 | 2.46e-02 | 1.41e-01 |    405
+2    | 2e-04 | 2.51e-02 | 1.44e-01 | 2.46e-02 | 1.41e-01 |    402
+2    | 2e-04 | 2.52e-02 | 1.44e-01 | 2.47e-02 | 1.41e-01 |    399
+2    | 2e-04 | 2.52e-02 | 1.44e-01 | 2.47e-02 | 1.41e-01 |    396
+2    | 2e-04 | 2.53e-02 | 1.44e-01 | 2.48e-02 | 1.41e-01 |    394
+2    | 2e-04 | 2.54e-02 | 1.44e-01 | 2.49e-02 | 1.41e-01 |    391
+2    | 2e-04 | 2.54e-02 | 1.44e-01 | 2.49e-02 | 1.41e-01 |    389
+2    | 2e-04 | 2.55e-02 | 1.44e-01 | 2.50e-02 | 1.41e-01 |    386
+2    | 2e-04 | 2.55e-02 | 1.44e-01 | 2.50e-02 | 1.41e-01 |    384
+2    | 2e-04 | 2.56e-02 | 1.44e-01 | 2.51e-02 | 1.41e-01 |    382
+2    | 2e-04 | 2.57e-02 | 1.44e-01 | 2.52e-02 | 1.41e-01 |    379
+2    | 2e-04 | 2.57e-02 | 1.44e-01 | 2.52e-02 | 1.41e-01 |    377
+2    | 3e-04 | 2.58e-02 | 1.44e-01 | 2.53e-02 | 1.41e-01 |    375
+2    | 3e-04 | 2.58e-02 | 1.44e-01 | 2.53e-02 | 1.41e-01 |    373
+2    | 3e-04 | 2.59e-02 | 1.44e-01 | 2.54e-02 | 1.42e-01 |    371
+2    | 3e-04 | 2.60e-02 | 1.44e-01 | 2.55e-02 | 1.42e-01 |    369
+2    | 3e-04 | 2.61e-02 | 1.44e-01 | 2.55e-02 | 1.42e-01 |    367
+2    | 3e-04 | 2.61e-02 | 1.44e-01 | 2.56e-02 | 1.42e-01 |    365
+2    | 3e-04 | 2.62e-02 | 1.44e-01 | 2.57e-02 | 1.42e-01 |    363
+2    | 3e-04 | 2.63e-02 | 1.44e-01 | 2.58e-02 | 1.42e-01 |    361
+2    | 3e-04 | 2.64e-02 | 1.44e-01 | 2.58e-02 | 1.42e-01 |    359
+2    | 3e-04 | 2.64e-02 | 1.45e-01 | 2.59e-02 | 1.42e-01 |    357
+2    | 3e-04 | 2.65e-02 | 1.45e-01 | 2.60e-02 | 1.42e-01 |    355
+2    | 3e-04 | 2.66e-02 | 1.45e-01 | 2.61e-02 | 1.42e-01 |    353
+2    | 3e-04 | 2.67e-02 | 1.45e-01 | 2.61e-02 | 1.42e-01 |    352
+2    | 3e-04 | 2.68e-02 | 1.45e-01 | 2.62e-02 | 1.42e-01 |    350
+2    | 3e-04 | 2.69e-02 | 1.45e-01 | 2.63e-02 | 1.42e-01 |    348
+2    | 3e-04 | 2.70e-02 | 1.45e-01 | 2.64e-02 | 1.42e-01 |    346
+2    | 3e-04 | 2.70e-02 | 1.45e-01 | 2.65e-02 | 1.42e-01 |    345
+2    | 3e-04 | 2.71e-02 | 1.45e-01 | 2.66e-02 | 1.42e-01 |    343
+2    | 3e-04 | 2.72e-02 | 1.45e-01 | 2.66e-02 | 1.42e-01 |    342
+2    | 3e-04 | 2.73e-02 | 1.45e-01 | 2.68e-02 | 1.42e-01 |    340
+2    | 4e-04 | 2.74e-02 | 1.45e-01 | 2.69e-02 | 1.42e-01 |    338
+2    | 4e-04 | 2.75e-02 | 1.45e-01 | 2.69e-02 | 1.42e-01 |    337
+2    | 4e-04 | 2.76e-02 | 1.45e-01 | 2.70e-02 | 1.42e-01 |    335
+2    | 4e-04 | 2.76e-02 | 1.45e-01 | 2.71e-02 | 1.42e-01 |    334
+2    | 4e-04 | 2.78e-02 | 1.45e-01 | 2.72e-02 | 1.42e-01 |    332
+2    | 4e-04 | 2.78e-02 | 1.45e-01 | 2.73e-02 | 1.42e-01 |    331
+2    | 4e-04 | 2.80e-02 | 1.45e-01 | 2.74e-02 | 1.42e-01 |    329
+2    | 4e-04 | 2.80e-02 | 1.45e-01 | 2.75e-02 | 1.42e-01 |    328
+2    | 4e-04 | 2.81e-02 | 1.45e-01 | 2.76e-02 | 1.42e-01 |    327
+2    | 4e-04 | 2.83e-02 | 1.45e-01 | 2.77e-02 | 1.42e-01 |    325
+2    | 4e-04 | 2.83e-02 | 1.45e-01 | 2.78e-02 | 1.42e-01 |    324
+2    | 4e-04 | 2.84e-02 | 1.45e-01 | 2.79e-02 | 1.42e-01 |    323
+2    | 4e-04 | 2.86e-02 | 1.45e-01 | 2.80e-02 | 1.42e-01 |    321
+2    | 4e-04 | 2.86e-02 | 1.45e-01 | 2.81e-02 | 1.42e-01 |    320
+2    | 4e-04 | 2.87e-02 | 1.45e-01 | 2.82e-02 | 1.42e-01 |    319
+2    | 4e-04 | 2.89e-02 | 1.45e-01 | 2.83e-02 | 1.42e-01 |    317
+2    | 4e-04 | 2.90e-02 | 1.45e-01 | 2.84e-02 | 1.42e-01 |    316
+2    | 4e-04 | 2.91e-02 | 1.45e-01 | 2.85e-02 | 1.42e-01 |    315
+2    | 4e-04 | 2.92e-02 | 1.45e-01 | 2.87e-02 | 1.42e-01 |    313
+2    | 4e-04 | 2.93e-02 | 1.45e-01 | 2.88e-02 | 1.42e-01 |    312
+2    | 5e-04 | 2.94e-02 | 1.45e-01 | 2.88e-02 | 1.42e-01 |    311
+2    | 5e-04 | 2.95e-02 | 1.45e-01 | 2.89e-02 | 1.42e-01 |    310
+2    | 5e-04 | 2.96e-02 | 1.45e-01 | 2.90e-02 | 1.43e-01 |    309
+2    | 5e-04 | 2.98e-02 | 1.45e-01 | 2.92e-02 | 1.43e-01 |    307
+2    | 5e-04 | 2.99e-02 | 1.45e-01 | 2.93e-02 | 1.43e-01 |    306
+2    | 5e-04 | 3.00e-02 | 1.45e-01 | 2.94e-02 | 1.43e-01 |    305
+2    | 5e-04 | 3.01e-02 | 1.45e-01 | 2.95e-02 | 1.43e-01 |    304
+2    | 5e-04 | 3.02e-02 | 1.45e-01 | 2.96e-02 | 1.43e-01 |    303
+2    | 5e-04 | 3.03e-02 | 1.46e-01 | 2.97e-02 | 1.43e-01 |    302
+2    | 5e-04 | 3.04e-02 | 1.46e-01 | 2.98e-02 | 1.43e-01 |    301
+2    | 5e-04 | 3.06e-02 | 1.46e-01 | 3.00e-02 | 1.43e-01 |    299
+2    | 5e-04 | 3.08e-02 | 1.46e-01 | 3.02e-02 | 1.43e-01 |    298
+2    | 5e-04 | 3.09e-02 | 1.46e-01 | 3.03e-02 | 1.43e-01 |    297
+2    | 5e-04 | 3.10e-02 | 1.46e-01 | 3.04e-02 | 1.43e-01 |    296
+2    | 5e-04 | 3.11e-02 | 1.46e-01 | 3.05e-02 | 1.43e-01 |    295
+2    | 5e-04 | 3.12e-02 | 1.46e-01 | 3.06e-02 | 1.43e-01 |    294
+2    | 5e-04 | 3.13e-02 | 1.46e-01 | 3.07e-02 | 1.43e-01 |    293
+2    | 5e-04 | 3.15e-02 | 1.46e-01 | 3.09e-02 | 1.43e-01 |    292
+2    | 5e-04 | 3.16e-02 | 1.46e-01 | 3.10e-02 | 1.43e-01 |    291
+2    | 5e-04 | 3.17e-02 | 1.46e-01 | 3.11e-02 | 1.43e-01 |    290
+2    | 6e-04 | 3.18e-02 | 1.46e-01 | 3.12e-02 | 1.43e-01 |    289
+2    | 6e-04 | 3.20e-02 | 1.46e-01 | 3.14e-02 | 1.43e-01 |    288
+2    | 6e-04 | 3.21e-02 | 1.46e-01 | 3.15e-02 | 1.43e-01 |    287
+2    | 6e-04 | 3.22e-02 | 1.46e-01 | 3.16e-02 | 1.43e-01 |    286
+2    | 6e-04 | 3.24e-02 | 1.46e-01 | 3.18e-02 | 1.43e-01 |    285
+2    | 6e-04 | 3.25e-02 | 1.46e-01 | 3.19e-02 | 1.43e-01 |    284
+2    | 6e-04 | 3.27e-02 | 1.46e-01 | 3.20e-02 | 1.43e-01 |    283
+2    | 6e-04 | 3.28e-02 | 1.46e-01 | 3.22e-02 | 1.43e-01 |    282
+2    | 6e-04 | 3.30e-02 | 1.46e-01 | 3.23e-02 | 1.43e-01 |    281
+2    | 6e-04 | 3.31e-02 | 1.46e-01 | 3.25e-02 | 1.43e-01 |    280
+2    | 6e-04 | 3.33e-02 | 1.46e-01 | 3.26e-02 | 1.43e-01 |    279
+2    | 6e-04 | 3.34e-02 | 1.46e-01 | 3.28e-02 | 1.43e-01 |    278
+2    | 6e-04 | 3.34e-02 | 1.46e-01 | 3.28e-02 | 1.43e-01 |    278
+2    | 6e-04 | 3.36e-02 | 1.46e-01 | 3.29e-02 | 1.43e-01 |    277
+2    | 6e-04 | 3.37e-02 | 1.46e-01 | 3.31e-02 | 1.43e-01 |    276
+2    | 6e-04 | 3.39e-02 | 1.46e-01 | 3.32e-02 | 1.43e-01 |    275
+2    | 6e-04 | 3.40e-02 | 1.46e-01 | 3.34e-02 | 1.43e-01 |    274
+2    | 6e-04 | 3.42e-02 | 1.46e-01 | 3.35e-02 | 1.44e-01 |    273
+2    | 6e-04 | 3.44e-02 | 1.46e-01 | 3.37e-02 | 1.44e-01 |    272
+2    | 6e-04 | 3.45e-02 | 1.46e-01 | 3.39e-02 | 1.44e-01 |    271
+2    | 7e-04 | 3.45e-02 | 1.46e-01 | 3.39e-02 | 1.44e-01 |    271
+2    | 7e-04 | 3.47e-02 | 1.46e-01 | 3.40e-02 | 1.44e-01 |    270
+2    | 7e-04 | 3.49e-02 | 1.47e-01 | 3.42e-02 | 1.44e-01 |    269
+2    | 7e-04 | 3.51e-02 | 1.47e-01 | 3.44e-02 | 1.44e-01 |    268
+2    | 7e-04 | 3.52e-02 | 1.47e-01 | 3.46e-02 | 1.44e-01 |    267
+2    | 7e-04 | 3.54e-02 | 1.47e-01 | 3.47e-02 | 1.44e-01 |    266
+2    | 7e-04 | 3.56e-02 | 1.47e-01 | 3.49e-02 | 1.44e-01 |    265
+2    | 7e-04 | 3.56e-02 | 1.47e-01 | 3.49e-02 | 1.44e-01 |    265
+2    | 7e-04 | 3.58e-02 | 1.47e-01 | 3.51e-02 | 1.44e-01 |    264
+2    | 7e-04 | 3.60e-02 | 1.47e-01 | 3.53e-02 | 1.44e-01 |    263
+2    | 7e-04 | 3.62e-02 | 1.47e-01 | 3.55e-02 | 1.44e-01 |    262
+2    | 7e-04 | 3.64e-02 | 1.47e-01 | 3.57e-02 | 1.44e-01 |    261
+2    | 7e-04 | 3.64e-02 | 1.47e-01 | 3.57e-02 | 1.44e-01 |    261
+2    | 7e-04 | 3.66e-02 | 1.47e-01 | 3.59e-02 | 1.44e-01 |    260
+2    | 7e-04 | 3.68e-02 | 1.47e-01 | 3.61e-02 | 1.44e-01 |    259
+2    | 7e-04 | 3.70e-02 | 1.47e-01 | 3.63e-02 | 1.44e-01 |    258
+2    | 7e-04 | 3.70e-02 | 1.47e-01 | 3.63e-02 | 1.44e-01 |    258
+2    | 7e-04 | 3.72e-02 | 1.47e-01 | 3.65e-02 | 1.44e-01 |    257
+2    | 7e-04 | 3.74e-02 | 1.47e-01 | 3.67e-02 | 1.44e-01 |    256
+2    | 7e-04 | 3.76e-02 | 1.47e-01 | 3.69e-02 | 1.44e-01 |    255
+2    | 8e-04 | 3.76e-02 | 1.47e-01 | 3.69e-02 | 1.44e-01 |    255
+2    | 8e-04 | 3.78e-02 | 1.47e-01 | 3.71e-02 | 1.44e-01 |    254
+2    | 8e-04 | 3.80e-02 | 1.47e-01 | 3.73e-02 | 1.44e-01 |    253
+2    | 8e-04 | 3.83e-02 | 1.47e-01 | 3.75e-02 | 1.44e-01 |    252
+2    | 8e-04 | 3.83e-02 | 1.47e-01 | 3.75e-02 | 1.44e-01 |    252
+2    | 8e-04 | 3.85e-02 | 1.47e-01 | 3.77e-02 | 1.44e-01 |    251
+2    | 8e-04 | 3.87e-02 | 1.47e-01 | 3.80e-02 | 1.44e-01 |    250
+2    | 8e-04 | 3.89e-02 | 1.47e-01 | 3.82e-02 | 1.44e-01 |    249
+2    | 8e-04 | 3.89e-02 | 1.47e-01 | 3.82e-02 | 1.44e-01 |    249
+2    | 8e-04 | 3.92e-02 | 1.47e-01 | 3.84e-02 | 1.44e-01 |    248
+2    | 8e-04 | 3.94e-02 | 1.47e-01 | 3.86e-02 | 1.45e-01 |    247
+2    | 8e-04 | 3.94e-02 | 1.47e-01 | 3.86e-02 | 1.45e-01 |    247
+2    | 8e-04 | 3.97e-02 | 1.47e-01 | 3.89e-02 | 1.45e-01 |    246
+2    | 8e-04 | 3.99e-02 | 1.48e-01 | 3.91e-02 | 1.45e-01 |    245
+2    | 8e-04 | 3.99e-02 | 1.48e-01 | 3.91e-02 | 1.45e-01 |    245
+2    | 8e-04 | 4.01e-02 | 1.48e-01 | 3.94e-02 | 1.45e-01 |    244
+2    | 8e-04 | 4.04e-02 | 1.48e-01 | 3.96e-02 | 1.45e-01 |    243
+2    | 8e-04 | 4.04e-02 | 1.48e-01 | 3.96e-02 | 1.45e-01 |    243
+2    | 8e-04 | 4.06e-02 | 1.48e-01 | 3.99e-02 | 1.45e-01 |    242
+2    | 8e-04 | 4.09e-02 | 1.48e-01 | 4.01e-02 | 1.45e-01 |    241
+2    | 9e-04 | 4.12e-02 | 1.48e-01 | 4.04e-02 | 1.45e-01 |    240
+2    | 9e-04 | 4.12e-02 | 1.48e-01 | 4.04e-02 | 1.45e-01 |    240
+2    | 9e-04 | 4.14e-02 | 1.48e-01 | 4.06e-02 | 1.45e-01 |    239
+2    | 9e-04 | 4.14e-02 | 1.48e-01 | 4.06e-02 | 1.45e-01 |    239
+2    | 9e-04 | 4.17e-02 | 1.48e-01 | 4.09e-02 | 1.45e-01 |    238
+2    | 9e-04 | 4.20e-02 | 1.48e-01 | 4.11e-02 | 1.45e-01 |    237
+2    | 9e-04 | 4.20e-02 | 1.48e-01 | 4.11e-02 | 1.45e-01 |    237
+2    | 9e-04 | 4.22e-02 | 1.48e-01 | 4.14e-02 | 1.45e-01 |    236
+2    | 9e-04 | 4.25e-02 | 1.48e-01 | 4.17e-02 | 1.45e-01 |    235
+2    | 9e-04 | 4.25e-02 | 1.48e-01 | 4.17e-02 | 1.45e-01 |    235
+2    | 9e-04 | 4.28e-02 | 1.48e-01 | 4.20e-02 | 1.45e-01 |    234
+2    | 9e-04 | 4.31e-02 | 1.48e-01 | 4.22e-02 | 1.45e-01 |    233
+2    | 9e-04 | 4.31e-02 | 1.48e-01 | 4.22e-02 | 1.45e-01 |    233
+2    | 9e-04 | 4.34e-02 | 1.48e-01 | 4.25e-02 | 1.45e-01 |    232
+2    | 9e-04 | 4.34e-02 | 1.48e-01 | 4.25e-02 | 1.45e-01 |    232
+2    | 9e-04 | 4.37e-02 | 1.48e-01 | 4.28e-02 | 1.45e-01 |    231
+2    | 9e-04 | 4.40e-02 | 1.48e-01 | 4.31e-02 | 1.45e-01 |    230
+2    | 9e-04 | 4.40e-02 | 1.48e-01 | 4.31e-02 | 1.45e-01 |    230
+2    | 9e-04 | 4.43e-02 | 1.48e-01 | 4.34e-02 | 1.45e-01 |    229
+2    | 9e-04 | 4.46e-02 | 1.48e-01 | 4.37e-02 | 1.46e-01 |    228
+2    | 1e-03 | 4.46e-02 | 1.48e-01 | 4.37e-02 | 1.46e-01 |    228
+2    | 1e-03 | 4.49e-02 | 1.48e-01 | 4.40e-02 | 1.46e-01 |    227
+2    | 1e-03 | 4.49e-02 | 1.48e-01 | 4.40e-02 | 1.46e-01 |    227
+2    | 1e-03 | 4.52e-02 | 1.49e-01 | 4.43e-02 | 1.46e-01 |    226
+2    | 1e-03 | 4.55e-02 | 1.49e-01 | 4.46e-02 | 1.46e-01 |    225
+2    | 1e-03 | 4.55e-02 | 1.49e-01 | 4.46e-02 | 1.46e-01 |    225
+2    | 1e-03 | 4.58e-02 | 1.49e-01 | 4.49e-02 | 1.46e-01 |    224
+2    | 1e-03 | 4.58e-02 | 1.49e-01 | 4.49e-02 | 1.46e-01 |    224
+2    | 1e-03 | 4.62e-02 | 1.49e-01 | 4.53e-02 | 1.46e-01 |    223
+2    | 1e-03 | 4.62e-02 | 1.49e-01 | 4.53e-02 | 1.46e-01 |    223
+-----|------------|------------|------------|------------|------------|------------
+3    | 1e-08 | 2.41e-02 | 1.43e-01 | 2.36e-02 | 1.40e-01 |    1459
+3    | 5e-06 | 2.41e-02 | 1.43e-01 | 2.36e-02 | 1.40e-01 |    794
+3    | 1e-05 | 2.41e-02 | 1.43e-01 | 2.36e-02 | 1.40e-01 |    720
+3    | 2e-05 | 2.41e-02 | 1.43e-01 | 2.36e-02 | 1.40e-01 |    677
+3    | 2e-05 | 2.41e-02 | 1.43e-01 | 2.37e-02 | 1.40e-01 |    646
+3    | 3e-05 | 2.41e-02 | 1.43e-01 | 2.37e-02 | 1.40e-01 |    622
+3    | 3e-05 | 2.41e-02 | 1.43e-01 | 2.37e-02 | 1.41e-01 |    603
+3    | 4e-05 | 2.41e-02 | 1.43e-01 | 2.37e-02 | 1.41e-01 |    586
+3    | 4e-05 | 2.42e-02 | 1.43e-01 | 2.37e-02 | 1.41e-01 |    572
+3    | 5e-05 | 2.42e-02 | 1.43e-01 | 2.37e-02 | 1.41e-01 |    559
+3    | 5e-05 | 2.42e-02 | 1.43e-01 | 2.37e-02 | 1.41e-01 |    548
+3    | 6e-05 | 2.42e-02 | 1.43e-01 | 2.37e-02 | 1.41e-01 |    538
+3    | 6e-05 | 2.42e-02 | 1.43e-01 | 2.37e-02 | 1.41e-01 |    528
+3    | 7e-05 | 2.42e-02 | 1.43e-01 | 2.37e-02 | 1.41e-01 |    520
+3    | 7e-05 | 2.42e-02 | 1.43e-01 | 2.38e-02 | 1.41e-01 |    512
+3    | 8e-05 | 2.43e-02 | 1.43e-01 | 2.38e-02 | 1.41e-01 |    504
+3    | 8e-05 | 2.43e-02 | 1.44e-01 | 2.38e-02 | 1.41e-01 |    498
+3    | 9e-05 | 2.43e-02 | 1.44e-01 | 2.38e-02 | 1.41e-01 |    491
+3    | 9e-05 | 2.43e-02 | 1.44e-01 | 2.38e-02 | 1.41e-01 |    485
+3    | 1e-04 | 2.43e-02 | 1.44e-01 | 2.39e-02 | 1.41e-01 |    479
+3    | 1e-04 | 2.44e-02 | 1.44e-01 | 2.39e-02 | 1.41e-01 |    474
+3    | 1e-04 | 2.44e-02 | 1.44e-01 | 2.39e-02 | 1.41e-01 |    468
+3    | 1e-04 | 2.44e-02 | 1.44e-01 | 2.40e-02 | 1.41e-01 |    463
+3    | 1e-04 | 2.45e-02 | 1.44e-01 | 2.40e-02 | 1.41e-01 |    459
+3    | 1e-04 | 2.45e-02 | 1.44e-01 | 2.40e-02 | 1.41e-01 |    454
+3    | 1e-04 | 2.45e-02 | 1.44e-01 | 2.40e-02 | 1.41e-01 |    450
+3    | 1e-04 | 2.46e-02 | 1.44e-01 | 2.41e-02 | 1.41e-01 |    445
+3    | 1e-04 | 2.46e-02 | 1.44e-01 | 2.41e-02 | 1.41e-01 |    441
+3    | 1e-04 | 2.46e-02 | 1.44e-01 | 2.42e-02 | 1.41e-01 |    437
+3    | 1e-04 | 2.47e-02 | 1.44e-01 | 2.42e-02 | 1.41e-01 |    434
+3    | 2e-04 | 2.47e-02 | 1.44e-01 | 2.42e-02 | 1.41e-01 |    430
+3    | 2e-04 | 2.48e-02 | 1.44e-01 | 2.43e-02 | 1.41e-01 |    426
+3    | 2e-04 | 2.48e-02 | 1.44e-01 | 2.43e-02 | 1.41e-01 |    423
+3    | 2e-04 | 2.48e-02 | 1.44e-01 | 2.43e-02 | 1.41e-01 |    420
+3    | 2e-04 | 2.49e-02 | 1.44e-01 | 2.44e-02 | 1.41e-01 |    417
+3    | 2e-04 | 2.49e-02 | 1.44e-01 | 2.44e-02 | 1.41e-01 |    413
+3    | 2e-04 | 2.50e-02 | 1.44e-01 | 2.45e-02 | 1.41e-01 |    410
+3    | 2e-04 | 2.50e-02 | 1.44e-01 | 2.45e-02 | 1.41e-01 |    407
+3    | 2e-04 | 2.51e-02 | 1.44e-01 | 2.46e-02 | 1.41e-01 |    405
+3    | 2e-04 | 2.51e-02 | 1.44e-01 | 2.46e-02 | 1.41e-01 |    402
+3    | 2e-04 | 2.52e-02 | 1.44e-01 | 2.47e-02 | 1.41e-01 |    399
+3    | 2e-04 | 2.52e-02 | 1.44e-01 | 2.47e-02 | 1.41e-01 |    396
+3    | 2e-04 | 2.53e-02 | 1.44e-01 | 2.48e-02 | 1.41e-01 |    394
+3    | 2e-04 | 2.54e-02 | 1.44e-01 | 2.49e-02 | 1.41e-01 |    391
+3    | 2e-04 | 2.54e-02 | 1.44e-01 | 2.49e-02 | 1.41e-01 |    389
+3    | 2e-04 | 2.55e-02 | 1.44e-01 | 2.50e-02 | 1.41e-01 |    386
+3    | 2e-04 | 2.55e-02 | 1.44e-01 | 2.50e-02 | 1.41e-01 |    384
+3    | 2e-04 | 2.56e-02 | 1.44e-01 | 2.51e-02 | 1.41e-01 |    382
+3    | 2e-04 | 2.57e-02 | 1.44e-01 | 2.52e-02 | 1.41e-01 |    379
+3    | 2e-04 | 2.57e-02 | 1.44e-01 | 2.52e-02 | 1.41e-01 |    377
+3    | 3e-04 | 2.58e-02 | 1.44e-01 | 2.53e-02 | 1.41e-01 |    375
+3    | 3e-04 | 2.58e-02 | 1.44e-01 | 2.53e-02 | 1.41e-01 |    373
+3    | 3e-04 | 2.59e-02 | 1.44e-01 | 2.54e-02 | 1.42e-01 |    371
+3    | 3e-04 | 2.60e-02 | 1.44e-01 | 2.55e-02 | 1.42e-01 |    369
+3    | 3e-04 | 2.61e-02 | 1.44e-01 | 2.55e-02 | 1.42e-01 |    367
+3    | 3e-04 | 2.61e-02 | 1.44e-01 | 2.56e-02 | 1.42e-01 |    365
+3    | 3e-04 | 2.62e-02 | 1.44e-01 | 2.57e-02 | 1.42e-01 |    363
+3    | 3e-04 | 2.63e-02 | 1.44e-01 | 2.58e-02 | 1.42e-01 |    361
+3    | 3e-04 | 2.64e-02 | 1.44e-01 | 2.58e-02 | 1.42e-01 |    359
+3    | 3e-04 | 2.64e-02 | 1.45e-01 | 2.59e-02 | 1.42e-01 |    357
+3    | 3e-04 | 2.65e-02 | 1.45e-01 | 2.60e-02 | 1.42e-01 |    355
+3    | 3e-04 | 2.66e-02 | 1.45e-01 | 2.61e-02 | 1.42e-01 |    353
+3    | 3e-04 | 2.67e-02 | 1.45e-01 | 2.61e-02 | 1.42e-01 |    352
+3    | 3e-04 | 2.68e-02 | 1.45e-01 | 2.62e-02 | 1.42e-01 |    350
+3    | 3e-04 | 2.69e-02 | 1.45e-01 | 2.63e-02 | 1.42e-01 |    348
+3    | 3e-04 | 2.70e-02 | 1.45e-01 | 2.64e-02 | 1.42e-01 |    346
+3    | 3e-04 | 2.70e-02 | 1.45e-01 | 2.65e-02 | 1.42e-01 |    345
+3    | 3e-04 | 2.71e-02 | 1.45e-01 | 2.66e-02 | 1.42e-01 |    343
+3    | 3e-04 | 2.72e-02 | 1.45e-01 | 2.66e-02 | 1.42e-01 |    342
+3    | 3e-04 | 2.73e-02 | 1.45e-01 | 2.68e-02 | 1.42e-01 |    340
+3    | 4e-04 | 2.74e-02 | 1.45e-01 | 2.69e-02 | 1.42e-01 |    338
+3    | 4e-04 | 2.75e-02 | 1.45e-01 | 2.69e-02 | 1.42e-01 |    337
+3    | 4e-04 | 2.76e-02 | 1.45e-01 | 2.70e-02 | 1.42e-01 |    335
+3    | 4e-04 | 2.76e-02 | 1.45e-01 | 2.71e-02 | 1.42e-01 |    334
+3    | 4e-04 | 2.78e-02 | 1.45e-01 | 2.72e-02 | 1.42e-01 |    332
+3    | 4e-04 | 2.78e-02 | 1.45e-01 | 2.73e-02 | 1.42e-01 |    331
+3    | 4e-04 | 2.80e-02 | 1.45e-01 | 2.74e-02 | 1.42e-01 |    329
+3    | 4e-04 | 2.80e-02 | 1.45e-01 | 2.75e-02 | 1.42e-01 |    328
+3    | 4e-04 | 2.81e-02 | 1.45e-01 | 2.76e-02 | 1.42e-01 |    327
+3    | 4e-04 | 2.83e-02 | 1.45e-01 | 2.77e-02 | 1.42e-01 |    325
+3    | 4e-04 | 2.83e-02 | 1.45e-01 | 2.78e-02 | 1.42e-01 |    324
+3    | 4e-04 | 2.84e-02 | 1.45e-01 | 2.79e-02 | 1.42e-01 |    323
+3    | 4e-04 | 2.86e-02 | 1.45e-01 | 2.80e-02 | 1.42e-01 |    321
+3    | 4e-04 | 2.86e-02 | 1.45e-01 | 2.81e-02 | 1.42e-01 |    320
+3    | 4e-04 | 2.87e-02 | 1.45e-01 | 2.82e-02 | 1.42e-01 |    319
+3    | 4e-04 | 2.89e-02 | 1.45e-01 | 2.83e-02 | 1.42e-01 |    317
+3    | 4e-04 | 2.90e-02 | 1.45e-01 | 2.84e-02 | 1.42e-01 |    316
+3    | 4e-04 | 2.91e-02 | 1.45e-01 | 2.85e-02 | 1.42e-01 |    315
+3    | 4e-04 | 2.92e-02 | 1.45e-01 | 2.87e-02 | 1.42e-01 |    313
+3    | 4e-04 | 2.93e-02 | 1.45e-01 | 2.88e-02 | 1.42e-01 |    312
+3    | 5e-04 | 2.94e-02 | 1.45e-01 | 2.88e-02 | 1.42e-01 |    311
+3    | 5e-04 | 2.95e-02 | 1.45e-01 | 2.89e-02 | 1.42e-01 |    310
+3    | 5e-04 | 2.96e-02 | 1.45e-01 | 2.90e-02 | 1.43e-01 |    309
+3    | 5e-04 | 2.98e-02 | 1.45e-01 | 2.92e-02 | 1.43e-01 |    307
+3    | 5e-04 | 2.99e-02 | 1.45e-01 | 2.93e-02 | 1.43e-01 |    306
+3    | 5e-04 | 3.00e-02 | 1.45e-01 | 2.94e-02 | 1.43e-01 |    305
+3    | 5e-04 | 3.01e-02 | 1.45e-01 | 2.95e-02 | 1.43e-01 |    304
+3    | 5e-04 | 3.02e-02 | 1.45e-01 | 2.96e-02 | 1.43e-01 |    303
+3    | 5e-04 | 3.03e-02 | 1.46e-01 | 2.97e-02 | 1.43e-01 |    302
+3    | 5e-04 | 3.04e-02 | 1.46e-01 | 2.98e-02 | 1.43e-01 |    301
+3    | 5e-04 | 3.06e-02 | 1.46e-01 | 3.00e-02 | 1.43e-01 |    299
+3    | 5e-04 | 3.08e-02 | 1.46e-01 | 3.02e-02 | 1.43e-01 |    298
+3    | 5e-04 | 3.09e-02 | 1.46e-01 | 3.03e-02 | 1.43e-01 |    297
+3    | 5e-04 | 3.10e-02 | 1.46e-01 | 3.04e-02 | 1.43e-01 |    296
+3    | 5e-04 | 3.11e-02 | 1.46e-01 | 3.05e-02 | 1.43e-01 |    295
+3    | 5e-04 | 3.12e-02 | 1.46e-01 | 3.06e-02 | 1.43e-01 |    294
+3    | 5e-04 | 3.13e-02 | 1.46e-01 | 3.07e-02 | 1.43e-01 |    293
+3    | 5e-04 | 3.15e-02 | 1.46e-01 | 3.09e-02 | 1.43e-01 |    292
+3    | 5e-04 | 3.16e-02 | 1.46e-01 | 3.10e-02 | 1.43e-01 |    291
+3    | 5e-04 | 3.17e-02 | 1.46e-01 | 3.11e-02 | 1.43e-01 |    290
+3    | 6e-04 | 3.18e-02 | 1.46e-01 | 3.12e-02 | 1.43e-01 |    289
+3    | 6e-04 | 3.20e-02 | 1.46e-01 | 3.14e-02 | 1.43e-01 |    288
+3    | 6e-04 | 3.21e-02 | 1.46e-01 | 3.15e-02 | 1.43e-01 |    287
+3    | 6e-04 | 3.22e-02 | 1.46e-01 | 3.16e-02 | 1.43e-01 |    286
+3    | 6e-04 | 3.24e-02 | 1.46e-01 | 3.18e-02 | 1.43e-01 |    285
+3    | 6e-04 | 3.25e-02 | 1.46e-01 | 3.19e-02 | 1.43e-01 |    284
+3    | 6e-04 | 3.27e-02 | 1.46e-01 | 3.20e-02 | 1.43e-01 |    283
+3    | 6e-04 | 3.28e-02 | 1.46e-01 | 3.22e-02 | 1.43e-01 |    282
+3    | 6e-04 | 3.30e-02 | 1.46e-01 | 3.23e-02 | 1.43e-01 |    281
+3    | 6e-04 | 3.31e-02 | 1.46e-01 | 3.25e-02 | 1.43e-01 |    280
+3    | 6e-04 | 3.33e-02 | 1.46e-01 | 3.26e-02 | 1.43e-01 |    279
+3    | 6e-04 | 3.34e-02 | 1.46e-01 | 3.28e-02 | 1.43e-01 |    278
+3    | 6e-04 | 3.34e-02 | 1.46e-01 | 3.28e-02 | 1.43e-01 |    278
+3    | 6e-04 | 3.36e-02 | 1.46e-01 | 3.29e-02 | 1.43e-01 |    277
+3    | 6e-04 | 3.37e-02 | 1.46e-01 | 3.31e-02 | 1.43e-01 |    276
+3    | 6e-04 | 3.39e-02 | 1.46e-01 | 3.32e-02 | 1.43e-01 |    275
+3    | 6e-04 | 3.40e-02 | 1.46e-01 | 3.34e-02 | 1.43e-01 |    274
+3    | 6e-04 | 3.42e-02 | 1.46e-01 | 3.35e-02 | 1.44e-01 |    273
+3    | 6e-04 | 3.44e-02 | 1.46e-01 | 3.37e-02 | 1.44e-01 |    272
+3    | 6e-04 | 3.45e-02 | 1.46e-01 | 3.39e-02 | 1.44e-01 |    271
+3    | 7e-04 | 3.45e-02 | 1.46e-01 | 3.39e-02 | 1.44e-01 |    271
+3    | 7e-04 | 3.47e-02 | 1.46e-01 | 3.40e-02 | 1.44e-01 |    270
+3    | 7e-04 | 3.49e-02 | 1.47e-01 | 3.42e-02 | 1.44e-01 |    269
+3    | 7e-04 | 3.51e-02 | 1.47e-01 | 3.44e-02 | 1.44e-01 |    268
+3    | 7e-04 | 3.52e-02 | 1.47e-01 | 3.46e-02 | 1.44e-01 |    267
+3    | 7e-04 | 3.54e-02 | 1.47e-01 | 3.47e-02 | 1.44e-01 |    266
+3    | 7e-04 | 3.56e-02 | 1.47e-01 | 3.49e-02 | 1.44e-01 |    265
+3    | 7e-04 | 3.56e-02 | 1.47e-01 | 3.49e-02 | 1.44e-01 |    265
+3    | 7e-04 | 3.58e-02 | 1.47e-01 | 3.51e-02 | 1.44e-01 |    264
+3    | 7e-04 | 3.60e-02 | 1.47e-01 | 3.53e-02 | 1.44e-01 |    263
+3    | 7e-04 | 3.62e-02 | 1.47e-01 | 3.55e-02 | 1.44e-01 |    262
+3    | 7e-04 | 3.64e-02 | 1.47e-01 | 3.57e-02 | 1.44e-01 |    261
+3    | 7e-04 | 3.64e-02 | 1.47e-01 | 3.57e-02 | 1.44e-01 |    261
+3    | 7e-04 | 3.66e-02 | 1.47e-01 | 3.59e-02 | 1.44e-01 |    260
+3    | 7e-04 | 3.68e-02 | 1.47e-01 | 3.61e-02 | 1.44e-01 |    259
+3    | 7e-04 | 3.70e-02 | 1.47e-01 | 3.63e-02 | 1.44e-01 |    258
+3    | 7e-04 | 3.70e-02 | 1.47e-01 | 3.63e-02 | 1.44e-01 |    258
+3    | 7e-04 | 3.72e-02 | 1.47e-01 | 3.65e-02 | 1.44e-01 |    257
+3    | 7e-04 | 3.74e-02 | 1.47e-01 | 3.67e-02 | 1.44e-01 |    256
+3    | 7e-04 | 3.76e-02 | 1.47e-01 | 3.69e-02 | 1.44e-01 |    255
+3    | 8e-04 | 3.76e-02 | 1.47e-01 | 3.69e-02 | 1.44e-01 |    255
+3    | 8e-04 | 3.78e-02 | 1.47e-01 | 3.71e-02 | 1.44e-01 |    254
+3    | 8e-04 | 3.80e-02 | 1.47e-01 | 3.73e-02 | 1.44e-01 |    253
+3    | 8e-04 | 3.83e-02 | 1.47e-01 | 3.75e-02 | 1.44e-01 |    252
+3    | 8e-04 | 3.83e-02 | 1.47e-01 | 3.75e-02 | 1.44e-01 |    252
+3    | 8e-04 | 3.85e-02 | 1.47e-01 | 3.77e-02 | 1.44e-01 |    251
+3    | 8e-04 | 3.87e-02 | 1.47e-01 | 3.80e-02 | 1.44e-01 |    250
+3    | 8e-04 | 3.89e-02 | 1.47e-01 | 3.82e-02 | 1.44e-01 |    249
+3    | 8e-04 | 3.89e-02 | 1.47e-01 | 3.82e-02 | 1.44e-01 |    249
+3    | 8e-04 | 3.92e-02 | 1.47e-01 | 3.84e-02 | 1.44e-01 |    248
+3    | 8e-04 | 3.94e-02 | 1.47e-01 | 3.86e-02 | 1.45e-01 |    247
+3    | 8e-04 | 3.94e-02 | 1.47e-01 | 3.86e-02 | 1.45e-01 |    247
+3    | 8e-04 | 3.97e-02 | 1.47e-01 | 3.89e-02 | 1.45e-01 |    246
+3    | 8e-04 | 3.99e-02 | 1.48e-01 | 3.91e-02 | 1.45e-01 |    245
+3    | 8e-04 | 3.99e-02 | 1.48e-01 | 3.91e-02 | 1.45e-01 |    245
+3    | 8e-04 | 4.01e-02 | 1.48e-01 | 3.94e-02 | 1.45e-01 |    244
+3    | 8e-04 | 4.04e-02 | 1.48e-01 | 3.96e-02 | 1.45e-01 |    243
+3    | 8e-04 | 4.04e-02 | 1.48e-01 | 3.96e-02 | 1.45e-01 |    243
+3    | 8e-04 | 4.06e-02 | 1.48e-01 | 3.99e-02 | 1.45e-01 |    242
+3    | 8e-04 | 4.09e-02 | 1.48e-01 | 4.01e-02 | 1.45e-01 |    241
+3    | 9e-04 | 4.12e-02 | 1.48e-01 | 4.04e-02 | 1.45e-01 |    240
+3    | 9e-04 | 4.12e-02 | 1.48e-01 | 4.04e-02 | 1.45e-01 |    240
+3    | 9e-04 | 4.14e-02 | 1.48e-01 | 4.06e-02 | 1.45e-01 |    239
+3    | 9e-04 | 4.14e-02 | 1.48e-01 | 4.06e-02 | 1.45e-01 |    239
+3    | 9e-04 | 4.17e-02 | 1.48e-01 | 4.09e-02 | 1.45e-01 |    238
+3    | 9e-04 | 4.20e-02 | 1.48e-01 | 4.11e-02 | 1.45e-01 |    237
+3    | 9e-04 | 4.20e-02 | 1.48e-01 | 4.11e-02 | 1.45e-01 |    237
+3    | 9e-04 | 4.22e-02 | 1.48e-01 | 4.14e-02 | 1.45e-01 |    236
+3    | 9e-04 | 4.25e-02 | 1.48e-01 | 4.17e-02 | 1.45e-01 |    235
+3    | 9e-04 | 4.25e-02 | 1.48e-01 | 4.17e-02 | 1.45e-01 |    235
+3    | 9e-04 | 4.28e-02 | 1.48e-01 | 4.20e-02 | 1.45e-01 |    234
+3    | 9e-04 | 4.31e-02 | 1.48e-01 | 4.22e-02 | 1.45e-01 |    233
+3    | 9e-04 | 4.31e-02 | 1.48e-01 | 4.22e-02 | 1.45e-01 |    233
+3    | 9e-04 | 4.34e-02 | 1.48e-01 | 4.25e-02 | 1.45e-01 |    232
+3    | 9e-04 | 4.34e-02 | 1.48e-01 | 4.25e-02 | 1.45e-01 |    232
+3    | 9e-04 | 4.37e-02 | 1.48e-01 | 4.28e-02 | 1.45e-01 |    231
+3    | 9e-04 | 4.40e-02 | 1.48e-01 | 4.31e-02 | 1.45e-01 |    230
+3    | 9e-04 | 4.40e-02 | 1.48e-01 | 4.31e-02 | 1.45e-01 |    230
+3    | 9e-04 | 4.43e-02 | 1.48e-01 | 4.34e-02 | 1.45e-01 |    229
+3    | 9e-04 | 4.46e-02 | 1.48e-01 | 4.37e-02 | 1.46e-01 |    228
+3    | 1e-03 | 4.46e-02 | 1.48e-01 | 4.37e-02 | 1.46e-01 |    228
+3    | 1e-03 | 4.49e-02 | 1.48e-01 | 4.40e-02 | 1.46e-01 |    227
+3    | 1e-03 | 4.49e-02 | 1.48e-01 | 4.40e-02 | 1.46e-01 |    227
+3    | 1e-03 | 4.52e-02 | 1.49e-01 | 4.43e-02 | 1.46e-01 |    226
+3    | 1e-03 | 4.55e-02 | 1.49e-01 | 4.46e-02 | 1.46e-01 |    225
+3    | 1e-03 | 4.55e-02 | 1.49e-01 | 4.46e-02 | 1.46e-01 |    225
+3    | 1e-03 | 4.58e-02 | 1.49e-01 | 4.49e-02 | 1.46e-01 |    224
+3    | 1e-03 | 4.58e-02 | 1.49e-01 | 4.49e-02 | 1.46e-01 |    224
+3    | 1e-03 | 4.62e-02 | 1.49e-01 | 4.53e-02 | 1.46e-01 |    223
+3    | 1e-03 | 4.62e-02 | 1.49e-01 | 4.53e-02 | 1.46e-01 |    223
+-----|------------|------------|------------|------------|------------|------------

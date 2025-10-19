@@ -11,7 +11,7 @@
 clearvars; close all; clc;
 
 %% Setup
-mesh_sizes = [8, 16, 32, 64];  % N and M values: 2^3 to 2^6
+mesh_sizes = [8, 16, 32, 64, 2^7, 2^8];  % N and M values: 2^3 to 2^8
 num_cases = 3;
 num_meshes = length(mesh_sizes);
 
