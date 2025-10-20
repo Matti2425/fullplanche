@@ -56,8 +56,8 @@ function [Geometry, v_in, p_in, T_in, psi_body, gas, Numerical, Init, w, CASE] =
     end
 
     % Numerical system properties
-    Numerical.N = 256/4;
-    Numerical.M = 256/4;
+    Numerical.N = 256;
+    Numerical.M = 256;
     Numerical.d = 1e-8;
     Numerical.i_max = 100000;
 

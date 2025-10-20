@@ -72,6 +72,16 @@ end
 name = "figures/" + "Case_"+ CASE + "/" + CASE + "_Pressure.png";
 exportgraphics(gca, name, 'Resolution', 300, 'ContentType', 'image', 'BackgroundColor', 'none');
 
+figure('Name', 'Temperature Field (K)', 'NumberTitle', 'off');
+plotCFD('Temperature (K)', T, Numerical.N, Numerical.M, dx, dy);
+if CASE ~= 1
+    hold on;
+    plot(x_cyl, y_cyl, 'k-', 'LineWidth', 2);
+    hold off;
+end
+name = "figures\" + "Case_"+ CASE + "\" + CASE + "_Temperature.png";
+exportgraphics(gca, name, 'Resolution', 300, 'ContentType', 'image', 'BackgroundColor', 'none');
+
 figure('Name', 'Velocity Magnitude (m/s)', 'NumberTitle', 'off');
 plotCFD('Velocity (m/s)', v_mag, Numerical.N, Numerical.M, dx, dy);
 if CASE ~= 1
