@@ -11,8 +11,8 @@
 clearvars; close all; clc;
 
 %% Setup
-mesh_sizes = [8, 16, 32, 64, 128];  % N and M values: 2^3 to 2^6
-num_cases = 3;
+mesh_sizes = [8, 16, 32, 64, 128, 256];  % N and M values: 2^3 to 2^6
+num_cases = 1;
 num_meshes = length(mesh_sizes);
 
 % Storage for convergence data
@@ -41,13 +41,13 @@ for case_idx = 1:num_cases
         fprintf('Mesh: N=%d, M=%d ... ', N, M);
         tic;
         
-        %% Read Input Data with Modified Mesh Size
+        % Read Input Data with Modified Mesh Size
         [Geometry, v_in, p_in, T_in, psi_body_default, gas, Numerical, Init, w, ~] = readInputData();
         Numerical.N = N;
         Numerical.M = M;
         CASE = case_idx;
         
-        %% Recompute psi_body for the current case
+        % Recompute psi_body for the current case
         if CASE == 1
             psi_body = 0;  % Channel only - no solid
         else
@@ -61,10 +61,10 @@ for case_idx = 1:num_cases
             end
         end
         
-        %% Generate Mesh
+        % Generate Mesh
         [x_P, y_P] = generateMesh(Geometry, Numerical);
         
-        %% Generate Cylinder Geometry and Solid Matrix
+        % Generate Cylinder Geometry and Solid Matrix
         if CASE == 1
             % Channel only - no solid
             S = ones(Numerical.M+2, Numerical.N+2);
@@ -75,20 +75,20 @@ for case_idx = 1:num_cases
             [x_cyl, y_cyl, S, theta] = solidMaterial(Geometry, x_P, y_P, Numerical);
         end
         
-        %% Initialize Fields
+        % Initialize Fields
         [psi, rho] = initParams(Init, Numerical, S);
         
-        %% Evaluate Coefficients
+        % Evaluate Coefficients
         [a_E, a_W, a_N, a_S, b_P, a_P] = evalCoefficients(psi, psi_body, Numerical, Geometry, v_in, x_P, y_P, S, Init);
         
-        %% Solve System
+        % Solve System
         [psi, iter, sol_error] = solveSystem(psi, psi_body, S, a_E, a_W, a_N, a_S, a_P, b_P, v_in, y_P, Numerical, Geometry);
         
-        %% Compute Analytical Solution
+        % Compute Analytical Solution
         R_cyl = Geometry.D / 2;
         psi_analytical = compute_analytical_psi(x_P, y_P, Geometry, v_in, CASE, w, R_cyl);
         
-        %% Calculate Error Metrics
+        % Calculate Error Metrics
         % Only consider fluid domain (outside solid)
         if CASE ~= 1
             error_domain = S == 1;  % Only where fluid exists
@@ -103,7 +103,7 @@ for case_idx = 1:num_cases
         % Compute L-infinity norm error
         Linf_error = max(max(abs(error_psi)));
         
-        %% Store Results
+        % Store Results
         convergence_data.L2_error(case_idx, mesh_idx) = L2_error;
         convergence_data.Linf_error(case_idx, mesh_idx) = Linf_error;
         convergence_data.dx(mesh_idx) = Geometry.L / N;
@@ -153,7 +153,7 @@ end
 %% Plotting - Convergence Study
 
 % Figure 1: L2-norm convergence (Case 1)
-figure('Name', 'Convergence Study - L2-norm (Case 1)', 'NumberTitle', 'off', 'Position', [100, 100, 800, 600]);
+figure('Name', 'Convergence Study - L2-norm (Case 2)', 'NumberTitle', 'off', 'Position', [100, 100, 800, 600]);
 hold on;
 dx_ref = convergence_data.dx;
 loglog(convergence_data.dx, convergence_data.L2_error(1, :), '-', 'LineWidth', 2);
@@ -165,13 +165,13 @@ loglog(dx_ref, e_ref_2nd, 'k:', 'LineWidth', 1.5, 'DisplayName', '2nd Order');
 hold off;
 xlabel('Grid Spacing (dx)');
 ylabel('L2-norm Error');
-title('L2-norm Convergence (Case 1 - Channel Flow)');
-legend('Case 1', '1st Order', '2nd Order');
+title('L2-norm Convergence (Case 2 - Static Cylinder)');
+legend('Case 2', '1st Order', '2nd Order');
 grid on;
 set(gca, 'XDir', 'reverse');
 
 % Figure 2: L-infinity norm convergence (Case 1)
-figure('Name', 'Convergence Study - L∞-norm (Case 1)', 'NumberTitle', 'off', 'Position', [100, 100, 800, 600]);
+figure('Name', 'Convergence Study - L∞-norm (Case 2)', 'NumberTitle', 'off', 'Position', [100, 100, 800, 600]);
 hold on;
 loglog(convergence_data.dx, convergence_data.Linf_error(1, :), '-', 'LineWidth', 2);
 % Plot reference lines
@@ -182,28 +182,28 @@ loglog(dx_ref, e_ref_2nd_inf, 'k:', 'LineWidth', 1.5, 'DisplayName', '2nd Order'
 hold off;
 xlabel('Grid Spacing (dx)');
 ylabel('L∞-norm Error');
-title('L∞-norm Convergence (Case 1 - Channel Flow)');
-legend('Case 1', '1st Order', '2nd Order');
+title('L∞-norm Convergence (Case 2 - Channel Flow)');
+legend('Case 2', '1st Order', '2nd Order');
 grid on;
 set(gca, 'XDir', 'reverse');
 
 % Figure 3: Iterations vs Mesh Size (Case 1)
-figure('Name', 'Convergence Study - Iterations (Case 1)', 'NumberTitle', 'off', 'Position', [100, 100, 800, 600]);
+figure('Name', 'Convergence Study - Iterations (Case 2)', 'NumberTitle', 'off', 'Position', [100, 100, 800, 600]);
 semilogy(mesh_sizes, convergence_data.iterations(1, :), '-', 'LineWidth', 2);
 xlabel('Mesh Size (N = M)');
 ylabel('Number of Iterations');
-title('Solver Iterations vs Mesh Refinement (Case 1 - Channel Flow)');
-legend('Case 1');
+title('Solver Iterations vs Mesh Refinement (Case 2 - Channel Flow)');
+legend('Case 2');
 grid on;
 set(gca, 'XScale', 'log');
 
 % Figure 4: Solver Residual vs Mesh Size (Case 1)
-figure('Name', 'Convergence Study - Residual (Case 1)', 'NumberTitle', 'off', 'Position',[100, 100, 800, 600]);
+figure('Name', 'Convergence Study - Residual (Case 2)', 'NumberTitle', 'off', 'Position',[100, 100, 800, 600]);
 loglog(mesh_sizes, convergence_data.convergence_error(1, :), '-', 'LineWidth', 2);
 xlabel('Mesh Size (N = M)');
 ylabel('Solver Residual');
-title('Solver Residual vs Mesh Refinement (Case 1 - Channel Flow)');
-legend('Case 1');
+title('Solver Residual vs Mesh Refinement (Case 2 - Channel Flow)');
+legend('Case 2');
 grid on;
 set(gca, 'XScale', 'log');
 
@@ -232,9 +232,9 @@ fprintf('Convergence study completed successfully!\n');
 % Study the effect of solver tolerance (Numerical.d) on solution accuracy
 fprintf('\n\n=== TOLERANCE SENSITIVITY STUDY ===\n');
 
-tolerance_values = linspace(1e-6, 1e-1, 200)*10e-3;
+tolerance_values = linspace(1e-6, 1e-1, 200);
 num_tol = length(tolerance_values);
-fixed_mesh_size = 32;  % Use 32x32 mesh for tolerance study
+fixed_mesh_size = 64;  % Use 32x32 mesh for tolerance study
 
 % Storage for tolerance sensitivity data
 tolerance_data = struct();
@@ -243,6 +243,10 @@ tolerance_data.L2_error = zeros(num_cases, num_tol);
 tolerance_data.Linf_error = zeros(num_cases, num_tol);
 tolerance_data.normalized_L2_error = zeros(num_cases, num_tol);
 tolerance_data.normalized_Linf_error = zeros(num_cases, num_tol);
+tolerance_data.vp_L2_error = zeros(num_cases, num_tol);
+tolerance_data.vp_Linf_error = zeros(num_cases, num_tol);
+tolerance_data.normalized_vp_L2_error = zeros(num_cases, num_tol);
+tolerance_data.normalized_vp_Linf_error = zeros(num_cases, num_tol);
 tolerance_data.iterations = zeros(num_cases, num_tol);
 
 fprintf('Fixed mesh size: %d x %d\n', fixed_mesh_size, fixed_mesh_size);
@@ -259,14 +263,14 @@ for case_idx = 1:num_cases
         fprintf('Tolerance: %.0e ... ', tol);
         tic;
         
-        %% Read Input Data
+        % Read Input Data
         [Geometry, v_in, p_in, T_in, psi_body_default, gas, Numerical, Init, w, ~] = readInputData();
         Numerical.N = fixed_mesh_size;
         Numerical.M = fixed_mesh_size;
         Numerical.d = tol;  % Set tolerance
         CASE = case_idx;
         
-        %% Recompute psi_body for the current case
+        % Recompute psi_body for the current case
         if CASE == 1
             psi_body = 0;
         else
@@ -278,10 +282,10 @@ for case_idx = 1:num_cases
             end
         end
         
-        %% Generate Mesh
+        % Generate Mesh
         [x_P, y_P] = generateMesh(Geometry, Numerical);
         
-        %% Generate Cylinder Geometry
+        % Generate Cylinder Geometry
         if CASE == 1
             S = ones(Numerical.M+2, Numerical.N+2);
             x_cyl = [];
@@ -291,27 +295,27 @@ for case_idx = 1:num_cases
             [x_cyl, y_cyl, S, theta] = solidMaterial(Geometry, x_P, y_P, Numerical);
         end
         
-        %% Initialize Fields
+        % Initialize Fields
         [psi, rho] = initParams(Init, Numerical, S);
         
-        %% Evaluate Coefficients
+        % Evaluate Coefficients
         [a_E, a_W, a_N, a_S, b_P, a_P] = evalCoefficients(psi, psi_body, Numerical, Geometry, v_in, x_P, y_P, S, Init);
         
-        %% Solve System
+        % Solve System
         [psi, iter, sol_error] = solveSystem(psi, psi_body, S, a_E, a_W, a_N, a_S, a_P, b_P, v_in, y_P, Numerical, Geometry);
         
-        %% Compute Analytical Solution
+        % Compute Analytical Solution
         R_cyl = Geometry.D / 2;
         psi_analytical = compute_analytical_psi(x_P, y_P, Geometry, v_in, CASE, w, R_cyl);
         
-        %% Calculate Error Metrics
+        % Calculate Error Metrics
         if CASE ~= 1
             error_domain = S == 1;
         else
             error_domain = ones(size(S));
         end
         
-        % Absolute errors
+        % Absolute errors for psi
         error_psi = (psi - psi_analytical) .* error_domain;
         L2_error = sqrt(sum(sum(error_psi.^2)) / sum(sum(error_domain)));
         Linf_error = max(max(abs(error_psi)));
@@ -326,57 +330,195 @@ for case_idx = 1:num_cases
             normalized_Linf_error = Linf_error;
         end
         
-        %% Store Results
+        % Compute velocity (vp) from psi: vp = -d(psi)/dy
+        dy = (y_P(1,2) - y_P(1,1));
+        vp_numerical = -diff(psi, 1, 1) / dy;
+        vp_analytical = -diff(psi_analytical, 1, 1) / dy;
+        
+        % Trim error domain to match velocity field dimensions
+        error_domain_vp = error_domain(1:end-1, :);
+        
+        % Compute velocity errors
+        error_vp = (vp_numerical - vp_analytical) .* error_domain_vp;
+        vp_L2_error = sqrt(sum(sum(error_vp.^2)) / sum(sum(error_domain_vp)));
+        vp_Linf_error = max(max(abs(error_vp)));
+        
+        % Normalized velocity errors
+        vp_max = max(max(abs(vp_analytical(error_domain_vp))));
+        if vp_max > 0
+            normalized_vp_L2_error = vp_L2_error / vp_max;
+            normalized_vp_Linf_error = vp_Linf_error / vp_max;
+        else
+            normalized_vp_L2_error = vp_L2_error;
+            normalized_vp_Linf_error = vp_Linf_error;
+        end
+        
+        % Store Results
         tolerance_data.L2_error(case_idx, tol_idx) = L2_error;
         tolerance_data.Linf_error(case_idx, tol_idx) = Linf_error;
         tolerance_data.normalized_L2_error(case_idx, tol_idx) = normalized_L2_error;
         tolerance_data.normalized_Linf_error(case_idx, tol_idx) = normalized_Linf_error;
+        tolerance_data.vp_L2_error(case_idx, tol_idx) = vp_L2_error;
+        tolerance_data.vp_Linf_error(case_idx, tol_idx) = vp_Linf_error;
+        tolerance_data.normalized_vp_L2_error(case_idx, tol_idx) = normalized_vp_L2_error;
+        tolerance_data.normalized_vp_Linf_error(case_idx, tol_idx) = normalized_vp_Linf_error;
         tolerance_data.iterations(case_idx, tol_idx) = iter;
         
         elapsed = toc;
-        fprintf('L2=%.2e, L∞=%.2e, Norm L2=%.2e, Iter=%d, Time=%.2fs\n', ...
-            L2_error, Linf_error, normalized_L2_error, iter, elapsed);
+        fprintf('L2=%.2e, L∞=%.2e, Norm L2=%.2e, vp-L2=%.2e, Iter=%d, Time=%.2fs\n', ...
+            L2_error, Linf_error, normalized_L2_error, normalized_vp_L2_error, iter, elapsed);
     end
     fprintf('\n');
 end
 
 %% Plotting - Tolerance Sensitivity Study
 
-% Figure 1: Absolute L2-norm error vs Tolerance (Case 1)
-figure('Name', 'Tolerance Study - Absolute L2-norm Error (Case 1)', 'NumberTitle', 'off', 'Position', [100, 100, 800, 600]);
-semilogx(tolerance_values, tolerance_data.L2_error(1, :), '-', 'LineWidth', 2);
+% Figure 1: Absolute velocity L2-norm error vs Tolerance (Case 2)
+figure('Name', 'Tolerance Study - Absolute vp L2-norm Error (Case 2)', 'NumberTitle', 'off', 'Position', [100, 100, 800, 600]);
+semilogx(tolerance_values, tolerance_data.vp_L2_error(2, :), '-', 'LineWidth', 2);
 xlabel('Solver Tolerance (Numerical.d)');
-ylabel('L2-norm Error');
-title('Absolute L2-norm Error vs Tolerance (Case 1 - Channel Flow, Fixed Mesh 32×32)');
-legend('Case 1');
+ylabel('vp L2-norm Error');
+title('Absolute Velocity L2-norm Error vs Tolerance (Case 2 - Static Cylinder, Fixed Mesh 32×32)');
+legend('Case 2');
 grid on;
 
-% Figure 2: Absolute L∞-norm error vs Tolerance (Case 1)
-figure('Name', 'Tolerance Study - Absolute L∞-norm Error (Case 1)', 'NumberTitle', 'off', 'Position', [100, 100, 800, 600]);
-semilogx(tolerance_values, tolerance_data.Linf_error(1, :), '-', 'LineWidth', 2);
+% Figure 2: Absolute velocity L∞-norm error vs Tolerance (Case 2)
+figure('Name', 'Tolerance Study - Absolute vp L∞-norm Error (Case 2)', 'NumberTitle', 'off', 'Position', [100, 100, 800, 600]);
+semilogx(tolerance_values, tolerance_data.vp_Linf_error(2, :), '-', 'LineWidth', 2);
 xlabel('Solver Tolerance (Numerical.d)');
-ylabel('L∞-norm Error');
-title('Absolute L∞-norm Error vs Tolerance (Case 1 - Channel Flow, Fixed Mesh 32×32)');
-legend('Case 1');
+ylabel('vp L∞-norm Error');
+title('Absolute Velocity L∞-norm Error vs Tolerance (Case 2 - Static Cylinder, Fixed Mesh 32×32)');
+legend('Case 2');
 grid on;
 
-% Figure 3: Normalized L2-norm error vs Tolerance (Case 1)
-figure('Name', 'Tolerance Study - Normalized L2-norm Error (Case 1)', 'NumberTitle', 'off', 'Position',[100, 100, 800, 600]);
-semilogx(tolerance_values, tolerance_data.normalized_L2_error(1, :), '-', 'LineWidth', 2);
+% Figure 3: Normalized velocity L2-norm error vs Tolerance (Case 2)
+figure('Name', 'Tolerance Study - Normalized vp L2-norm Error (Case 2)', 'NumberTitle', 'off', 'Position',[100, 100, 800, 600]);
+semilogx(tolerance_values, tolerance_data.normalized_vp_L2_error(2, :), '-', 'LineWidth', 2);
 xlabel('Solver Tolerance (Numerical.d)');
-ylabel('Normalized L2-norm Error');
-title('Normalized L2-norm Error vs Tolerance (Case 1 - Channel Flow, Fixed Mesh 32×32)');
-legend('Case 1');
+ylabel('Normalized vp L2-norm Error');
+title('Normalized Velocity L2-norm Error vs Tolerance (Case 2 - Static Cylinder, Fixed Mesh 32×32)');
+legend('Case 2');
 grid on;
 
-% Figure 4: Normalized L∞-norm error vs Tolerance (Case 1)
-figure('Name', 'Tolerance Study - Normalized L∞-norm Error (Case 1)', 'NumberTitle', 'off', 'Position', [100, 100, 800, 600]);
-semilogx(tolerance_values, tolerance_data.normalized_Linf_error(1, :), '-', 'LineWidth', 2);
+% Figure 4: Normalized velocity L∞-norm error vs Tolerance (Case 2)
+figure('Name', 'Tolerance Study - Normalized vp L∞-norm Error (Case 2)', 'NumberTitle', 'off', 'Position', [100, 100, 800, 600]);
+semilogx(tolerance_values, tolerance_data.normalized_vp_Linf_error(2, :), '-', 'LineWidth', 2);
 xlabel('Solver Tolerance (Numerical.d)');
-ylabel('Normalized L∞-norm Error');
-title('Normalized L∞-norm Error vs Tolerance (Case 1 - Channel Flow, Fixed Mesh 32×32)');
-legend('Case 1');
+ylabel('Normalized vp L∞-norm Error');
+title('Normalized Velocity L∞-norm Error vs Tolerance (Case 2 - Static Cylinder, Fixed Mesh 32×32)');
+legend('Case 2');
 grid on;
+
+%% MULTI-MESH TOLERANCE SENSITIVITY STUDY
+% Study normalized vp error vs tolerance for different mesh sizes (Case 2)
+fprintf('\n=== MULTI-MESH TOLERANCE SENSITIVITY STUDY (Case 2) ===\n');
+
+multi_mesh_sizes = mesh_sizes;
+num_multi_meshes = length(multi_mesh_sizes);
+case_idx = 2;  % Case 2 - Static Cylinder
+
+% Storage for multi-mesh tolerance data
+multi_mesh_data = struct();
+multi_mesh_data.mesh_sizes = multi_mesh_sizes;
+multi_mesh_data.tolerances = tolerance_values;
+multi_mesh_data.normalized_vp_L2_error = zeros(num_multi_meshes, num_tol);
+multi_mesh_data.iterations = zeros(num_multi_meshes, num_tol);
+
+fprintf('Case: 2 (Static Cylinder)\n');
+fprintf('Tolerance range: %.0e to %.0e\n', tolerance_values(1), tolerance_values(end));
+fprintf('Mesh sizes: %s\n\n', sprintf('%d ', multi_mesh_sizes));
+
+for mesh_idx = 1:num_multi_meshes
+    mesh_size = multi_mesh_sizes(mesh_idx);
+    fprintf('---------- Mesh Size %d x %d ----------\n', mesh_size, mesh_size);
+    
+    for tol_idx = 1:num_tol
+        tol = tolerance_values(tol_idx);
+        
+        if mod(tol_idx, 50) == 0 || tol_idx == 1
+            fprintf('Tolerance: %.0e ... ', tol);
+        end
+        
+        tic;
+        
+        % Read Input Data
+        [Geometry, v_in, p_in, T_in, psi_body_default, gas, Numerical, Init, w, ~] = readInputData();
+        Numerical.N = mesh_size;
+        Numerical.M = mesh_size;
+        Numerical.d = tol;  % Set tolerance
+        CASE = 2;  % Static Cylinder
+        
+        % Recompute psi_body for Case 2 (Static Cylinder)
+        R_cyl = Geometry.D / 2;
+        psi_body = v_in * (Geometry.H/2);
+        
+        % Generate Mesh
+        [x_P, y_P] = generateMesh(Geometry, Numerical);
+        
+        % Generate Cylinder Geometry
+        [x_cyl, y_cyl, S, theta] = solidMaterial(Geometry, x_P, y_P, Numerical);
+        
+        % Initialize Fields
+        [psi, rho] = initParams(Init, Numerical, S);
+        
+        % Evaluate Coefficients
+        [a_E, a_W, a_N, a_S, b_P, a_P] = evalCoefficients(psi, psi_body, Numerical, Geometry, v_in, x_P, y_P, S, Init);
+        
+        % Solve System
+        [psi, iter, sol_error] = solveSystem(psi, psi_body, S, a_E, a_W, a_N, a_S, a_P, b_P, v_in, y_P, Numerical, Geometry);
+        
+        % Compute Analytical Solution
+        psi_analytical = compute_analytical_psi(x_P, y_P, Geometry, v_in, CASE, w, R_cyl);
+        
+        % Calculate Error Domain
+        error_domain = S == 1;
+        
+        % Compute Velocity Error
+        dy = (y_P(1,2) - y_P(1,1));
+        vp_numerical = -diff(psi, 1, 1) / dy;
+        vp_analytical = -diff(psi_analytical, 1, 1) / dy;
+        
+        error_domain_vp = error_domain(1:end-1, :);
+        error_vp = (vp_numerical - vp_analytical) .* error_domain_vp;
+        vp_L2_error = sqrt(sum(sum(error_vp.^2)) / sum(sum(error_domain_vp)));
+        
+        % Normalized velocity error
+        vp_max = max(max(abs(vp_analytical(error_domain_vp))));
+        if vp_max > 0
+            normalized_vp_L2_error = vp_L2_error / vp_max;
+        else
+            normalized_vp_L2_error = vp_L2_error;
+        end
+        
+        %% Store Results
+        multi_mesh_data.normalized_vp_L2_error(mesh_idx, tol_idx) = normalized_vp_L2_error;
+        multi_mesh_data.iterations(mesh_idx, tol_idx) = iter;
+        
+        if mod(tol_idx, 50) == 0 || tol_idx == 1
+            elapsed = toc;
+            fprintf('Norm vp-L2=%.2e, Iter=%d, Time=%.2fs\n', normalized_vp_L2_error, iter, elapsed);
+        end
+    end
+    fprintf('\n');
+end
+
+%% Plot: Normalized vp error vs Tolerance for different mesh sizes (Case 2)
+figure('Name', 'Multi-Mesh Tolerance Sensitivity - Normalized vp L2 Error', 'NumberTitle', 'off', 'Position', [100, 100, 900, 700]);
+hold on;
+colors = lines(num_multi_meshes);
+for mesh_idx = 1:num_multi_meshes
+    mesh_size = multi_mesh_sizes(mesh_idx);
+    semilogx(tolerance_values, multi_mesh_data.normalized_vp_L2_error(mesh_idx, :), '-', ...
+        'LineWidth', 2.5, 'Color', colors(mesh_idx, :), ...
+        'DisplayName', sprintf('Mesh %d×%d', mesh_size, mesh_size));
+end
+hold off;
+xlabel('Solver Tolerance (Numerical.d)', 'FontSize', 12);
+ylabel('Normalized Velocity L2-norm Error', 'FontSize', 12);
+title('Normalized Velocity Error vs Tolerance for Different Mesh Sizes (Case 2 - Static Cylinder)', 'FontSize', 13);
+legend('FontSize', 11, 'Location', 'best');
+grid on;
+set(gca, 'XScale', 'log');
 
 %% Print Tolerance Study Summary Table
 fprintf('\n=== TOLERANCE SENSITIVITY SUMMARY ===\n');
@@ -396,5 +538,6 @@ for case_idx = 1:num_cases
 end
 
 %% Save Tolerance Study Results
-save('tolerance_sensitivity_results.mat', 'tolerance_data');
+save('tolerance_sensitivity_results.mat', 'tolerance_data', 'multi_mesh_data');
 fprintf('\nTolerance study results saved to: tolerance_sensitivity_results.mat\n');
+fprintf('Multi-mesh tolerance study data also saved.\n');
