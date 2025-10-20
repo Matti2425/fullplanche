@@ -21,7 +21,7 @@ function [Geometry, v_in, p_in, T_in, psi_body, gas, Numerical, Init, w, CASE] =
     % CASE=1 for channel only
     % CASE=2 for channel + static cylinder
     % CASE=3 for channel + rotating cylinder (w>0 --> Clockwise)
-    CASE = 2;
+    CASE = 1;
     
     % Geometry properties
     Geometry.L = 2;
@@ -50,16 +50,16 @@ function [Geometry, v_in, p_in, T_in, psi_body, gas, Numerical, Init, w, CASE] =
     % Body properties (stream function on cylinder surface)
     if CASE ~= 1
         R_cyl = Geometry.D / 2;
-        psi_body = v_in * (Geometry.H/2) + R_cyl^2 * w * (1/(2*pi));
+        psi_body = v_in * (Geometry.H/2) + R_cyl^2 * w;% * (1/(2*pi));
     else
         psi_body = 0;
     end
 
     % Numerical system properties
-    Numerical.N = 50;
-    Numerical.M = 50;
-    Numerical.d = 1e-10;
-    Numerical.i_max = 1000000;
+    Numerical.N = 256/4;
+    Numerical.M = 256/4;
+    Numerical.d = 1e-8;
+    Numerical.i_max = 100000;
 
     % Initial properties
     Init.T = T_in;

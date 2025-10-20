@@ -10,7 +10,9 @@ clearvars; close all; clc;
 
 %% Generate Cylinder Geometry and Solid Matrix
 [x_cyl, y_cyl, S, theta] = solidMaterial(Geometry, x_P, y_P, Numerical);
-
+if CASE == 1
+    S = S*0;
+end
 %% Initialize Fields
 [psi, rho] = initParams(Init, Numerical, S);
 
@@ -56,22 +58,29 @@ end
 xlabel('x [m]'); ylabel('y [m]');
 title('Stream Function Contours');
 axis equal tight;
+name = "figures/" + "Case_"+ CASE + "/" + CASE + "_Streamfunc.png";
+exportgraphics(gca, name, 'Resolution', 300, 'ContentType', 'image', 'BackgroundColor', 'none');
 
-figure('Name', 'Pressure Field', 'NumberTitle', 'off');
-plotCFD('Pressure', P, Numerical.N, Numerical.M, dx, dy);
+
+figure('Name', 'Pressure Field (Pa)', 'NumberTitle', 'off');
+plotCFD('Pressure (Pa)', P, Numerical.N, Numerical.M, dx, dy);
 if CASE ~= 1
     hold on;
     plot(x_cyl, y_cyl, 'k-', 'LineWidth', 2);
     hold off;
 end
+name = "figures/" + "Case_"+ CASE + "/" + CASE + "_Pressure.png";
+exportgraphics(gca, name, 'Resolution', 300, 'ContentType', 'image', 'BackgroundColor', 'none');
 
-figure('Name', 'Velocity Magnitude', 'NumberTitle', 'off');
-plotCFD('Velocity Magnitude', v_mag, Numerical.N, Numerical.M, dx, dy);
+figure('Name', 'Velocity Magnitude (m/s)', 'NumberTitle', 'off');
+plotCFD('Velocity (m/s)', v_mag, Numerical.N, Numerical.M, dx, dy);
 if CASE ~= 1
     hold on;
     plot(x_cyl, y_cyl, 'k-', 'LineWidth', 2);
     hold off;
 end
+name = "figures/" + "Case_"+ CASE + "/" + CASE + "_Velocity.png";
+exportgraphics(gca, name, 'Resolution', 300, 'ContentType', 'image', 'BackgroundColor', 'none');
 
 if CASE ~= 1
     figure('Name', 'Pressure Distribution on Cylinder', 'NumberTitle', 'off');
