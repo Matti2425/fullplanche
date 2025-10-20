@@ -12,7 +12,7 @@ clearvars; close all; clc;
 %% Obstacle Geometry Definition
 [cylX, cylY, fluidMask, angularPos] = defineObstacles(domain, gridX, gridY, solver);
 if simCase == 1
-    fluidMask = fluidMask * 0;  % Remove obstacle for open channel case
+    fluidMask = ones(size(fluidMask));  % Entire domain is fluid for open channel case
 end
 
 %% Field Initialization
