@@ -1,104 +1,113 @@
-%% CFD Simulation - Potential Flow Around a Cylinder
-% E1 Implementation
+%% Potential Flow Simulation Around Cylindrical Obstacle
+% Comprehensive CFD solver using stream function formulation
+%
 clearvars; close all; clc;
 
-%% Read Input Data
-[Geometry, v_in, p_in, T_in, psi_body, gas, Numerical, Init, w, CASE] = readInputData();
+%% Configuration and Parameter Setup
+[domain, inlet, boundary, material, solver, state, rotSpeed, simCase] = setupSimulation();
 
-%% Generate Mesh
-[x_P, y_P] = generateMesh(Geometry, Numerical);
+%% Mesh Generation
+[gridX, gridY] = createComputationalGrid(domain, solver);
 
-%% Generate Cylinder Geometry and Solid Matrix
-[x_cyl, y_cyl, S, theta] = solidMaterial(Geometry, x_P, y_P, Numerical);
-if CASE == 1
-    S = S*0;
+%% Obstacle Geometry Definition
+[cylX, cylY, fluidMask, angularPos] = defineObstacles(domain, gridX, gridY, solver);
+if simCase == 1
+    fluidMask = fluidMask * 0;  % Remove obstacle for open channel case
 end
-%% Initialize Fields
-[psi, rho] = initParams(Init, Numerical, S);
 
-%% Evaluate Coefficients
-[a_E, a_W, a_N, a_S, b_P, a_P] = evalCoefficients(psi, psi_body, Numerical, Geometry, v_in, x_P, y_P, S, Init);
+%% Field Initialization
+[streamFunc, density] = initializeFields(state, solver, fluidMask);
 
-%% Solve System (Gauss-Seidel Iteration)
-fprintf('Starting Gauss-Seidel solver...\n');
-[psi, i, error] = solveSystem(psi, psi_body, S, a_E, a_W, a_N, a_S, a_P, b_P, v_in, y_P, Numerical, Geometry);
-fprintf('Converged after %d iterations with error = %.2e\n', i, error);
+%% Construct Discretization Matrix
+[coeff_east, coeff_west, coeff_north, coeff_south, coeff_center, rhs] = ...
+    constructMatrix(streamFunc, boundary.psi_surface, solver, domain, inlet.velocity, ...
+                    gridX, gridY, fluidMask, state);
 
-%% Compute Velocities
-[v_x, v_y, v_mag] = compute_vel(psi, x_P, y_P, Numerical, v_in, Geometry.rho_ref, rho);
+%% Iterative Solution (Gauss-Seidel Method)
+fprintf('Initiating iterative solver...\n');
+[streamFunc, numIter, residual] = iterativeSolver(streamFunc, boundary.psi_surface, fluidMask, ...
+                                                   coeff_east, coeff_west, coeff_north, coeff_south, ...
+                                                   coeff_center, rhs, inlet.velocity, gridY, solver, domain);
+fprintf('Convergence achieved in %d iterations with residual = %.2e\n', numIter, residual);
 
-%% Compute Thermodynamic Properties
-[T, P, rho, cp_mean] = compute_thermo(v_mag, Numerical, Init, gas);
+%% Velocity Field Reconstruction
+[velX, velY, velMag] = velocityField(streamFunc, gridX, gridY, solver, inlet.velocity, ...
+                                     domain.ref_density, density);
 
-%% Compute Aerodynamic Coefficients
-if CASE ~= 1
-    [C_D, C_L, Gamma, D, L, p_cyl] = final_calc(x_P, y_P, P, v_x, v_y, x_cyl, y_cyl, theta, Geometry, w, v_in);
+%% Thermodynamic Property Calculation
+[tempField, pressField, rhoField, cpAvg] = thermoProperties(velMag, solver, state, material);
+
+%% Aerodynamic Coefficient Evaluation
+if simCase ~= 1
+    [coeffDrag, coeffLift, circulation, forceDrag, forceLift, pressureOnBody] = ...
+        aeroCoefficients(gridX, gridY, pressField, velX, velY, cylX, cylY, ...
+                        angularPos, domain, rotSpeed, inlet.velocity);
     
-    % Display results
-    fprintf('\n=== Aerodynamic Results ===\n');
-    fprintf('Drag Coefficient (C_D): %.6f\n', C_D);
-    fprintf('Lift Coefficient (C_L): %.6f\n', C_L);
-    fprintf('Circulation (Gamma): %.6f\n', Gamma);
-    fprintf('Drag Force (D): %.6f N\n', D);
-    fprintf('Lift Force (L): %.6f N\n', L);
+    % Results Display
+    fprintf('\n=== Aerodynamic Performance Metrics ===\n');
+    fprintf('Drag Coefficient (C_D):  %.6f\n', coeffDrag);
+    fprintf('Lift Coefficient (C_L):  %.6f\n', coeffLift);
+    fprintf('Circulation (Gamma):     %.6f\n', circulation);
+    fprintf('Drag Force (D):          %.6f N\n', forceDrag);
+    fprintf('Lift Force (L):          %.6f N\n', forceLift);
 end
 
-%% Plotting
-% Calculate grid spacing
-dx = Geometry.L / Numerical.N;
-dy = Geometry.H / Numerical.M;
+%% Visualization
+% Compute mesh spacing for proper scaling
+dx = domain.length / solver.nx;
+dy = domain.height / solver.ny;
 
-figure('Name', 'Stream Function Contours', 'NumberTitle', 'off');
-plotStreamLines(psi, x_P, y_P);
-if CASE ~= 1
+figure('Name', 'Flow Pattern Analysis', 'NumberTitle', 'off');
+displayFlowPattern(streamFunc, gridX, gridY);
+if simCase ~= 1
     hold on;
-    plot(x_cyl, y_cyl, 'r-', 'LineWidth', 2);
+    plot(cylX, cylY, 'r-', 'LineWidth', 2);
     hold off;
 end
 xlabel('x [m]'); ylabel('y [m]');
-title('Stream Function Contours');
+title('Stream Function Streamlines');
 axis equal tight;
-name = "figures/" + "Case_"+ CASE + "/" + CASE + "_Streamfunc.png";
+name = "figures/" + "Case_"+ simCase + "/" + simCase + "_Streamfunc.png";
 exportgraphics(gca, name, 'Resolution', 300, 'ContentType', 'image', 'BackgroundColor', 'none');
 
 
-figure('Name', 'Pressure Field (Pa)', 'NumberTitle', 'off');
-plotCFD('Pressure (Pa)', P, Numerical.N, Numerical.M, dx, dy);
-if CASE ~= 1
+figure('Name', 'Pressure Distribution (Pa)', 'NumberTitle', 'off');
+visualizeScalarField('Pressure (Pa)', pressField, solver.nx, solver.ny, dx, dy);
+if simCase ~= 1
     hold on;
-    plot(x_cyl, y_cyl, 'k-', 'LineWidth', 2);
+    plot(cylX, cylY, 'k-', 'LineWidth', 2);
     hold off;
 end
-name = "figures/" + "Case_"+ CASE + "/" + CASE + "_Pressure.png";
+name = "figures/" + "Case_"+ simCase + "/" + simCase + "_Pressure.png";
 exportgraphics(gca, name, 'Resolution', 300, 'ContentType', 'image', 'BackgroundColor', 'none');
 
-figure('Name', 'Temperature Field (K)', 'NumberTitle', 'off');
-plotCFD('Temperature (K)', T, Numerical.N, Numerical.M, dx, dy);
-if CASE ~= 1
+figure('Name', 'Temperature Profile (K)', 'NumberTitle', 'off');
+visualizeScalarField('Temperature (K)', tempField, solver.nx, solver.ny, dx, dy);
+if simCase ~= 1
     hold on;
-    plot(x_cyl, y_cyl, 'k-', 'LineWidth', 2);
+    plot(cylX, cylY, 'k-', 'LineWidth', 2);
     hold off;
 end
-name = "figures\" + "Case_"+ CASE + "\" + CASE + "_Temperature.png";
+name = "figures/" + "Case_"+ simCase + "/" + simCase + "_Temperature.png";
 exportgraphics(gca, name, 'Resolution', 300, 'ContentType', 'image', 'BackgroundColor', 'none');
 
-figure('Name', 'Velocity Magnitude (m/s)', 'NumberTitle', 'off');
-plotCFD('Velocity (m/s)', v_mag, Numerical.N, Numerical.M, dx, dy);
-if CASE ~= 1
+figure('Name', 'Velocity Field (m/s)', 'NumberTitle', 'off');
+visualizeScalarField('Velocity (m/s)', velMag, solver.nx, solver.ny, dx, dy);
+if simCase ~= 1
     hold on;
-    plot(x_cyl, y_cyl, 'k-', 'LineWidth', 2);
+    plot(cylX, cylY, 'k-', 'LineWidth', 2);
     hold off;
 end
-name = "figures/" + "Case_"+ CASE + "/" + CASE + "_Velocity.png";
+name = "figures/" + "Case_"+ simCase + "/" + simCase + "_Velocity.png";
 exportgraphics(gca, name, 'Resolution', 300, 'ContentType', 'image', 'BackgroundColor', 'none');
 
-if CASE ~= 1
-    figure('Name', 'Pressure Distribution on Cylinder', 'NumberTitle', 'off');
-    plot(theta * 180/pi, p_cyl, 'b-', 'LineWidth', 2);
-    xlabel('Angle (degrees)');
+if simCase ~= 1
+    figure('Name', 'Surface Pressure Distribution', 'NumberTitle', 'off');
+    plot(angularPos * 180/pi, pressureOnBody, 'b-', 'LineWidth', 2);
+    xlabel('Angular Position (degrees)');
     ylabel('Pressure (Pa)');
-    title('Pressure Distribution on Cylinder Surface');
+    title('Pressure Variation Around Obstacle Surface');
     grid on;
 end
 
-fprintf('\nSimulation completed successfully!\n');
+fprintf('\nSimulation execution completed successfully!\n');
