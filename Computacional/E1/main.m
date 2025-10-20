@@ -1,10 +1,10 @@
 %% Potential Flow Simulation Around Cylindrical Obstacle
-% Comprehensive CFD solver using stream function formulation
+% Gerard Martínez Vilella
 %
 clearvars; close all; clc;
 
 %% Select case
-simCase = 1; % 1- Uniform flow 2- Static Cylinder 3- Rotating Cylinder
+simCase = 2; % 1- Uniform flow 2- Static Cylinder 3- Rotating Cylinder
 
 %% Configuration and Parameter Setup
 [domain, inlet, boundary, material, solver, state, rotSpeed] = setupSimulation(simCase);

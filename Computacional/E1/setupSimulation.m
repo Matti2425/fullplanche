@@ -1,4 +1,4 @@
-function [domain, inlet, boundary, material, solver, state, rotSpeed] = setupSimulation()
+function [domain, inlet, boundary, material, solver, state, rotSpeed] = setupSimulation(simCase)
 % SETUPSIMULATION Initializes all simulation parameters for potential flow analysis
 %
 % This function configures all physical, geometrical, and numerical parameters
@@ -27,7 +27,7 @@ function [domain, inlet, boundary, material, solver, state, rotSpeed] = setupSim
 
     % Fluid Material Properties
     material.gamma = 1.4;           % Heat capacity ratio (air)
-    material.specific_gas_constant = 287;  % Gas constant [J/(kg·K)]
+    material.R_gas = 287;  % Gas constant [J/(kg·K)]
 
     % Flow Inlet Conditions
     inlet.velocity = 1;             % Inlet velocity [m/s]
@@ -35,7 +35,7 @@ function [domain, inlet, boundary, material, solver, state, rotSpeed] = setupSim
     inlet.temperature = 300;        % Reference temperature [K]
     
     % Compute reference density
-    rho_reference = inlet.pressure / (material.specific_gas_constant * inlet.temperature);
+    rho_reference = inlet.pressure / (material.R_gas * inlet.temperature);
     domain.ref_density = rho_reference;
 
     % Cylinder Rotation Parameter
@@ -49,14 +49,14 @@ function [domain, inlet, boundary, material, solver, state, rotSpeed] = setupSim
     if simCase ~= 1
         R_obstacle = domain.diameter / 2;
         boundary.psi_surface = inlet.velocity * (domain.height/2) + ...
-                              R_obstacle^2 * rotSpeed * (1/(2*pi));
+                              R_obstacle^2 * rotSpeed;
     else
         boundary.psi_surface = 0;
     end
 
     % Numerical Solver Configuration
-    solver.nx = 100;                % Grid points x-direction
-    solver.ny = 100;                % Grid points y-direction
+    solver.nx = 250;                % Grid points x-direction
+    solver.ny = 250;                % Grid points y-direction
     solver.tolerance = 1e-10;       % Convergence tolerance
     solver.max_iterations = 1000000;  % Maximum iteration count
 

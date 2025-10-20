@@ -24,7 +24,7 @@ function [tempField, pressField, rhoField, cpAvg] = thermoProperties(velMag, sol
     tempRef = state.temperature;
     pressRef = state.pressure;
     velRef = state.velocity;
-    R_gas = material.specific_gas_constant;
+    R_gas = material.R_gas;
     gammaRatio = material.gamma;
 
     % Polynomial coefficients for cp(T) = A + B*T + C*T^2
