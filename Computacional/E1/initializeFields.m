@@ -1,4 +1,4 @@
-function [streamFunc, density] = initializeFields(state, solver, fluidMask)
+function [psi, density] = initializeFields(state, solver, fluidMask, varargin)
 % INITIALIZEFIELDS Sets initial conditions for stream function and density
 %
 % Initializes computational fields with reference values and applies
@@ -18,7 +18,7 @@ function [streamFunc, density] = initializeFields(state, solver, fluidMask)
     ny = solver.ny;
 
     % Initialize stream function with reference value everywhere
-    streamFunc = state.psi_ref * ones(ny+2, nx+2);
+    psi = state.psi_ref * ones(ny+2, nx+2);
 
     % Initialize density: reference density in fluid, zero in solid
     density = state.density * fluidMask;

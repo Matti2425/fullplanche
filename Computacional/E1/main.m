@@ -4,7 +4,7 @@
 clearvars; close all; clc;
 
 %% Select case
-simCase = 2; % 1- Uniform flow 2- Static Cylinder 3- Rotating Cylinder
+simCase = 3; % 1- Uniform flow 2- Static Cylinder 3- Rotating Cylinder
 
 %% Configuration and Parameter Setup
 [domain, inlet, boundary, material, solver, state, rotSpeed] = setupSimulation(simCase);
@@ -16,22 +16,22 @@ simCase = 2; % 1- Uniform flow 2- Static Cylinder 3- Rotating Cylinder
 [cylX, cylY, fluidMask, angularPos] = defineObstacles(domain, gridX, gridY, solver, simCase);
 
 %% Field Initialization
-[streamFunc, density] = initializeFields(state, solver, fluidMask);
+[psi, density] = initializeFields(state, solver, fluidMask);
 
 %% Construct Discretization Matrix
-[coeff_east, coeff_west, coeff_north, coeff_south, coeff_center, rhs] = ...
-    constructMatrix(streamFunc, boundary.psi_surface, solver, domain, inlet.velocity, ...
+[a_E, a_W, a_N, a_S, a_P, rhs] = ...
+    constructMatrix(psi, boundary.psi_surface, solver, domain, inlet.velocity, ...
                     gridX, gridY, fluidMask, state);
 
 %% Iterative Solution (Gauss-Seidel Method)
 fprintf('Initiating iterative solver...\n');
-[streamFunc, numIter, residual] = iterativeSolver(streamFunc, boundary.psi_surface, fluidMask, ...
-                                                   coeff_east, coeff_west, coeff_north, coeff_south, ...
-                                                   coeff_center, rhs, inlet.velocity, gridY, solver, domain);
+[psi, numIter, residual] = iterativeSolver(psi, boundary.psi_surface, fluidMask, ...
+                                                   a_E, a_W, a_N, a_S, ...
+                                                   a_P, rhs, inlet.velocity, gridY, solver, domain);
 fprintf('Convergence achieved in %d iterations with residual = %.2e\n', numIter, residual);
 
 %% Velocity Field Reconstruction
-[velX, velY, velMag] = velocityField(streamFunc, gridX, gridY, solver, inlet.velocity, ...
+[velX, velY, velMag] = velocityField(psi, gridX, gridY, solver, inlet.velocity, ...
                                      domain.ref_density, density);
 
 %% Thermodynamic Property Calculation
@@ -39,9 +39,8 @@ fprintf('Convergence achieved in %d iterations with residual = %.2e\n', numIter,
 
 %% Aerodynamic Coefficient Evaluation
 if simCase ~= 1
-    [coeffDrag, coeffLift, circulation, forceDrag, forceLift, pressureOnBody] = ...
-        aeroCoefficients(gridX, gridY, pressField, velX, velY, cylX, cylY, ...
-                        angularPos, domain, rotSpeed, inlet.velocity);
+    [coeffDrag, coeffLift, circulation, forceDrag, forceLift, pressureOnBody] = aeroCoefficients(gridX, gridY, pressField, velX, velY, cylX, cylY, ...
+                                                                                                    angularPos, domain, inlet.velocity);
     
     % Results Display
     fprintf('\n=== Aerodynamic Performance Metrics ===\n');
@@ -58,7 +57,7 @@ dx = domain.length / solver.nx;
 dy = domain.height / solver.ny;
 
 figure('Name', 'Flow Pattern Analysis', 'NumberTitle', 'off');
-displayFlowPattern(streamFunc, gridX, gridY);
+displayFlowPattern(psi, gridX, gridY);
 if simCase ~= 1
     hold on;
     plot(cylX, cylY, 'r-', 'LineWidth', 2);

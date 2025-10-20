@@ -1,5 +1,5 @@
-function [coeff_east, coeff_west, coeff_north, coeff_south, coeff_center, rhs] = ...
-         constructMatrix(streamFunc, psi_boundary, solver, domain, velocity, gridX, gridY, fluidMask, state)
+function [a_E, a_W, a_N, a_S, a_P, rhs] = ...
+         constructMatrix(psi, psi_boundary, solver, domain, velocity, gridX, gridY, fluidMask, state)
 % CONSTRUCTMATRIX Builds coefficient matrices for discretized stream equation
 %
 % Constructs the finite difference stencil coefficients for solving the
@@ -30,11 +30,11 @@ function [coeff_east, coeff_west, coeff_north, coeff_south, coeff_center, rhs] =
     dy = domainHeight / ny;
 
     % Allocate coefficient matrices
-    coeff_east = zeros(ny+2, nx+2);
-    coeff_west = zeros(ny+2, nx+2);
-    coeff_north = zeros(ny+2, nx+2);
-    coeff_south = zeros(ny+2, nx+2);
-    coeff_center = zeros(ny+2, nx+2);
+    a_E = zeros(ny+2, nx+2);
+    a_W = zeros(ny+2, nx+2);
+    a_N = zeros(ny+2, nx+2);
+    a_S = zeros(ny+2, nx+2);
+    a_P = zeros(ny+2, nx+2);
     rhs = zeros(ny+2, nx+2);
 
     psi_bottom = state.psi_ref;
@@ -42,53 +42,53 @@ function [coeff_east, coeff_west, coeff_north, coeff_south, coeff_center, rhs] =
     % Interior nodes - construct finite difference stencil
     for j = 2:ny+1
         for i = 2:nx+1
-            coeff_east(j, i) = dy / (gridX(i+1) - gridX(i));
-            coeff_west(j, i) = dy / (gridX(i) - gridX(i-1));
-            coeff_north(j, i) = dx / (gridY(j+1) - gridY(j));
-            coeff_south(j, i) = dx / (gridY(j) - gridY(j-1));
-            coeff_center(j, i) = coeff_east(j, i) + coeff_west(j, i) + ...
-                                coeff_north(j, i) + coeff_south(j, i);
+            a_E(j, i) = dy / (gridX(i+1) - gridX(i));
+            a_W(j, i) = dy / (gridX(i) - gridX(i-1));
+            a_N(j, i) = dx / (gridY(j+1) - gridY(j));
+            a_S(j, i) = dx / (gridY(j) - gridY(j-1));
+            a_P(j, i) = a_E(j, i) + a_W(j, i) + ...
+                                a_N(j, i) + a_S(j, i);
             rhs(j, i) = 0;
         end
     end
 
     % Bottom boundary (j=1) - Dirichlet condition
     for i = 1:nx+2
-        coeff_east(1, i) = 0;
-        coeff_west(1, i) = 0;
-        coeff_north(1, i) = 0;
-        coeff_south(1, i) = 0;
-        coeff_center(1, i) = 1;
+        a_E(1, i) = 0;
+        a_W(1, i) = 0;
+        a_N(1, i) = 0;
+        a_S(1, i) = 0;
+        a_P(1, i) = 1;
         rhs(1, i) = psi_bottom;
     end
 
     % Top boundary (j=ny+2) - Dirichlet condition
     for i = 1:nx+2
-        coeff_east(ny+2, i) = 0;
-        coeff_west(ny+2, i) = 0;
-        coeff_north(ny+2, i) = 0;
-        coeff_south(ny+2, i) = 0;
-        coeff_center(ny+2, i) = 1;
+        a_E(ny+2, i) = 0;
+        a_W(ny+2, i) = 0;
+        a_N(ny+2, i) = 0;
+        a_S(ny+2, i) = 0;
+        a_P(ny+2, i) = 1;
         rhs(ny+2, i) = psi_bottom + velocity * domainHeight;
     end
 
     % Inlet boundary (i=1) - Dirichlet condition
     for j = 2:ny+1
-        coeff_east(j, 1) = 0;
-        coeff_west(j, 1) = 0;
-        coeff_north(j, 1) = 0;
-        coeff_south(j, 1) = 0;
-        coeff_center(j, 1) = 1;
+        a_E(j, 1) = 0;
+        a_W(j, 1) = 0;
+        a_N(j, 1) = 0;
+        a_S(j, 1) = 0;
+        a_P(j, 1) = 1;
         rhs(j, 1) = psi_bottom + velocity * gridY(j);
     end
 
     % Outlet boundary (i=nx+2) - Neumann-like condition
     for j = 2:ny+1
-        coeff_east(j, nx+2) = 0;
-        coeff_west(j, nx+2) = 1;
-        coeff_north(j, nx+2) = 0;
-        coeff_south(j, nx+2) = 0;
-        coeff_center(j, nx+2) = 1;
+        a_E(j, nx+2) = 0;
+        a_W(j, nx+2) = 1;
+        a_N(j, nx+2) = 0;
+        a_S(j, nx+2) = 0;
+        a_P(j, nx+2) = 1;
         rhs(j, nx+2) = 0;
     end
 
@@ -96,11 +96,11 @@ function [coeff_east, coeff_west, coeff_north, coeff_south, coeff_center, rhs] =
     for j = 2:ny+1
         for i = 2:nx+1
             if fluidMask(j, i) == 0
-                coeff_east(j, i) = 0;
-                coeff_west(j, i) = 0;
-                coeff_north(j, i) = 0;
-                coeff_south(j, i) = 0;
-                coeff_center(j, i) = 1;
+                a_E(j, i) = 0;
+                a_W(j, i) = 0;
+                a_N(j, i) = 0;
+                a_S(j, i) = 0;
+                a_P(j, i) = 1;
                 rhs(j, i) = psi_boundary;
             end
         end

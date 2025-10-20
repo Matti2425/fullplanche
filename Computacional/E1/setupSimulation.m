@@ -55,8 +55,8 @@ function [domain, inlet, boundary, material, solver, state, rotSpeed] = setupSim
     end
 
     % Numerical Solver Configuration
-    solver.nx = 250;                % Grid points x-direction
-    solver.ny = 250;                % Grid points y-direction
+    solver.nx = 100;                % Grid points x-direction
+    solver.ny = 100;                % Grid points y-direction
     solver.tolerance = 1e-10;       % Convergence tolerance
     solver.max_iterations = 1000000;  % Maximum iteration count
 

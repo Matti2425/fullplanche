@@ -25,7 +25,7 @@ function [tempField, pressField, rhoField, cpAvg] = thermoProperties(velMag, sol
     pressRef = state.pressure;
     velRef = state.velocity;
     R_gas = material.R_gas;
-    gammaRatio = material.gamma;
+    gamma = material.gamma;
 
     % Polynomial coefficients for cp(T) = A + B*T + C*T^2
     cp_A = 1005;        % J/(kg·K) - intercept
@@ -43,26 +43,34 @@ function [tempField, pressField, rhoField, cpAvg] = thermoProperties(velMag, sol
         for j = 2:ny+1
             % Temperature using energy equation
             % T = T_ref + (V_ref^2 - V^2) / (2 * cp_mean)
-            % First estimate cp_mean assuming small temperature change
+            % For low-speed flow, use constant cp approximation
             cp_local = cp_A + cp_B * tempRef + cp_C * tempRef^2;
 
-            % Temperature from isentropic relation
+            % Temperature from energy equation (isentropic for ideal gas)
             tempField(j,i) = tempRef + ((velRef^2 - velMag(j,i)^2) / (2 * cp_local));
 
-            % Refine cp_mean using computed temperature
-            tempMid = (tempField(j,i) + tempRef) / 2;
-            cpAvg(j,i) = (1 / (tempField(j,i) - tempRef)) * ...
-                        (cp_A * (tempField(j,i) - tempRef) + ...
-                         (cp_B / 2) * (tempField(j,i)^2 - tempRef^2) + ...
-                         (cp_C / 3) * (tempField(j,i)^3 - tempRef^3));
+            % Guard against division by zero at stagnation points
+            deltaT = tempField(j,i) - tempRef;
+            if abs(deltaT) < 1e-10
+                % At stagnation point or near-stagnation, use cp_A directly
+                cpAvg(j,i) = cp_A;
+            else
+                % Compute average cp using integral definition
+                % cpAvg = (1/ΔT) * ∫[Tref to T] cp(τ) dτ
+                cpAvg(j,i) = (1 / deltaT) * ...
+                            (cp_A * deltaT + ...
+                             (cp_B / 2) * (tempField(j,i)^2 - tempRef^2) + ...
+                             (cp_C / 3) * (tempField(j,i)^3 - tempRef^3));
+            end
 
-            % Recompute temperature with refined cp (iterative refinement)
-            tempField(j,i) = tempRef + ((velRef^2 - velMag(j,i)^2) / (2 * cpAvg(j,i)));
+            % For low-speed flow, temperature changes are typically negligible
+            % No need for iterative refinement; single pass is sufficient
+            % tempField(j,i) already computed above
 
-            % Pressure from isentropic relation
-            pressField(j,i) = pressRef * (tempField(j,i) / tempRef)^(gammaRatio / (gammaRatio - 1));
+            % Pressure from isentropic relation: P = P_ref * (T/T_ref)^(gamma/(gamma-1))
+            pressField(j,i) = pressRef * (tempField(j,i) / tempRef)^(gamma / (gamma - 1));
 
-            % Density from ideal gas law
+            % Density from ideal gas law: rho = P / (R * T)
             rhoField(j,i) = pressField(j,i) / (R_gas * tempField(j,i));
         end
     end
