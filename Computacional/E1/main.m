@@ -3,17 +3,17 @@
 %
 clearvars; close all; clc;
 
+%% Select case
+simCase = 1; % 1- Uniform flow 2- Static Cylinder 3- Rotating Cylinder
+
 %% Configuration and Parameter Setup
-[domain, inlet, boundary, material, solver, state, rotSpeed, simCase] = setupSimulation();
+[domain, inlet, boundary, material, solver, state, rotSpeed] = setupSimulation(simCase);
 
 %% Mesh Generation
 [gridX, gridY] = createComputationalGrid(domain, solver);
 
 %% Obstacle Geometry Definition
-[cylX, cylY, fluidMask, angularPos] = defineObstacles(domain, gridX, gridY, solver);
-if simCase == 1
-    fluidMask = ones(size(fluidMask));  % Entire domain is fluid for open channel case
-end
+[cylX, cylY, fluidMask, angularPos] = defineObstacles(domain, gridX, gridY, solver, simCase);
 
 %% Field Initialization
 [streamFunc, density] = initializeFields(state, solver, fluidMask);

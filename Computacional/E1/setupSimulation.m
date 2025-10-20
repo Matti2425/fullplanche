@@ -1,8 +1,11 @@
-function [domain, inlet, boundary, material, solver, state, rotSpeed, simCase] = setupSimulation()
+function [domain, inlet, boundary, material, solver, state, rotSpeed] = setupSimulation()
 % SETUPSIMULATION Initializes all simulation parameters for potential flow analysis
 %
 % This function configures all physical, geometrical, and numerical parameters
 % necessary for solving potential flow around a cylindrical obstacle.
+%
+% INPUTS:
+%   simCase   - Selected Case
 %
 % OUTPUTS:
 %   domain    - Geometric domain structure (length, height, diameter, center, ref_density)
@@ -14,9 +17,6 @@ function [domain, inlet, boundary, material, solver, state, rotSpeed, simCase] =
 %   rotSpeed  - Angular velocity of rotating cylinder (rad/s)
 %   simCase   - Case selector (1=channel, 2=static, 3=rotating)
 %--------------------------------------------------------------------------
-
-    % Load case selector
-    simCase = 1;  % Default case: static cylinder
 
     % Domain Geometry Configuration
     domain.length = 2;              % Channel length [m]

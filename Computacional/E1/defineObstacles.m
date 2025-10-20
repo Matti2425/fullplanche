@@ -1,4 +1,4 @@
-function [cylX, cylY, fluidMask, angularPos] = defineObstacles(domain, gridX, gridY, solver)
+function [cylX, cylY, fluidMask, angularPos] = defineObstacles(domain, gridX, gridY, solver, simCase)
 % DEFINEOBSTACLES Defines cylindrical obstacle geometry in the domain
 %
 % Creates a circular obstacle at domain center and marks fluid/solid regions.
@@ -29,11 +29,13 @@ function [cylX, cylY, fluidMask, angularPos] = defineObstacles(domain, gridX, gr
     cylY = obstacleY + obstacleRadius * sin(angularPos);
 
     % Mark solid region (points inside obstacle)
-    for j = 1:ny+2
-        for i = 1:nx+2
-            distanceToCenter = (gridX(i) - obstacleX)^2 + (gridY(j) - obstacleY)^2;
-            if distanceToCenter <= obstacleRadius^2
-                fluidMask(j, i) = 0;  % Mark as solid
+    if simCase ~= 1
+        for j = 1:ny+2
+            for i = 1:nx+2
+                distanceToCenter = (gridX(i) - obstacleX)^2 + (gridY(j) - obstacleY)^2;
+                if distanceToCenter <= obstacleRadius^2
+                    fluidMask(j, i) = 0;  % Mark as solid
+                end
             end
         end
     end
