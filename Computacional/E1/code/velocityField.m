@@ -83,8 +83,8 @@ function [velX, velY, velMag] = velocityField(streamFunc, gridX, gridY, solver, 
             vel_west = -(1/rho_ratio_west(j,i)) * (streamFunc(j, i) - streamFunc(j, i-1)) / dx_west;
 
             % Average face velocities to get node-centered values
-            velX(j, i) =  (vel_east + vel_west) / 2;  
-            velY(j, i) = (vel_north + vel_south) / 2;     
+            velX(j, i) =  (vel_north + vel_south) / 2;  
+            velY(j, i) = (vel_east + vel_west) / 2;     
 
         end
     end

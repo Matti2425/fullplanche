@@ -19,9 +19,9 @@ function [domain, inlet, boundary, material, solver, state, rotSpeed] = setupSim
 %--------------------------------------------------------------------------
 
     % Domain Geometry Configuration
-    domain.length = 2;              % Channel length [m]
-    domain.height = 1;              % Channel height [m]
-    domain.diameter = 0.2;          % Obstacle diameter [m]
+    domain.length = 4;              % Channel length [m]
+    domain.height = 2;              % Channel height [m]
+    domain.diameter = 0.5;          % Obstacle diameter [m]
     domain.center_x = domain.length / 2;  % Obstacle x-position [m]
     domain.center_y = domain.height / 2;  % Obstacle y-position [m]
 
@@ -30,7 +30,7 @@ function [domain, inlet, boundary, material, solver, state, rotSpeed] = setupSim
     material.R_gas = 287;  % Gas constant [J/(kg·K)]
 
     % Flow Inlet Conditions
-    inlet.velocity = 1;             % Inlet velocity [m/s]
+    inlet.velocity = 3;             % Inlet velocity [m/s]
     inlet.pressure = 101325;        % Reference pressure [Pa]
     inlet.temperature = 300;        % Reference temperature [K]
     
@@ -55,8 +55,8 @@ function [domain, inlet, boundary, material, solver, state, rotSpeed] = setupSim
     end
 
     % Numerical Solver Configuration
-    solver.nx = 100;                % Grid points x-direction
-    solver.ny = 100;                % Grid points y-direction
+    solver.nx = 250;                % Grid points x-direction
+    solver.ny = 250;                % Grid points y-direction
     solver.tolerance = 1e-10;       % Convergence tolerance
     solver.max_iterations = 1000000;  % Maximum iteration count
 

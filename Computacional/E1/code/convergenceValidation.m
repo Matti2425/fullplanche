@@ -7,8 +7,8 @@
 clearvars; close all; clc;
 
 %% Configuration Phase
-gridSizes = [8, 16, 32, 64, 128, 256];  % Mesh refinement levels: 2^3 to 2^8
-numCases = 1;
+gridSizes = [8, 16, 32, 64, 128];  % Mesh refinement levels: 2^3 to 2^8
+numCases = 3;
 numGrids = length(gridSizes);
 
 % Data storage structure
@@ -39,7 +39,7 @@ for caseIdx = 1:numCases
 
         % Initialize Simulation Parameters
         [domainGeo, flowInlet, flowBoundary, fluidMaterial, numericalCfg, ...
-         initialState, cylinderSpeed, flowCase] = setupSimulation();
+            initialState, cylinderSpeed] = setupSimulation(caseIdx);
 
         numericalCfg.nx = N;
         numericalCfg.ny = M;

@@ -1,0 +1,60 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[a4paper]{geometry} 
+\usepackage{setspace} 
+\usepackage{fancyhdr} 
+\usepackage{graphicx} 
+\usepackage[english]{babel}  %%LANGUAGE
+\usepackage{amsmath}
+\usepackage[justification=centering]{caption}
+\usepackage{enumitem} 
+\usepackage{hyperref} 
+\usepackage{float}
+\usepackage{multirow}
+\usepackage[style=iso-numeric]{biblatex}
+\usepackage{comment}
+\usepackage{listings}
+\usepackage{xcolor}
+
+
+\bibliography{refs.bib}
+
+\let\olditemize\itemize
+\def\itemize{\olditemize\itemsep=0pt }
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=black,      
+    urlcolor=black,
+    citecolor=black,
+    }
+    
+\geometry{top=3cm, bottom=2.5cm, left=2.5cm, right=2.5cm} 
+\rmfamily 
+\spacing{1.2} 
+\setlength{\parindent}{0cm} 
+\setlength{\parskip}{8px} 
+
+\definecolor{codegray}{rgb}{0.95,0.95,0.95}
+\definecolor{codeblue}{rgb}{0.1,0.1,0.6}
+\definecolor{codered}{rgb}{0.6,0.1,0.1}
+\definecolor{codegreen}{rgb}{0.0,0.5,0.0}
+
+\lstdefinestyle{matlabstyle}{
+    backgroundcolor=\color{codegray},
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,
+    frame=single,
+    rulecolor=\color{black},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    keywordstyle=\color{codeblue}\bfseries,
+    commentstyle=\color{codegreen}\itshape,
+    stringstyle=\color{codered},
+    showstringspaces=false,
+    tabsize=4,
+    language=Matlab
+}
+
+\lstset{style=matlabstyle}
