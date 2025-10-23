@@ -1,0 +1,102 @@
+classdef Body
+    
+    properties
+        type            % tipo
+        mass            % kg
+        r_cg            % Vector posición del centro de gravedad en el ref. global [3x1]
+        dims            % Vector con las medidas importantes según tipo
+        I_local         % Tensor de inercia respecto al centro de gravedad local [3x3]
+        orientation     % Matriz de rotación SR local → SR global
+    end
+
+    methods
+        % Constructor
+        function obj = Body(type, mass, r_cg, dims, orientation, I_custom)
+            obj.type = lower(type);
+            obj.mass = mass;
+            obj.r_cg = r_cg(:);
+            obj.orientation = orientation;
+            obj.dims = dims(:).';  % aseguramos formato fila
+    
+            if nargin > 0
+                                % --- Calcula el tensor de inercia local según el tipo ---
+                switch obj.type
+                    case 'sphere'
+                        r = obj.dims(1) / 2;  % supondremos que d1 = diámetro
+                        Ival = (2/5) * obj.mass * r^2;
+                        obj.I_local = Ival * eye(3);
+
+                    case 'box'
+                        % d1, d2, d3 son las longitudes de los lados
+                        a = obj.dims(1); b = obj.dims(2); c = obj.dims(3);
+                        Ixx = (1/12) * obj.mass * (b^2 + c^2);
+                        Iyy = (1/12) * obj.mass * (a^2 + c^2);
+                        Izz = (1/12) * obj.mass * (a^2 + b^2);
+                        obj.I_local = diag([Ixx, Iyy, Izz]);
+
+                    case 'cube'
+                        % Ejes principales alineados con los lados 
+                        a = obj.dims(1);
+                        Ival = (1/6) * obj.mass * a^2;
+                        obj.I_local = diag([Ival, Ival, Ival]);
+                    
+                    case 'cylinder'
+                        % Cilindro sólido con eje principal en z
+                        % dims = [diametro, altura, ~]
+                        r = obj.dims(1) / 2;   % radio
+                        h = obj.dims(2);       % altura
+                        Ixx = (1/12) * obj.mass * (3*r^2 + h^2);
+                        Iyy = Ixx;
+                        Izz = (1/2) * obj.mass * r^2;
+                        obj.I_local = diag([Ixx, Iyy, Izz]);
+
+                    case 'tri_prism'
+                        % prismalado a (x) y lado b (y) altura h (z) 
+                        % dims = [diametro, altura, ~]
+                        a = obj.dims(1); 
+                        b = obj.dims(1);
+                        h = obj.dims(3);       % altura
+                        Ixx = b^2/36 + h^2/12;
+                        Iyy = a^2/36 + h^2/12;
+                        Izz = (a^2+b^2)/36;
+                        obj.I_local = diag([Ixx, Iyy, Izz]);
+                        % Recordar que el cdg se encuentra en (a/3, b/3, h/2)
+
+                    otherwise
+                        if nargin  > 5
+                            obj.I_local = I_custom;
+                        else
+                            fprintf('Type error or I not introduced')
+                        end
+                end
+                % Y rotamos la matriz de inercia al SR global
+                %R = obj.orientation;
+                %obj.I_local = R * obj.I_local * R.';  % Transformación al sistema global
+            end
+        end
+        
+        % SR_Local -> SR_Global : Rotation
+%         function I_oriented = orient_I(obj)
+%             R = obj.orientation;
+%             I_oriented = R * obj.I_local * R.';  % Transformación al sistema global
+%         end
+
+
+        % SR_Local -> SR_Global : Translation orientation
+        function I_global = inertiaAtRef(obj, r_ref)
+
+            R = obj.orientation;
+            I_oriented = R * obj.I_local * R.';  % Transformación al sistema global
+
+            % Calcula el tensor de inercia respecto a un punto de referencia (r_ref)
+            % usando el teorema de ejes paralelos.
+            
+            d = obj.r_cg - r_ref;  % Vector de desplazamiento
+%             d_skew = [  0   -d(3)  d(2);
+%                        d(3)   0   -d(1);
+%                       -d(2)  d(1)   0  ];
+%           se usa implícitamente
+            I_global = I_oriented + obj.mass * ( (d.'*d)*eye(3) - (d*d.') );
+        end
+    end
+end
