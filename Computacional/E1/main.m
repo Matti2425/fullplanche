@@ -11,7 +11,7 @@ clearvars; close all; clc;
 %% Generate Cylinder Geometry and Solid Matrix
 [x_cyl, y_cyl, S, theta] = solidMaterial(Geometry, x_P, y_P, Numerical);
 if CASE == 1
-    S = S*0;
+    S = ones(Numerical.N+2, Numerical.M+2);
 end
 %% Initialize Fields
 [psi, rho] = initParams(Init, Numerical, S);

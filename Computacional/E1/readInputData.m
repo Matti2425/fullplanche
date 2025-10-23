@@ -21,7 +21,7 @@ function [Geometry, v_in, p_in, T_in, psi_body, gas, Numerical, Init, w, CASE] =
     % CASE=1 for channel only
     % CASE=2 for channel + static cylinder
     % CASE=3 for channel + rotating cylinder (w>0 --> Clockwise)
-    CASE = 1;
+    CASE = 3;
     
     % Geometry properties
     Geometry.L = 2;

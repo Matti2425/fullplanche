@@ -42,7 +42,7 @@ function [C_D, C_L, Gamma, D, L, p_cyl] = final_calc(x_P, y_P, p_P, v_xP, v_yP, 
     Gamma = 2 * pi * R_cyl^2 * w;
     
     % Compute lift and drag forces (vectorized)
-    L = -6.5 * trapz(theta, p_cyl .* sin(theta)) * R_cyl;
+    L = -trapz(theta, p_cyl .* sin(theta)) * R_cyl;
     D = -trapz(theta, p_cyl .* cos(theta)) * R_cyl;
     
     % Compute lift and drag coefficients

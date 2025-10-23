@@ -278,7 +278,7 @@ for case_idx = 1:num_cases
             if CASE == 2
                 psi_body = v_in * (Geometry.H/2);
             else  % CASE == 3
-                psi_body = v_in * (Geometry.H/2) + R_cyl^2 * w;%* (1/(2*pi));
+                psi_body = v_in * (Geometry.H/2) + R_cyl^2 * w* (1/(2*pi));
             end
         end
         
