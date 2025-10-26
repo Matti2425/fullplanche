@@ -1,16 +1,10 @@
-function [Geometry, Fluid, Numerical, BoundaryConditions] = readInputData(case_study, diag)
-% READINPUTDATA Reads and sets up all input parameters for convection-diffusion simulation
+function [Geometry, Fluid, Numerical, BoundaryConditions] = setupSimulation(diag)
+% setupSimulation Reads and sets up all input parameters for convection-diffusion simulation
 %
 % This function defines all the physical, geometrical, and numerical parameters
 % required for solving the generic convection-diffusion transport equation.
 %
 % INPUTS:
-%   case_study - Discretization scheme selector:
-%                1 = Upwind
-%                2 = Exponential
-%                3 = CDS (Central Differencing Scheme)
-%                4 = HDS (Hybrid Differencing Scheme)
-%                5 = PLDS (Power Law Differencing Scheme)
 %   diag       - Diagonal flow test case (1 = diagonal, 0 = Smith-Hutton)
 %
 % OUTPUTS:
@@ -23,7 +17,7 @@ function [Geometry, Fluid, Numerical, BoundaryConditions] = readInputData(case_s
     % Geometry properties
     Geometry.L = 10;  % [m] Domain length
     
-    if diag == 1
+    if diag
         Geometry.H = Geometry.L;  % Square domain for diagonal case
     else
         Geometry.H = Geometry.L / 2;  % Smith-Hutton case
@@ -40,7 +34,7 @@ function [Geometry, Fluid, Numerical, BoundaryConditions] = readInputData(case_s
     Fluid.gamma = Fluid.rho ./ Fluid.GAMMA;  % Normalized diffusion
     
     % Diagonal case specific velocity
-    if diag == 1
+    if diag
         Fluid.v_0 = 10;  % [m/s] Velocity magnitude for diagonal flow
     end
     
@@ -48,7 +42,7 @@ function [Geometry, Fluid, Numerical, BoundaryConditions] = readInputData(case_s
     Numerical.N = 500;  % Number of cells in x-direction
     Numerical.M = round(Geometry.H / Geometry.L * Numerical.N);  % Cells in y-direction
     
-    if diag == 1
+    if diag
         Numerical.M = Numerical.N;  % Square mesh for diagonal case
     end
     
@@ -57,14 +51,14 @@ function [Geometry, Fluid, Numerical, BoundaryConditions] = readInputData(case_s
     Numerical.time_step = 0.1;  % Time step for transient solver
     
     % Boundary conditions
-    BoundaryConditions.phi_inlet = 1;  % Generic phi inlet value
+    BoundaryConditions.psi_inlet = 1;  % Generic phi inlet value
     
     % Diagonal case boundary values
-    if diag == 1
-        BoundaryConditions.phi_left = 100;
-        BoundaryConditions.phi_right = 0;
-        BoundaryConditions.phi_bottom = 0;
-        BoundaryConditions.phi_top = 100;
+    if diag
+        BoundaryConditions.psi_left = 100;
+        BoundaryConditions.psi_right = 0;
+        BoundaryConditions.psi_bottom = 0;
+        BoundaryConditions.psi_top = 100;
     end
 
 end

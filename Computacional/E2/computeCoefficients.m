@@ -1,7 +1,7 @@
-function [a_n, a_s, a_e, a_w, a_p, a_p_base, b_p] = evalCoefficients(v_x, v_y, Numerical, Fluid, ...
+function [a_n, a_s, a_e, a_w, a_p, a_p_base, b_p] = computeCoefficients(v_x, v_y, Numerical, Fluid, ...
                                                                       sx_w, sx_e, sx_p, sy_s, sy_n, sy_p, ...
                                                                       gamma_val, case_study, A_x, A_y)
-% EVALCOEFFICIENTS Evaluates discretization coefficients for convection-diffusion equation
+% COMPUTECOEFFICIENTS Evaluates discretization coefficients for convection-diffusion equation
 %
 % This function computes the coefficients for the finite volume discretization
 % of the generic convection-diffusion transport equation using various schemes.
@@ -60,31 +60,31 @@ function [a_n, a_s, a_e, a_w, a_p, a_p_base, b_p] = evalCoefficients(v_x, v_y, N
             
             % Select discretization scheme
             switch case_study
-                case 1  % Upwind
+                case "UDS" 
                     A_n = 1;
                     A_s = 1;
                     A_e = 1;
                     A_w = 1;
-                    
-                case 2  % Exponential
-                    A_n = abs(p_n) / (exp(abs(p_n)) - 1);
-                    A_s = abs(p_s) / (exp(abs(p_s)) - 1);
-                    A_e = abs(p_e) / (exp(abs(p_e)) - 1);
-                    A_w = abs(p_w) / (exp(abs(p_w)) - 1);
-                    
-                case 3  % CDS (Central Differencing Scheme)
+
+                case "CDS"  
                     A_n = abs((abs(p_n)/2) - 1);
                     A_s = abs((abs(p_s)/2) - 1);
                     A_e = abs((abs(p_e)/2) - 1);
                     A_w = abs((abs(p_w)/2) - 1);
-                    
-                case 4  % HDS (Hybrid Differencing Scheme)
+
+                case "HDS" 
                     A_n = max(0, 1 - (abs(p_n)/2));
                     A_s = max(0, 1 - (abs(p_s)/2));
                     A_e = max(0, 1 - (abs(p_e)/2));
                     A_w = max(0, 1 - (abs(p_w)/2));
                     
-                case 5  % PLDS (Power Law Differencing Scheme)
+                case "EDS" 
+                    A_n = abs(p_n) / (exp(abs(p_n)) - 1);
+                    A_s = abs(p_s) / (exp(abs(p_s)) - 1);
+                    A_e = abs(p_e) / (exp(abs(p_e)) - 1);
+                    A_w = abs(p_w) / (exp(abs(p_w)) - 1);
+                    
+                case "PLDS" 
                     A_n = max(0, 1 - (abs(p_n)/2)^5);
                     A_s = max(0, 1 - (abs(p_s)/2)^5);
                     A_e = max(0, 1 - (abs(p_e)/2)^5);

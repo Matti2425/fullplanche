@@ -24,12 +24,12 @@ function [a_n, a_s, a_e, a_w, a_p, b_p] = applyBoundaryConditions(a_n, a_s, a_e,
     N = Numerical.N;
     M = Numerical.M;
     
-    if diag == 1
+    if diag
         % Diagonal flow case: simple Dirichlet boundaries
-        b_p(1, 1:M+2) = BoundaryConditions.phi_left;      % Left wall
-        b_p(N+2, 1:M+2) = BoundaryConditions.phi_right;   % Right wall
-        b_p(1:N+2, 1) = BoundaryConditions.phi_bottom;    % Bottom wall
-        b_p(1:N+2, M+2) = BoundaryConditions.phi_top;     % Top wall
+        b_p(1, 1:M+2) = BoundaryConditions.psi_left;      % Left wall
+        b_p(N+2, 1:M+2) = BoundaryConditions.psi_right;   % Right wall
+        b_p(1:N+2, 1) = BoundaryConditions.psi_bottom;    % Bottom wall
+        b_p(1:N+2, M+2) = BoundaryConditions.psi_top;     % Top wall
         
     else
         % Smith-Hutton test case boundaries

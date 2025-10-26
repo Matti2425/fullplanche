@@ -15,7 +15,7 @@ function [v_x, v_y] = computeVelocityField(surf_x, surf_y, Fluid, diag)
 %   v_y - Velocity component in y-direction
 %--------------------------------------------------------------------------
 
-    if diag == 1
+    if diag
         % Diagonal flow case: uniform velocity at 45 degrees
         v_x = Fluid.v_0 * cosd(45) * ones(size(surf_x));
         v_y = Fluid.v_0 * sind(45) * ones(size(surf_y));
