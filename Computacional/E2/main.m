@@ -51,14 +51,14 @@ fprintf('Computing velocity field...\n');
 [v_x, v_y] = computeVelocityField(surf_x, surf_y, Fluid, diag);
 
 %% SOLVER LOOP FOR DIFFERENT GAMMA VALUES
-psi_def = zeros(Numerical.N+2, Numerical.M+2, length(Fluid.gamma));
+phi_def = zeros(Numerical.N+2, Numerical.M+2, length(Fluid.gamma));
 
 for l = 1:length(Fluid.gamma)
     fprintf('--- Solving for rho/Gamma = %.0e ---\n', Fluid.GAMMA(l));
     
-    % Initialize psi field
-    psi_in = ones(Numerical.N+2, Numerical.M+2) * BoundaryConditions.psi_inlet;
-    psi_prev = psi_in;
+    % Initialize phi field
+    phi_in = ones(Numerical.N+2, Numerical.M+2) * BoundaryConditions.phi_inlet;
+    phi_prev = phi_in;
     
     % Evaluate coefficients
     fprintf('Evaluating coefficients...\n');
@@ -73,18 +73,18 @@ for l = 1:length(Fluid.gamma)
     
     % Solve system
     fprintf('Solving system...\n');
-    [psi, iter_outer, iter_inner] = solveSystem(a_n, a_s, a_e, a_w, a_p, a_p_base, b_p, ...
-                                                 psi_in, psi_prev, Numerical);
+    [phi, iter_outer, iter_inner] = solveSystem(a_n, a_s, a_e, a_w, a_p, a_p_base, b_p, ...
+                                                 phi_in, phi_prev, Numerical);
     
     fprintf('Converged: Outer iterations = %d, Total inner iterations = %d\n\n', iter_outer, iter_inner);
     
     % Store solution
-    psi_def(:, :, l) = psi;
+    phi_def(:, :, l) = phi;
 end
 
 %% PLOT RESULTS
 fprintf('Generating plots...\n');
-plotResults(surf_x, surf_y, psi_def, nod_x, nod_y, Geometry, Fluid, diag, case_study);
+plotResults(surf_x, surf_y, phi_def, nod_x, nod_y, Geometry, Fluid, diag, case_study);
 
 fprintf('\n=== Simulation completed successfully! ===\n');
 

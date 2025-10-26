@@ -6,7 +6,7 @@ function plotResults(surf_x, surf_y, phi_def, nod_x, nod_y, Geometry, Fluid, dia
 %
 % INPUTS:
 %   surf_x, surf_y - Meshgrid coordinates
-%   psi_def        - Solution array (N+2, M+2, num_gamma)
+%   phi_def        - Solution array (N+2, M+2, num_gamma)
 %   nod_x, nod_y   - Node coordinates
 %   Geometry       - Structure with H
 %   Fluid          - Structure with gamma
@@ -19,19 +19,19 @@ function plotResults(surf_x, surf_y, phi_def, nod_x, nod_y, Geometry, Fluid, dia
     
     if ~diag
         % Smith-Hutton case: Compare with analytical solution
-        r = [0.000, 0.100, 0.200, 0.300, 0.400, 0.500, 0.600, 0.700, 0.800, 0.900, 1.000]';
+        x = [0.000, 0.100, 0.200, 0.300, 0.400, 0.500, 0.600, 0.700, 0.800, 0.900, 1.000]';
         p = [1.989, 1.402, 1.146, 0.946, 0.775, 0.621, 0.480, 0.349, 0.227, 0.111, 0.000;
              2.00,  1.999, 1.9997, 1.985, 1.841, 0.951, 0.154, 0.001, 0.000, 0.000, 0.000;
              2.000, 2.000, 2.000, 1.999, 1.964, 1.000, 0.036, 0.001, 0.000, 0.000, 0.000]';
         
-        phi_n = zeros(length(r), size(p, 2));
+        phi_n = zeros(length(x), size(p, 2));
         
         % Interpolate numerical solution at analytical points
         for i = 1:size(p, 2)
-            assert(r(1) >= (nod_x(1) - H), 'You must have min(x) <= min(xx).');
-            assert(r(end) <= (nod_x(end) - H), 'You must have max(xx) <= max(x).');
+            assert(x(1) >= (nod_x(1) - H), 'You must have min(x) <= min(xx).');
+            assert(x(end) <= (nod_x(end) - H), 'You must have max(xx) <= max(x).');
             
-            int_phi = interp1(nod_x - H, phi_def(:, 1, i), r, 'linear', 'extrap');
+            int_phi = interp1(nod_x - H, phi_def(:, 1, i), x, 'linear', 'extrap');
             phi_n(:, i) = int_phi(:);
         end
         
@@ -39,12 +39,16 @@ function plotResults(surf_x, surf_y, phi_def, nod_x, nod_y, Geometry, Fluid, dia
         figure('Name', 'Code Verification', 'NumberTitle', 'off');
         hold on;
         for i = 1:length(gamma)
-            plot(r, phi_n(:, i), 'LineWidth', 2);
-            plot(r, p(:, i), 'o', 'MarkerSize', 5);
+            h1 = plot(x, phi_n(:, i), 'LineWidth', 2);
+            h2 = plot(x, p(:, i), '--o', 'MarkerSize', 5);
+            
+            % Fill dots
+            h1.MarkerFaceColor = h1.Color;
+            h2.MarkerFaceColor = h2.Color;
         end
         grid on;
         xlabel('x [m]');
-        ylabel('\phi');
+        ylabel('\rho/\Gamma');
         ylim([-0.1, 2.1]);
         s = size(surf_x) - 2;
         mesh_size = s(1) + "x" + s(2);
@@ -64,11 +68,11 @@ function plotResults(surf_x, surf_y, phi_def, nod_x, nod_y, Geometry, Fluid, dia
         surf(surf_x, surf_y, phi_def(:, :, i), 'EdgeColor', 'none', 'FaceColor', 'interp');
         view(0, 90);
         c = colorbar;
-        c.Label.String = '\Psi';
+        c.Label.String = '\phi';
         colormap jet;
         title(sprintf('Distribution Map \\rho/\\Gamma = %.0e', Fluid.GAMMA(i)));
         % Texto tipo nota arriba a la derecha con fondo blanco
-        annotation('textbox', [0.69, 0.75, 0.25, 0.1], ...
+        annotation('textbox', [0.69, 0.79, 0.25, 0.1], ...
             'String', "Mesh Size: " + mesh_size, ...
             'FitBoxToText', 'on', ...
             'BackgroundColor', 'white', ...

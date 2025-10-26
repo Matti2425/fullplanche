@@ -51,14 +51,14 @@ function [Geometry, Fluid, Numerical, BoundaryConditions] = setupSimulation(diag
     Numerical.time_step = 0.1;  % Time step for transient solver
     
     % Boundary conditions
-    BoundaryConditions.psi_inlet = 1;  % Generic phi inlet value
+    BoundaryConditions.phi_inlet = 1;  % Generic phi inlet value
     
     % Diagonal case boundary values
     if diag
-        BoundaryConditions.psi_left = 100;
-        BoundaryConditions.psi_right = 0;
-        BoundaryConditions.psi_bottom = 0;
-        BoundaryConditions.psi_top = 100;
+        BoundaryConditions.phi_left = 100;
+        BoundaryConditions.phi_right = 0;
+        BoundaryConditions.phi_bottom = 0;
+        BoundaryConditions.phi_top = 100;
     end
 
 end
