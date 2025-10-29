@@ -16,6 +16,8 @@ function plotResults(surf_x, surf_y, phi_def, nod_x, nod_y, Geometry, Fluid, dia
 
     gamma = Fluid.gamma;
     H = Geometry.H;
+    s = size(surf_x) - 2;
+    mesh_size = s(1) + "x" + s(2);
     
     if ~diag
         % Smith-Hutton case: Compare with analytical solution
@@ -50,8 +52,6 @@ function plotResults(surf_x, surf_y, phi_def, nod_x, nod_y, Geometry, Fluid, dia
         xlabel('x [m]');
         ylabel('\rho/\Gamma');
         ylim([-0.1, 2.1]);
-        s = size(surf_x) - 2;
-        mesh_size = s(1) + "x" + s(2);
         name = "Code Verification (Analytic vs Numeric) " + mesh_size;
         title(name, 'FontSize', 14);
         legend('\rho/\Gamma = 10', 'Analytic \rho/\Gamma = 10', ...
@@ -64,23 +64,24 @@ function plotResults(surf_x, surf_y, phi_def, nod_x, nod_y, Geometry, Fluid, dia
     
     % Distribution maps for each gamma value
     for i = 1:length(gamma)
-        figure('Name', sprintf('Distribution Map - rho/Gamma = %.0e', Fluid.GAMMA(i)), 'NumberTitle', 'off');
+        figure('Name', sprintf('Distribution Map - rho/Gamma = %.0e', Fluid.gamma(i)), 'NumberTitle', 'off');
         surf(surf_x, surf_y, phi_def(:, :, i), 'EdgeColor', 'none', 'FaceColor', 'interp');
         view(0, 90);
         c = colorbar;
         c.Label.String = '\phi';
         colormap jet;
-        title(sprintf('Distribution Map \\rho/\\Gamma = %.0e', Fluid.GAMMA(i)));
+        title(sprintf('Distribution Map \\rho/\\Gamma = %.0e', Fluid.gamma(i)));
         % Texto tipo nota arriba a la derecha con fondo blanco
-        annotation('textbox', [0.69, 0.79, 0.25, 0.1], ...
-            'String', "Mesh Size: " + mesh_size, ...
-            'FitBoxToText', 'on', ...
-            'BackgroundColor', 'white', ...
-            'EdgeColor', 'none', ...
-            'HorizontalAlignment', 'center', ...
-            'VerticalAlignment', 'top', ...
-            'FontSize', 12);
-
+        if ~diag
+            annotation('textbox', [0.69, 0.79, 0.25, 0.1], ...
+                'String', "Mesh Size: " + mesh_size, ...
+                'FitBoxToText', 'on', ...
+                'BackgroundColor', 'white', ...
+                'EdgeColor', 'none', ...
+                'HorizontalAlignment', 'center', ...
+                'VerticalAlignment', 'top', ...
+                'FontSize', 12);
+        end
 
         axis equal;
         xlabel('x [m]');
@@ -94,7 +95,11 @@ function plotResults(surf_x, surf_y, phi_def, nod_x, nod_y, Geometry, Fluid, dia
             xlim([-10, 0]);
             ylim([0, 10]);
         end
-        dir = "figures/" + case_study + "/Distribution_map_" + Fluid.GAMMA(i) + "_" + mesh_size + ".png";
+        if diag
+            dir = "figures/UDS/diag/Distribution_map_" + Fluid.GAMMA(i) + "_" + mesh_size + ".png";
+        else
+            dir = "figures/" + case_study + "/Distribution_map_" + Fluid.GAMMA(i) + "_" + mesh_size + ".png";
+        end
         % Obtener la carpeta de la ruta
         folder = fileparts(dir);
         

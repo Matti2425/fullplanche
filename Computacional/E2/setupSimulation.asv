@@ -1,16 +1,10 @@
-function [Geometry, Fluid, Numerical, BoundaryConditions] = setupSimulation(case_study, diag)
+function [Geometry, Fluid, Numerical, BoundaryConditions] = setupSimulation(diag)
 % setupSimulation Reads and sets up all input parameters for convection-diffusion simulation
 %
 % This function defines all the physical, geometrical, and numerical parameters
 % required for solving the generic convection-diffusion transport equation.
 %
 % INPUTS:
-%   case_study - Discretization scheme selector:
-%                1 = Upwind
-%                2 = Exponential
-%                3 = CDS (Central Differencing Scheme)
-%                4 = HDS (Hybrid Differencing Scheme)
-%                5 = PLDS (Power Law Differencing Scheme)
 %   diag       - Diagonal flow test case (1 = diagonal, 0 = Smith-Hutton)
 %
 % OUTPUTS:
@@ -45,7 +39,7 @@ function [Geometry, Fluid, Numerical, BoundaryConditions] = setupSimulation(case
     end
     
     % Numerical parameters
-    Numerical.N = 500;  % Number of cells in x-direction
+    Numerical.N = 100;  % Number of cells in x-direction
     Numerical.M = round(Geometry.H / Geometry.L * Numerical.N);  % Cells in y-direction
     
     if diag

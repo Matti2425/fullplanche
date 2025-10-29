@@ -4,14 +4,6 @@
 clearvars; close all;
 
 %% CONFIGURATION
-% Case study selection:
-% UDS (Upwind Differencing Scheme)
-% CDS (Central Differencing Scheme)
-% HDS (Hybrid Differencing Scheme)
-% EDS (Exponential Differencing Scheme)
-% PLDS (Power Law Differencing Scheme)
-case_study = "UDS";
-
 % Problem type:
 % diag = false: Smith-Hutton test case
 % diag = true: Diagonal flow test case
@@ -20,7 +12,16 @@ diag = false;
 % Override for diagnostic mode
 if diag
     case_study = "UDS";  % Use Upwind for diagonal case
+else
+    % Case study selection:
+    % UDS (Upwind Differencing Scheme)
+    % CDS (Central Differencing Scheme)
+    % HDS (Hybrid Differencing Scheme)
+    % EDS (Exponential Differencing Scheme)
+    % PLDS (Power Law Differencing Scheme)
+    case_study = "PLDS";
 end
+
 
 %% READ INPUT DATA
 fprintf('=== CFD Convection-Diffusion Solver ===\n');

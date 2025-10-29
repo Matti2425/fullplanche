@@ -1,33 +1,34 @@
 %% CFD Simulation - Generic Convection-Diffusion Transport Equation
 % E2 Implementation
 % Assignment 2: Solving the generic convection-diffusion equation with various schemes
-clearvars; close all; clc;
+clearvars; close all;
 
 %% CONFIGURATION
-% Case study selection:
-% 1 = Upwind
-% 2 = Exponential
-% 3 = CDS (Central Differencing Scheme)
-% 4 = HDS (Hybrid Differencing Scheme)
-% 5 = PLDS (Power Law Differencing Scheme)
-case_study = 1;
-
 % Problem type:
-% diag = 0: Smith-Hutton test case
-% diag = 1: Diagonal flow test case
-diag = 1;
+% diag = false: Smith-Hutton test case
+% diag = true: Diagonal flow test case
+diag = true;
 
 % Override for diagnostic mode
-if diag == 1
-    case_study = 1;  % Use Upwind for diagonal case
+if diag
+    case_study = "UDS";  % Use Upwind for diagonal case
+else
+    case_study = 
 end
+% Case study selection:
+% UDS (Upwind Differencing Scheme)
+% CDS (Central Differencing Scheme)
+% HDS (Hybrid Differencing Scheme)
+% EDS (Exponential Differencing Scheme)
+% PLDS (Power Law Differencing Scheme)
+case_study = "UDS";
 
 %% READ INPUT DATA
 fprintf('=== CFD Convection-Diffusion Solver ===\n');
-fprintf('Case study: %d\n', case_study);
-fprintf('Problem type: %s\n\n', iif(diag == 1, 'Diagonal flow', 'Smith-Hutton'));
+fprintf('Case study: %s\n', case_study);
+fprintf('Problem type: %s\n\n', iif(diag, 'Diagonal flow', 'Smith-Hutton'));
 
-[Geometry, Fluid, Numerical, BoundaryConditions] = readInputData(case_study, diag);
+[Geometry, Fluid, Numerical, BoundaryConditions] = setupSimulation(diag);
 
 %% GENERATE MESH
 fprintf('Generating mesh...\n');
@@ -62,7 +63,7 @@ for l = 1:length(Fluid.gamma)
     
     % Evaluate coefficients
     fprintf('Evaluating coefficients...\n');
-    [a_n, a_s, a_e, a_w, a_p, a_p_base, b_p] = evalCoefficients(v_x, v_y, Numerical, Fluid, ...
+    [a_n, a_s, a_e, a_w, a_p, a_p_base, b_p] = computeCoefficients(v_x, v_y, Numerical, Fluid, ...
                                                                   sx_w, sx_e, sx_p, sy_s, sy_n, sy_p, ...
                                                                   Fluid.gamma(l), case_study, A_x, A_y);
     
@@ -84,7 +85,7 @@ end
 
 %% PLOT RESULTS
 fprintf('Generating plots...\n');
-plotResults(surf_x, surf_y, phi_def, nod_x, nod_y, Geometry, Fluid, diag);
+plotResults(surf_x, surf_y, phi_def, nod_x, nod_y, Geometry, Fluid, diag, case_study);
 
 fprintf('\n=== Simulation completed successfully! ===\n');
 

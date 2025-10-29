@@ -1,0 +1,64 @@
+function [Geometry, Fluid, Numerical, BoundaryConditions] = setupSimulation(diag)
+% setupSimulation Reads and sets up all input parameters for convection-diffusion simulation
+%
+% This function defines all the physical, geometrical, and numerical parameters
+% required for solving the generic convection-diffusion transport equation.
+%
+% INPUTS:
+%   diag       - Diagonal flow test case (1 = diagonal, 0 = Smith-Hutton)
+%
+% OUTPUTS:
+%   Geometry           - Structure with L, H, x_in, y_in, x_out, y_out
+%   Fluid              - Structure with rho, GAMMA, gamma
+%   Numerical          - Structure with N, M, tolerance, maxIt, time_step
+%   BoundaryConditions - Structure with phi_inlet
+%--------------------------------------------------------------------------
+
+    % Geometry properties
+    Geometry.L = 10;  % [m] Domain length
+    
+    if diag
+        Geometry.H = Geometry.L;  % Square domain for diagonal case
+    else
+        Geometry.H = Geometry.L / 2;  % Smith-Hutton case
+    end
+    
+    Geometry.x_in = -Geometry.L / 2;
+    Geometry.y_in = Geometry.H;
+    Geometry.x_out = Geometry.L / 2;
+    Geometry.y_out = 0;
+    
+    % Fluid properties
+    Fluid.rho = 1.225;  % [kg/m^3] Density
+    Fluid.GAMMA = [10, 10^3, 10^6];  % Diffusion coefficient values
+    Fluid.gamma = Fluid.rho ./ Fluid.GAMMA;  % Normalized diffusion
+    
+    % Diagonal case specific velocity
+    if diag
+        Fluid.v_0 = 10;  % [m/s] Velocity magnitude for diagonal flow
+    end
+    
+    % Numerical parameters
+    Numerical.N = 500;  % Number of cells in x-direction
+    Numerical.M = round(Geometry.H / Geometry.L * Numerical.N);  % Cells in y-direction
+    
+    if diag
+        Numerical.M = Numerical.N;  % Square mesh for diagonal case
+    end
+    
+    Numerical.tolerance = 1e-6;  % Convergence tolerance
+    Numerical.maxIt = 1e6;  % Maximum iterations
+    Numerical.time_step = 0.1;  % Time step for transient solver
+    
+    % Boundary conditions
+    BoundaryConditions.phi_inlet = 1;  % Generic phi inlet value
+    
+    % Diagonal case boundary values
+    if diag
+        BoundaryConditions.phi_left = 100;
+        BoundaryConditions.phi_right = 0;
+        BoundaryConditions.phi_bottom = 0;
+        BoundaryConditions.phi_top = 100;
+    end
+
+end
