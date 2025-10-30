@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.optimize import fsolve
+from D2.solvers import halley_solver
 
 # =======================
 # Step 1 and 2: Julian Date (JD) and Julian Century (JC)
@@ -39,7 +39,9 @@ def propagation_equation(x_0, x_punkt, jc):
 def propagate_elements(X_0 , X_punkt, JC):
     a = propagation_equation(X_0["a"], X_punkt["a"], JC ) #AU
     e = propagation_equation(X_0["e"], X_punkt["e"], JC)  # -
-    i = deg_correction(propagation_equation(X_0["i"],X_punkt["i"], JC))  # rest is in deg
+    i = propagation_equation(X_0["i"],X_punkt["i"], JC)
+    if i < 0:
+      i = 180+i
     omega = deg_correction(propagation_equation(X_0["omega"], X_punkt["omega"], JC))
     w_bar = deg_correction(propagation_equation(X_0["w_bar"], X_punkt["w_bar"],JC))
     L = deg_correction(propagation_equation(X_0["L"], X_punkt["L"], JC))
@@ -66,16 +68,23 @@ print("----------------------------------------------")
 #Gravitational parameter of the Sun mu=1.32712440018*10^20 m^3/s^2  - ask the Prof
 k_gauss= 0.01720209895
 mu_sun_AU = k_gauss**2
+# Exact IAU 2012 AU definition
+AU_KM = 149_597_870.7                # km (exact)
+SECONDS_PER_DAY = 86400.0
 
 def angular_momentum (a,e):
     h = np.sqrt(mu_sun_AU*a*(1-e**2))
     return h
 
+def au2day_to_km2s(h_au2_day):
+    """Convert AU^2/day -> km^2/s."""
+    return h_au2_day * (AU_KM**2) / SECONDS_PER_DAY
+
 h_earth = angular_momentum(pe_earth["a"], pe_earth["e"])
 h_saturn = angular_momentum(pe_saturn["a"], pe_saturn["e"])
 print("Angular momentum h in [AU^2/day]:")
-print("Earth: ", h_earth, "AU^2/day")
-print("Saturn: ", h_saturn, "AU^2/day")
+print("Earth: ", h_earth, "AU^2/day"," = ", au2day_to_km2s(h_earth),"km^2/s")
+print("Saturn: ", h_saturn, "AU^2/day"," = ", au2day_to_km2s(h_saturn), "km^2/s")
 print("----------------------------------------------")
 
 # =======================
@@ -99,31 +108,61 @@ print("----------------------------------------------")
 
 # =======================
 # Step 6: Calculate eccentric anomaly E solving the Kepler equation M = E - e*sin(E)
-# STANDARD SERIES
 # =======================
+# Using Halley's method from assignment 1
+
+E_earth, iter_E, _ = halley_solver(e=0.5, E0=np.radians(M_earth), M=50)
+E_saturn, iter_S, _ = halley_solver(e=0.5, E0=np.radians(M_saturn), M=50)
+
 # solving Kepler equation with Standard series - error = O(e^4)
-# Now solving numerically with fsolve from scipy.optimize :)
+
+def kepler_newton_deg(M_deg, e, tol=1e-12, max_iter=50):  # inputs in degrees
+    # M = E - e*sin(E)  (elliptic 0 ≤ e < 1)
+    # --- degrees → radians
+    M = M_deg * (np.pi / 180.0)
+
+    # normalize M to [0, 2π)
+    twopi = 2.0 * np.pi
+    while M < 0.0:
+        M += twopi
+    while M >= twopi:
+        M -= twopi
+
+    # initial guess
+    E = M if e < 0.8 else np.pi
+
+    # Newton loop
+    k = 0
+    while k < max_iter:
+        f  = E - e*np.sin(E) - M
+        fp = 1.0 - e*np.cos(E)
+        dE = -f / fp
+        E += dE
+        if abs(dE) < tol:
+            break
+        k += 1
+
+    # normalize result to [0, 2π)
+    while E < 0.0:
+        E += twopi
+    while E >= twopi:
+        E -= twopi
+    return E
+
+
+E_earth = kepler_newton_deg(M_earth, pe_earth["e"])
+E_saturn = kepler_newton_deg(M_saturn, pe_saturn["e"])
+
+print("Eccentric anomaly NUMERICAL APPROACH: ")
+print("E earth (rad)", E_earth)
+print("E saturn (rad)", E_saturn)
+print("----------------------------------------------")
+
+
 
 def rad_correction(x):
     return x % (2*np.pi)
 
-def kepler_equation(E, M, e):
-    return E - e * np.sin(E) - M
-
-def kepler_E_series(M_deg, e):
-    M = rad_correction(np.deg2rad(M_deg)) #Wraps the angle to the principal range [0,2π)
-    E_init = 0.5 # Initial guess
-    E = fsolve(kepler_equation, E_init, args=(M, e))
-    #E = M + e*np.sin(M) + 0.5*e**2*np.sin(2*M)+ (e**3/8.0)*(3*np.sin(3*M) - np.sin(M)) + (1/3)*e**4*np.sin(4*M)
-    return rad_correction(E[0])
-
-E_earth = kepler_E_series(M_earth, pe_earth["e"])
-E_saturn = kepler_E_series(M_saturn, pe_saturn["e"])
-
-print("Eccentric anomaly: ")
-print("E_earth: ", E_earth, "Rad")
-print("E_saturn: ", E_saturn, "Rad")
-print("----------------------------------------------")
 
 # =======================
 # Step 7: Compute true anomaly
@@ -156,12 +195,24 @@ def r_v_pf(h, e, theta):  # h [AU^2/day], e [-], theta [rad]
     v_pf = (mu_sun_AU / h) * np.array([-np.sin(theta), e + np.cos(theta), 0.0])
     return r_pf, v_pf, r
 
+def au_per_day_to_km_per_s(v_au_per_day):
+    """Convert AU/day -> km/s."""
+    return v_au_per_day * AU_KM / SECONDS_PER_DAY
+
+def au_to_km(x_au):
+    """Convert AU -> km."""
+    return x_au * AU_KM
+
 # re-evaluate:
 r_pf_E, v_pf_E, _ = r_v_pf(h_earth,  pe_earth["e"],  theta_earth)
 r_pf_S, v_pf_S, _ = r_v_pf(h_saturn, pe_saturn["e"], theta_saturn)
 print("Vectors (r,v) in perifocal system (r_pf in [AU] and v_pf in [AU/day]):")
 print("earth: r_pf_E =", r_pf_E, "v_pf_E = ", v_pf_E)
 print("saturn: r_pf_S =", r_pf_S, "v_pf_S = ", v_pf_S)
+print("----------------------------------------------")
+print("Vectors (r,v) in perifocal system (r_pf in [km] and v_pf in [km/s]):")
+print("earth: r_pf_E =", au_to_km(r_pf_E), "v_pf_E = ", au_per_day_to_km_per_s(v_pf_E))
+print("saturn: r_pf_S =", au_to_km(r_pf_S), "v_pf_S = ", au_per_day_to_km_per_s(v_pf_S))
 print("----------------------------------------------")
 
 # 2) Rotation to the heliocentric ecliptic J2000 system (X to aries)
@@ -183,10 +234,10 @@ def pf_to_ecliptic(elem, r_pf, v_pf):
     r_pf, v_pf: vectors in perifocal system (PQW)
     Returns: r, v in heliocentric-ecliptic J2000 (x→Aries)
     """
-    i_rad = np.deg2rad(elem["i"])
-    omega_rad = np.deg2rad(elem["omega"])  # Ω
+    i_rad = elem["i"]*(np.pi/180) #degree --> radiants
+    omega_rad = elem["omega"]*(np.pi/180)   # Ω
     w_deg = deg_correction(elem["w_bar"]-elem["omega"])  # because i have \bar{ω}= w + omega (ω = varpi - Ω)
-    w_rad = np.deg2rad(w_deg)
+    w_rad = w_deg*(np.pi/180)
 
     Rotation = R3(omega_rad) @ R1(i_rad) @ R3(w_rad)  #matrix multiplication (also possible with np.matmul)
     r_ecliptic = Rotation @ r_pf
@@ -197,10 +248,10 @@ rE_ecliptic, vE_ecliptic = pf_to_ecliptic(pe_earth, r_pf_E, v_pf_E)
 rS_ecliptic, vS_ecliptic = pf_to_ecliptic(pe_saturn, r_pf_S, v_pf_S)
 
 print("Ecliptic vectors (r,v)")
-print("Earth: r_ecliptic [AU] = ", rE_ecliptic)
-print("Earth: v_ecliptic [AU/day] = ", vE_ecliptic)
-print("Saturn: r_ecliptic [AU] = ", rS_ecliptic)
-print("Saturn: v_ecliptic [AU/day] = ", vS_ecliptic)
+print("Earth: r_ecliptic [AU] = ", rE_ecliptic, "r_ecliptic [km] = ", au_to_km(rE_ecliptic))
+print("Earth: v_ecliptic [AU/day] = ", vE_ecliptic, "v_ecliptic [km/s] = ", au_per_day_to_km_per_s(vE_ecliptic))
+print("Saturn: r_ecliptic [AU] = ", rS_ecliptic, "r_ecliptic [km] = ", au_to_km(rS_ecliptic))
+print("Saturn: v_ecliptic [AU/day] = ", vS_ecliptic, "v_ecliptic [km/s] = ", au_per_day_to_km_per_s(vS_ecliptic))
 print("----------------------------------------------")
 
 # =======================
@@ -216,11 +267,11 @@ def cartesian_to_spherical_ecliptic(r_ecliptic):
     r = np.linalg.norm(r_ecliptic)  # distance
     lambda_rad = np.arctan2(Y, X)  # celestial longitude
     beta_rad = np.arctan2(Z, np.sqrt(X**2 + Y**2))  # celestial latitude
-    
+
     # Convert to degrees and ensure lambda is in [0, 360)
     lambda_deg = deg_correction(np.rad2deg(lambda_rad))
     beta_deg = np.rad2deg(beta_rad)
-    
+
     return lambda_deg, beta_deg, r
 
 lambda_E, beta_E, r_E = cartesian_to_spherical_ecliptic(rE_ecliptic)
@@ -229,7 +280,10 @@ lambda_S, beta_S, r_S = cartesian_to_spherical_ecliptic(rS_ecliptic)
 print("Spherical Ecliptic Coordinates:")
 print("Earth: λ =", lambda_E, "degrees, β =", beta_E, "degrees, r =", r_E, "AU")
 print("Saturn: λ =", lambda_S, "degrees, β =", beta_S, "degrees, r =", r_S, "AU")
+print("Earth: r [km] =", au_to_km(r_E))
+print("Saturn: r [km] =", au_to_km(r_S))
 print("----------------------------------------------")
+
 
 # |r × v| should be ≈ sin(h)
 hE_num = np.linalg.norm(np.cross(rE_ecliptic, vE_ecliptic))
@@ -237,4 +291,94 @@ hS_num = np.linalg.norm(np.cross(rS_ecliptic, vS_ecliptic))
 print("Consistency check:")
 print("Check h_E: |r×v| =", hE_num, " ~ ", h_earth)
 print("Check h_S: |r×v| =", hS_num, " ~ ", h_saturn)
+print("----------------------------------------------")
 
+# =======================
+# Step 10: Relative Vector Earth --> Saturn
+# =======================
+
+# 1) Earth --> Saturn center
+r_ES_center = rS_ecliptic - rE_ecliptic
+v_ES_center = vS_ecliptic - vE_ecliptic
+
+# 2) Earth --> Saturn Surface (saturn approx. a sphere)
+AU_km = 149597870.7 #one AU equals 149597870.7km
+Radius_Saturn_km = 60268.0 #km - check again in a book
+Radius_Saturn_au = Radius_Saturn_km / AU_km  # Radius of Saturn in AU
+
+# Unit vector from Earth to Saturn's center
+u_ES = r_ES_center / np.linalg.norm(r_ES_center) # direction only (length 1)
+# Earth → Saturn surface point along the same line (nearest point to Earth)
+r_ES_surface = r_ES_center - Radius_Saturn_au * u_ES
+
+# Diagnostics
+dist_center  = np.linalg.norm(r_ES_center)  #lenth of the vector
+dist_surface = np.linalg.norm(r_ES_surface)
+delta_mag    = dist_center - dist_surface                 # ≈ Saturn radius in AU
+rel_error    = delta_mag / dist_center                    # fractional difference
+angle_rad    = np.arccos(np.clip(np.dot(r_ES_center, r_ES_surface) /
+                                 (dist_center * dist_surface), -1.0, 1.0))
+angle_arcsec = np.degrees(angle_rad) * 3600.0
+
+
+print("Relative Vectors:")
+print("Earth --> Saturn center: r_ES_center [AU] = ", r_ES_center)
+print("Earth --> Saturn surface: r_ES_surface [AU] = ", r_ES_surface)
+print(" ")
+print("\nComparison Earth --> Saturn vectors")
+print(f"|r_center|  = {dist_center:.9f} AU")
+print(f"|r_surface| = {dist_surface:.9f} AU")
+print(f"Δ|r|       = {delta_mag:.9f} AU  (should ≈ R_Saturn = {Radius_Saturn_au:.9f} AU)")
+print(f"Relative difference = {rel_error:.6e}")
+print("Since the two vectors are nearly identical, subsequent analyses use the Earth–Saturn center vector.")
+print("----------------------------------------------")
+
+
+# =======================
+# Step 11: Earth→Saturn ecliptic angles (λ, β) from geocentric vector
+# =======================
+lambda_ES, beta_ES, r_ES = cartesian_to_spherical_ecliptic(r_ES_center)
+print("\nGeocentric ecliptic coords Earth --> Saturn:")
+print(f"λ = {lambda_ES:.6f} deg, β = {beta_ES:.6f} deg, r = {r_ES:.9f} AU")
+print(" r_ES (Earth --> Saturn) = ", au_to_km(r_ES), "km")
+#ecliptic longitude lambda : 0<lamda<360deg
+#ecliptic latitude beta: -90<b<90deg
+
+# =======================
+# Step 12: Ecliptic → Equatorial (RA α, Dec δ)
+# =======================
+def mean_obliquity_deg(JC): #calculation of epsilon
+    # ε(T) in arcseconds using an IAU polynomial, T = Julian Century since J2000
+    eps_arcsec = 84381.448 - 46.8150*JC - 0.00059*(JC**2) + 0.001813*(JC**3) #IAU-1980-Polynom
+    return eps_arcsec / 3600.0  #Convert arcseconds → degrees and return eplsilon
+
+def ecl_to_equatorial(lambda_deg, beta_deg, eps_deg): #converts lambda_deg and beta_deg to right ascension and declination
+    lam = np.deg2rad(lambda_deg) #Convert all three angles from degrees to radians
+    bet = np.deg2rad(beta_deg)
+    eps = np.deg2rad(eps_deg)
+
+    # From spherical triangle / rotation about x-axis by +ε (script)
+    # sinδ =  sinβ cosε + cosβ sinλ sinε
+    # cosδ cosα =  cosβ cosλ
+    # cosδ sinα = -sinβ sinε + cosβ sinλ cosε
+    sin_delta = np.sin(bet)*np.cos(eps) + np.cos(bet)*np.sin(lam)*np.sin(eps) #compute sin delta
+    y = -np.sin(bet)*np.sin(eps) + np.cos(bet)*np.sin(lam)*np.cos(eps)  # = cosδ sinα
+    x =  np.cos(bet)*np.cos(lam)                                       # = cosδ cosα
+
+    delta = np.arcsin(np.clip(sin_delta, -1.0, 1.0))
+    # declination d: -90<d<90deg
+    alpha = np.arctan2(y, x)  # robust quadrant handling
+    # right ascension alpha: 0h< a < 24h equivalent 0<a<360deg --> 15deg = 1h
+
+    alpha_deg = (np.degrees(alpha) % 360.0)
+    delta_deg = np.degrees(delta)
+    alpha_hours = alpha_deg / 15.0
+    return alpha_deg, alpha_hours, delta_deg
+
+eps = mean_obliquity_deg(JC(JD_from_UTC(2017,11,15)))
+
+alpha_deg, alpha_hours, delta_deg = ecl_to_equatorial(lambda_ES, beta_ES, eps)
+print("\nEquatorial coordinates Earth --> Saturn (mean, J2000 obliquity):")
+print(f"ε = {eps:.6f} deg")
+print(f"Right Ascension α = {alpha_deg:.6f} deg  ({alpha_hours:.6f} h)")
+print(f"Declination   δ = {delta_deg:.6f} deg")
