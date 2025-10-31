@@ -1,5 +1,7 @@
 import numpy as np
+from datetime import datetime
 from math import sin, cos, pi
+from utils import get_ephemeris, read_glonass_rinex
 
 # =========================
 # Time & rotation helpers
@@ -84,24 +86,34 @@ def accel_total(r, a_SM_eci):
 # =========================
 # RK4 (order-4)
 # =========================
-def f_rhs(t, y, a_SM_eci):
+def f_rhs(t, y, a_trf, gmst0):
+    """
+    t: seconds since epoch (float)
+    y: 6-vector [r; v] in ECI at that t
+    a_trf: acceleration vector expressed in TRF (m/s^2) -- physical TRF vector
+    gmst0: GMST rad at epoch (t=0)
+    """
+    # compute gmst at time t (linear approx using Earth's rotation rate)
+    gmst_t = gmst0 + OMEGA_E[2] * t   # rad; accurate for short propagation windows
+    # rotate the TRF physical acceleration into ECI at this instant
+    a_SM_eci_t = R3(-gmst_t) @ a_trf
+
     r = y[:3]; v = y[3:]
-    a = accel_total(r, a_SM_eci)
+    a = accel_total(r, a_SM_eci_t)
     return np.hstack([v, a])
 
-def rk4_step(t, y, h, a_SM_eci):
-    k1 = f_rhs(t,         y,            a_SM_eci)
-    k2 = f_rhs(t + 0.5*h, y + 0.5*h*k1, a_SM_eci)
-    k3 = f_rhs(t + 0.5*h, y + 0.5*h*k2, a_SM_eci)
-    k4 = f_rhs(t + h,     y + h*k3,     a_SM_eci)
+def rk4_step(t, y, h, a_trf, gmst0):
+    k1 = f_rhs(t,         y,            a_trf, gmst0)
+    k2 = f_rhs(t + 0.5*h, y + 0.5*h*k1, a_trf, gmst0)
+    k3 = f_rhs(t + 0.5*h, y + 0.5*h*k2, a_trf, gmst0)
+    k4 = f_rhs(t + h,     y + h*k3,     a_trf, gmst0)
     return y + (h/6.0)*(k1 + 2*k2 + 2*k3 + k4)
-
-def propagate_rk4(t0, y0, h, steps, a_SM_eci):
+def propagate_rk4(t0, y0, h, steps, a_trf, gmst0):
     t = t0
     y = y0.copy()
     traj = [y.copy()]
     for _ in range(steps):
-        y = rk4_step(t, y, h, a_SM_eci)
+        y = rk4_step(t, y, h, a_trf, gmst0)
         t += h
         traj.append(y.copy())
     return np.vstack(traj)
@@ -115,10 +127,23 @@ X,  Xdot,  Xddot  =  0.179436245117E+05, -0.138885307312E+01,  0.372529029846E-0
 Y,  Ydot,  Yddot  = -0.106202993164E+05,  0.146085643768E+01,  0.000000000000E+00
 Z,  Zdot,  Zddot  =  0.147005888672E+05,  0.275223255158E+01, -0.279396772385E-08
 
+# Load all ephemerides once
+data = read_glonass_rinex("brdc2320.09g.txt")
+
+# Retrieve PRN 2 at 2009-08-20 00:15:00
+from datetime import datetime
+epoch = datetime(2009, 8, 20, 0, 15, 0)
+eph = get_ephemeris(data, 2, epoch)
+
+print("PRN 2 @ 00:15:00 UTC")
+print("Position (km):", eph["pos"])
+print("Velocity (km/s):", eph["vel"])
+print("Acceleration (km/s²):", eph["acc"])
+
 # Convert to SI
-r_ecef  = np.array([X, Y, Z]) * 1000.0
-v_ecef  = np.array([Xdot, Ydot, Zdot]) * 1000.0
-a_trf   = np.array([Xddot, Yddot, Zddot]) * 1000.0   # assumed a_SM in TRF
+r_ecef = np.array([X, Y, Z], dtype=float) * 1000.0
+v_ecef = np.array([Xdot, Ydot, Zdot], dtype=float) * 1000.0
+a_trf  = np.array([Xddot, Yddot, Zddot], dtype=float) * 1000.0
 
 # ECI initial state and tide vector
 gmst_0015 = gmst_rad(*epoch)
@@ -155,14 +180,20 @@ Tend  = 1800.0        # 30 min
 steps = int(Tend/dt)
 
 y0 = np.hstack([r0_eci, v0_eci])
-traj = propagate_rk4(0.0, y0, dt, steps, a_SM_eci)
+traj = propagate_rk4(0.0, y0, dt, steps, a_trf, gmst_0015)
 
 r_30 = traj[-1, :3]
 v_30 = traj[-1, 3:]
 
+# compute GMST at t = 1800 s and rotate a_trf to get a_SM at that instant
+t_final = steps * dt   # or Tend
+gmst_final = gmst_0015 + OMEGA_E[2] * t_final
+a_SM_eci_30 = R3(-gmst_final) @ a_trf
+
 a2b_30  = accel_central_earth(r_30)
 aJ2_30  = accel_J2_first_term(r_30)
-atot_30 = a2b_30 + aJ2_30 + a_SM_eci
+atot_30 = a2b_30 + aJ2_30 + a_SM_eci_30
+
 
 print("\n=========== State after 1800 s (00:45:00) ===========")
 print("r_30min_ECI [m]:   ", r_30)
@@ -173,6 +204,7 @@ print("a_SM_30    [m/s^2]: ", a_SM_eci)
 print("a_total_30 [m/s^2]: ", atot_30)
 print("||a_total_30|| [m/s^2]:", np.linalg.norm(atot_30))
 print("======================================================")
+
 
 
 
