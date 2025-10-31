@@ -135,6 +135,10 @@ from datetime import datetime
 epoch = datetime(2009, 8, 20, 0, 15, 0)
 eph = get_ephemeris(data, 2, epoch)
 
+print("-------------------------------------------------------")
+print(eph)
+print("-------------------------------------------------------")
+
 print("PRN 2 @ 00:15:00 UTC")
 print("Position (km):", eph["pos"])
 print("Velocity (km/s):", eph["vel"])

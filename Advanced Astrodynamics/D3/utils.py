@@ -22,7 +22,7 @@ def read_glonass_rinex(filepath):
 
     # Pattern for start of GLONASS block (PRN + date/time)
     header_pattern = re.compile(
-        r"^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([\d\.]+)\s*([-+Ee\d\.]*)"
+        r"^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([\d\.]+)"
     )
 
     # Pattern for floats including missing spaces
