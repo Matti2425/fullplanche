@@ -1,5 +1,5 @@
 import numpy as np
-from D2.solvers import halley_solver
+from D2.solvers import newton_solver
 
 # =======================
 # Step 1 and 2: Julian Date (JD) and Julian Century (JC)
@@ -109,53 +109,14 @@ print("----------------------------------------------")
 # =======================
 # Step 6: Calculate eccentric anomaly E solving the Kepler equation M = E - e*sin(E)
 # =======================
-# Using Halley's method from assignment 1
+# Using Newton-Raphson's method from Assignment 1
 
-E_earth, iter_E, _ = halley_solver(e=0.5, E0=np.radians(M_earth), M=50)
-E_saturn, iter_S, _ = halley_solver(e=0.5, E0=np.radians(M_saturn), M=50)
-
-# solving Kepler equation with Standard series - error = O(e^4)
-
-def kepler_newton_deg(M_deg, e, tol=1e-12, max_iter=50):  # inputs in degrees
-    # M = E - e*sin(E)  (elliptic 0 ≤ e < 1)
-    # --- degrees → radians
-    M = M_deg * (np.pi / 180.0)
-
-    # normalize M to [0, 2π)
-    twopi = 2.0 * np.pi
-    while M < 0.0:
-        M += twopi
-    while M >= twopi:
-        M -= twopi
-
-    # initial guess
-    E = M if e < 0.8 else np.pi
-
-    # Newton loop
-    k = 0
-    while k < max_iter:
-        f  = E - e*np.sin(E) - M
-        fp = 1.0 - e*np.cos(E)
-        dE = -f / fp
-        E += dE
-        if abs(dE) < tol:
-            break
-        k += 1
-
-    # normalize result to [0, 2π)
-    while E < 0.0:
-        E += twopi
-    while E >= twopi:
-        E -= twopi
-    return E
-
-
-E_earth = kepler_newton_deg(M_earth, pe_earth["e"])
-E_saturn = kepler_newton_deg(M_saturn, pe_saturn["e"])
+E_earth, iter_E, _ = newton_solver(e=pe_earth['e'], M=np.radians(M_earth), E0=np.radians(M_earth))
+E_saturn, iter_S, _ = newton_solver(e=pe_saturn['e'], M=np.radians(M_saturn), E0=np.radians(M_saturn))
 
 print("Eccentric anomaly NUMERICAL APPROACH: ")
-print("E earth (rad)", E_earth)
-print("E saturn (rad)", E_saturn)
+print("E earth (rad): E_ear =", E_earth, "number of iterations: ", iter_E)
+print("E saturn (rad): E_sat =", E_saturn, "number of iterations:", iter_S)
 print("----------------------------------------------")
 
 
