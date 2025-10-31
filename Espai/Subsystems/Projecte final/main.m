@@ -4,7 +4,7 @@ close all; clearvars
 %% User parameters
 animation = false;
 do_plots = true;
-n_steps = 600;
+n_steps = 6000;
 
 %% Initial data
 
@@ -19,14 +19,19 @@ w_E = 2*pi/T_E;
 
 g = 9.8066;     % m/s^2
 
-h = 700e3;
-r_orbit = R_E + h;
+% Ensamblaje y cálculos de elementos del satélite
 Sat = [];
 Sat = [Sat, Body('cube', 400, [0,0,0], 2, eye(3))];
 Sat = [Sat, Body('box', 50, [3,0,0],[4,2,0.1],eye(3))];
 Sat = [Sat, Body('box', 50, [-3,0,0],[4,2,0.1],eye(3))];
 
-T_orbit = 2*pi^2*sqrt(r_orbit^3/mu_E);
+[r_cdg_sat_local, I_sat] = assemblySatellite(Sat);
+
+% Parámetros orbitales
+h = 700e3;
+r_orbit = R_E + h;
+
+T_orbit = 2*pi*sqrt(r_orbit^3/mu_E);
 w_orbit = 2*pi/T_orbit;
 
 w_sat = [0,0,0.05];
@@ -75,88 +80,80 @@ if do_plots
 %     plot3(r_sat_eci(1,1),r_sat_eci(2,1),r_sat_eci(3,1), 'ro', 'MarkerFaceColor', 'r', 'MarkerSize', 6);
 end
 
-%% === 2. Attitude dynamics and control ===
-% Este bloque implementa 2.1..2.4 usando cuaterniones.
-% Asume variables definidas en main.m:
-%   r_sat_eci   (3xN), r_POI_eci (3xN), t (1xN), w_sat (3x1 o 3xN opcional)
-% Guarda resultados en arrays para posteriores gráficas.
+%% Section 2: Attitude dynamics and control
 
-% ---- Parameters (ajusta si lo necesitas) ----
-I = diag([100, 120, 80]);    % Inercia (kg*m^2) - ajusta según tu satélite
-invI = inv(I);
-% Gains PDI (puedes convertir en vectores por eje)
-Kp = 2.0;
-Kd = 1.0;
-Ki = 0.01;
+% Calculamos solo una vez la inversa
+invI_sat = inv(I_sat);
 
-% Sensor axis (en BRF) que queremos alinear con sat->POI (por ejemplo eje +Z)
+% Ganancias iniciales de control (ajustar según respuesta)
+Kp = 0.003;
+Ki = 0;
+Kd = 5;
+
+% Eje del sensor (en el sistema de cuerpo)
 b_sensor = [0; 0; 1];
 
-% Inicial conditions (puedes cambiar q0 y omega0)
-q = [1; 0; 0; 0];        % quaternion (scalar-first) que transforma body->inertial
-% Si tienes w_sat inicial en tu main.m, úsalo; en caso contrario:
-if exist('w_sat','var') && numel(w_sat)==3
-    omega = w_sat(:);  % body angular velocity inicial (rad/s)
-elseif exist('w_sat','var') && size(w_sat,2)>=1
-    omega = w_sat(:,1);
-else
-    omega = [0;0;0.05];
-end
+% Condiciones iniciales
+q = [1; 0; 0; 0];           % quaternion body->inertial
+omega = w_sat(:);            % usa la velocidad inicial definida en SI
 
-% Preparar arrays de salida
-N = length(t);
-q_hist = zeros(4,N);
-omega_hist = zeros(3,N);
-tau_hist = zeros(3,N);
-err_hist = zeros(3,N);
+% Prealocación
+q_hist = zeros(4,n_steps);
+omega_hist = zeros(3,n_steps);
+tau_hist = zeros(3,n_steps);
+err_ang_hist = zeros(3,n_steps);
+int_err = zeros(3,1);
 
-int_err = zeros(3,1); % integral term init
-
-% dt (suponemos muestreo uniforme)
-if length(t)>=2
-    dt = t(2)-t(1);
-else
-    dt = 1;
-end
-
-% Run integration loop (simple Euler explícito). Si prefieres, usa RK4/ode45.
-for k = 1:N
-    % posiciones
+for k = 1:n_steps
     rs = r_sat_eci(:,k);
     rp = r_POI_eci(:,k);
 
-    % ---- 2.1 Cuaternión deseado (orientar b_sensor hacia v_des) ----
+    % 2.1 Cuaternión deseado
     v_des_eci = rp - rs;
     v_des_eci = v_des_eci / norm(v_des_eci);
 
-    % Convertir b_sensor (body) a ECI con q: v_sensor_eci = R(q) * b_sensor
-    q0 = q(1); qv = q(2:4);
+    % Vector del sensor en ECI
+    q0 = q(1);
+    qv = q(2:4);
     R_q = (2*q0^2 - 1)*eye(3) + 2*(qv*qv.') + 2*q0*skew(qv);
     v_sensor_eci = R_q * b_sensor;
 
-    % quaternion que rota v_sensor_eci -> v_des_eci (scalar-first)
     qd = quatFromTwoVectors(v_sensor_eci, v_des_eci);
     qd = quatNormalize(qd);
 
-    % ---- 2.2 Error de actitud ----
-    qinv = quatConj(q);          % q^{-1}
+    % 2.2 Cuaternión de error
+    qinv = quatConj(q);
     q_err = quatMultiply(qd, qinv);
     q_err = quatNormalize(q_err);
-    % for control, take vector part; ensure scalar positive to use shortest rotation
     if q_err(1) < 0
-        q_err = -q_err;
+        q_err = -q_err; % asegurar rotación mínima
     end
-    err_vec = q_err(2:4); % 3x1
 
-    % ---- 2.3 Control PDI -> torque ----
-    int_err = int_err + err_vec * dt;
-    der_err = -omega; % heuristic: reduce angular velocity to zero
-    tau_ctrl = Kp * err_vec + Ki * int_err + Kd * der_err;
+    % Convertimos a axis-angle (axis * angle)
+    q0_err = max(min(q_err(1),1),-1);
+    vec_err = q_err(2:4);
+    angle = 2 * acos(q0_err);
+    if abs(angle) < 1e-8 % Si es muy pequeño evitamos hacer el tonto y que se disparen los numeros
+        err_ang_vec = [0;0;0];
+    else
+        s = sin(angle/2);
+        if abs(s) < 1e-8
+            axis = vec_err / norm(vec_err);
+        else
+            axis = vec_err / s;
+        end
+        axis = axis / norm(axis);
+        err_ang_vec = axis * angle;
+    end
+    err_ang_hist(:,k) = err_ang_vec;
 
-    % ---- 2.3 Dinámica rígida ----
-    omega_dot = invI * ( tau_ctrl - cross(omega, I*omega) );
+    % 2.3 Control PDI
+    int_err = int_err + err_ang_vec * dt;
+    der_err = -omega;
+    tau_ctrl = Kp * err_ang_vec + Ki * int_err + Kd * der_err;
 
-    % ---- 2.4 Cinemática de cuaterniones ----
+    % 2.4 Dinámica y cinemática
+    omega_dot = invI_sat * ( tau_ctrl - cross(omega, I_sat*omega) );
     qdot = 0.5 * OmegaMatrix(omega) * q;
 
     % Integración explícita (Euler)
@@ -168,26 +165,40 @@ for k = 1:N
     q_hist(:,k) = q;
     omega_hist(:,k) = omega;
     tau_hist(:,k) = tau_ctrl;
-    err_hist(:,k) = err_vec;
 end
 
-% Almacenamos resultados para plot posterior (si do_plots == true)
-if exist('do_plots','var') && do_plots
-    figure;
-    subplot(3,1,1); plot(t, q_hist(1,:), t, q_hist(2,:), t, q_hist(3,:), t, q_hist(4,:));
-    legend('q0','q1','q2','q3'); title('Quaternion history');
+% He probado de hacer un plot con el movimiento final del satélite pero no
+% es demasiado bonito, creo que la función no está preparada para el
+% formato de omega_hist
+%generate_Animation_GPT(r_POI_eci,r_sat_eci,R_E,t,n_steps,w_E,omega_hist)
 
-    subplot(3,1,2); plot(t, omega_hist(1,:), t, omega_hist(2,:), t, omega_hist(3,:));
-    legend('\omega_x','\omega_y','\omega_z'); title('Angular velocity');
-
-    subplot(3,1,3); plot(t, vecnorm(err_hist));
-    title('Attitude error norm'); xlabel('t (s)');
-end
-
-% Final: exportar variables al espacio de trabajo (opcional)
+% Resultados
 results.q_hist = q_hist;
 results.omega_hist = omega_hist;
 results.tau_hist = tau_hist;
-results.err_hist = err_hist;
+results.err_ang_hist = err_ang_hist;
 assignin('base','ADCS_results', results);
+
+% --- Plots finales ---
+if do_plots
+    % Vector error (norma)
+    figure('Name','Error vector (axis * angle)');
+    plot(t, vecnorm(err_ang_hist));
+    grid on; xlabel('t (s)'); ylabel('||axis*angle|| (rad)');
+    title('Norma del vector de error (axis*angle)');
+
+    % Velocidad angular
+    figure('Name','Angular velocity');
+    plot(t, omega_hist(1,:), t, omega_hist(2,:), t, omega_hist(3,:),'LineWidth',1.2);
+    legend('\omega_x','\omega_y','\omega_z'); grid on;
+    xlabel('t (s)'); ylabel('\omega (rad/s)');
+    title('Velocidad angular del satélite');
+
+    % Par de control
+    figure('Name','Control torques');
+    plot(t, tau_hist(1,:), t, tau_hist(2,:), t, tau_hist(3,:),'LineWidth',1.2);
+    legend('\tau_x','\tau_y','\tau_z'); grid on;
+    xlabel('t (s)'); ylabel('\tau (N·m)');
+    title('Componentes del par de control');
+end
 
