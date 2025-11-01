@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from datetime import datetime
 from math import sin, cos, pi
 from utils import get_ephemeris, read_glonass_rinex
@@ -119,38 +120,32 @@ def propagate_rk4(t0, y0, h, steps, a_trf, gmst0):
     return np.vstack(traj)
 
 # =========================
-# PRN 02: RINEX block at 00:15:00 (km, km/s, km/s^2 in TRF)
+# PRN 02: ephemeris retrieval at 00:15:00 (km, km/s, km/s^2 in TRF)
 # =========================
-epoch = (2009, 8, 20, 0, 15, 0.0)  # UTC
-# X row, Y row, Z row (X, Xdot, Xddot) etc.
-X,  Xdot,  Xddot  =  0.179436245117E+05, -0.138885307312E+01,  0.372529029846E-08
-Y,  Ydot,  Yddot  = -0.106202993164E+05,  0.146085643768E+01,  0.000000000000E+00
-Z,  Zdot,  Zddot  =  0.147005888672E+05,  0.275223255158E+01, -0.279396772385E-08
+PRN_ID = 2
+epoch_dt = datetime(2009, 8, 20, 0, 15, 0)  # UTC
 
 # Load all ephemerides once
 data = read_glonass_rinex("brdc2320.09g.txt")
 
 # Retrieve PRN 2 at 2009-08-20 00:15:00
-from datetime import datetime
-epoch = datetime(2009, 8, 20, 0, 15, 0)
-eph = get_ephemeris(data, 2, epoch)
-
-print("-------------------------------------------------------")
-print(eph)
-print("-------------------------------------------------------")
+eph = get_ephemeris(data, PRN_ID, epoch_dt)
 
 print("PRN 2 @ 00:15:00 UTC")
+print(f"PRN {PRN_ID} @ {epoch_dt:%Y-%m-%d %H:%M:%S} UTC")
 print("Position (km):", eph["pos"])
 print("Velocity (km/s):", eph["vel"])
 print("Acceleration (km/s²):", eph["acc"])
 
 # Convert to SI
-r_ecef = np.array([X, Y, Z], dtype=float) * 1000.0
-v_ecef = np.array([Xdot, Ydot, Zdot], dtype=float) * 1000.0
-a_trf  = np.array([Xddot, Yddot, Zddot], dtype=float) * 1000.0
+r_ecef = np.asarray(eph["pos"], dtype=float) * 1000.0
+v_ecef = np.asarray(eph["vel"], dtype=float) * 1000.0
+a_trf  = np.asarray(eph["acc"], dtype=float) * 1000.0
 
 # ECI initial state and tide vector
-gmst_0015 = gmst_rad(*epoch)
+sec_fraction = epoch_dt.second + epoch_dt.microsecond / 1e6
+gmst_0015 = gmst_rad(epoch_dt.year, epoch_dt.month, epoch_dt.day,
+                     epoch_dt.hour, epoch_dt.minute, sec_fraction)
 r0_eci = ecef_r_to_eci(r_ecef, gmst_0015)
 v0_eci = ecef_v_to_eci(r_ecef, v_ecef, gmst_0015)
 a_SM_eci = trf_vec_to_eci(a_trf, gmst_0015)          # physical vector -> pure rotation
@@ -204,10 +199,129 @@ print("r_30min_ECI [m]:   ", r_30)
 print("v_30min_ECI [m/s]: ", v_30)
 print("a_2body_30 [m/s^2]: ", a2b_30)
 print("a_J2_30    [m/s^2]: ", aJ2_30)
-print("a_SM_30    [m/s^2]: ", a_SM_eci)
+print("a_SM_30    [m/s^2]: ", a_SM_eci_30)
 print("a_total_30 [m/s^2]: ", atot_30)
 print("||a_total_30|| [m/s^2]:", np.linalg.norm(atot_30))
+print("||r|| [km]:", np.linalg.norm(r_30) / 1000)
+print("||v|| [km/s]:", np.linalg.norm(v_30) / 1000)
 print("======================================================")
+
+# ======================================================
+# ✅ COMPARISON WITH ACTUAL BROADCAST EPHEMERIS
+# ======================================================
+target_dt = datetime(2009, 8, 20, 0, 45, 0)
+eph_actual = get_ephemeris(data, PRN_ID, target_dt)
+
+r_actual_ecef = np.asarray(eph_actual["pos"], dtype=float) * 1000.0
+v_actual_ecef = np.asarray(eph_actual["vel"], dtype=float) * 1000.0
+sec_fraction_actual = target_dt.second + target_dt.microsecond / 1e6
+gmst_actual = gmst_rad(
+    target_dt.year, target_dt.month, target_dt.day,
+    target_dt.hour, target_dt.minute, sec_fraction_actual
+)
+r_actual_eci = ecef_r_to_eci(r_actual_ecef, gmst_actual)
+v_actual_eci = ecef_v_to_eci(r_actual_ecef, v_actual_ecef, gmst_actual)
+
+# Differences
+delta_r = r_30 - r_actual_eci
+delta_v = v_30 - v_actual_eci
+
+print("\n=========== COMPARISON WITH ACTUAL RINEX ===========")
+print("Epoch actual:", eph_actual["epoch"])
+print("r_actual_ECI [m]:   ", r_actual_eci)
+print("v_actual_ECI [m/s]: ", v_actual_eci)
+print("\nΔr [m]:", delta_r)
+print("||Δr|| [m]:", np.linalg.norm(delta_r))
+print("Δv [m/s]:", delta_v)
+print("||Δv|| [m/s]:", np.linalg.norm(delta_v))
+print("=====================================================")
+
+# =========================
+# Plot projected ECI trajectories
+# =========================
+traj_pos_km = traj[:, :3] / 1000.0
+start_pos_km = traj_pos_km[0]
+pred_final_pos_km = traj_pos_km[-1]
+actual_final_pos_km = r_actual_eci / 1000.0
+
+fig, axes = plt.subplots(1, 3, figsize=(16, 5))
+projections = [
+    (0, 1, "X", "Y"),  # XY plane
+    (0, 2, "X", "Z"),  # XZ plane
+    (1, 2, "Y", "Z"),  # YZ plane
+]
+
+for ax, (i, j, label_i, label_j) in zip(axes, projections):
+    ax.plot(traj_pos_km[:, i], traj_pos_km[:, j], label="Propagated path", color="tab:blue")
+    ax.scatter(start_pos_km[i], start_pos_km[j], color="tab:green", marker="*", s=120, label="Start" if i == 0 and j == 1 else "")
+    ax.scatter(pred_final_pos_km[i], pred_final_pos_km[j], color="tab:red", marker="o", s=70, label="Propagated end" if i == 0 and j == 1 else "")
+    ax.scatter(actual_final_pos_km[i], actual_final_pos_km[j], color="tab:purple", marker="X", s=90, label="RINEX end" if i == 0 and j == 1 else "")
+    ax.set_xlabel(f"{label_i} [km]")
+    ax.set_ylabel(f"{label_j} [km]")
+    ax.set_title(f"{label_i}{label_j} projection")
+    ax.grid(True, linestyle="--", alpha=0.5)
+    ax.axis("equal")
+
+# Add a single legend using the first axis handles
+handles, labels = axes[0].get_legend_handles_labels()
+fig.legend(handles, labels, loc="upper center", ncol=3)
+fig.suptitle(f"ECI Trajectory Projections for PRN {PRN_ID}", fontsize=14)
+plt.tight_layout(rect=[0, 0, 1, 0.92])
+
+# =========================
+# 3D ECI trajectory
+# =========================
+fig3d = plt.figure(figsize=(8, 6))
+ax3d = fig3d.add_subplot(111, projection="3d")
+ax3d.plot(
+    traj_pos_km[:, 0],
+    traj_pos_km[:, 1],
+    traj_pos_km[:, 2],
+    label="Propagated path",
+    color="tab:blue",
+)
+ax3d.scatter(
+    start_pos_km[0],
+    start_pos_km[1],
+    start_pos_km[2],
+    color="tab:green",
+    marker="*",
+    s=120,
+    label="Start",
+)
+ax3d.scatter(
+    pred_final_pos_km[0],
+    pred_final_pos_km[1],
+    pred_final_pos_km[2],
+    color="tab:red",
+    marker="o",
+    s=70,
+    label="Propagated end",
+)
+ax3d.scatter(
+    actual_final_pos_km[0],
+    actual_final_pos_km[1],
+    actual_final_pos_km[2],
+    color="tab:purple",
+    marker="X",
+    s=90,
+    label="RINEX end",
+)
+ax3d.set_xlabel("X [km]")
+ax3d.set_ylabel("Y [km]")
+ax3d.set_zlabel("Z [km]")
+ax3d.set_title(f"ECI 3D Trajectory for PRN {PRN_ID}")
+ax3d.grid(True, linestyle="--", alpha=0.5)
+ax3d.set_box_aspect(
+    (
+        np.ptp(traj_pos_km[:, 0]),
+        np.ptp(traj_pos_km[:, 1]),
+        np.ptp(traj_pos_km[:, 2]),
+    )
+)
+ax3d.legend(loc="upper left")
+
+plt.show()
 
 
 
