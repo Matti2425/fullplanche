@@ -177,7 +177,7 @@ print("-----------------------------------------------------")
 # Integrate 30 minutes with RK4 (J2 + a_SM)
 # =========================
 dt    = 10.0          # s
-Tend  = 1800.0        # 30 min
+Tend  = 1800.0 * 2 * 12       # 30 min
 steps = int(Tend/dt)
 
 y0 = np.hstack([r0_eci, v0_eci])
@@ -211,7 +211,7 @@ print("======================================================")
 # ======================================================
 # ✅ COMPARISON WITH ACTUAL BROADCAST EPHEMERIS
 # ======================================================
-target_dt = datetime(2009, 8, 20, 0, 45, 0)
+target_dt = datetime(2009, 8, 20, 12, 15, 0)
 eph_actual = get_ephemeris(data, PRN_ID, target_dt)
 
 r_actual_ecef = np.asarray(eph_actual["pos"], dtype=float) * 1000.0
