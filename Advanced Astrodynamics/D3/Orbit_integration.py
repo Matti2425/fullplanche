@@ -46,15 +46,17 @@ OMEGA_E = np.array([0.0, 0.0, 7.2921150e-5])
 # =========================
 def ecef_r_to_eci(r_ecef, gmst):
     """Position: pure rotation."""
-    return R3(-gmst) @ r_ecef
+    return R3(gmst) @ r_ecef
 
 def ecef_v_to_eci(r_ecef, v_ecef, gmst):
-    """Velocity: add omega×r in ECEF, then rotate."""
-    return R3(-gmst) @ (v_ecef + np.cross(OMEGA_E, r_ecef))
+    """Velocity: add omega×r in ECI frame."""
+    r_eci = R3(gmst) @ r_ecef
+    v_eci = R3(gmst) @ v_ecef + np.cross(OMEGA_E, r_eci)
+    return v_eci
 
 def trf_vec_to_eci(vec_trf, gmst):
     """Rotate any physical vector (e.g., tide acceleration) from TRF to ECI."""
-    return R3(-gmst) @ vec_trf
+    return R3(gmst) @ vec_trf
 
 # =========================
 # Dynamics: Earth 2-body + J2 + a_SM
@@ -264,66 +266,11 @@ for ax, (i, j, label_i, label_j) in zip(axes, projections):
 
 # Add a single legend using the first axis handles
 handles, labels = axes[0].get_legend_handles_labels()
-fig.legend(handles, labels, loc="upper center", ncol=3)
+fig.legend(handles, labels, loc="upper right", ncol=3)
 fig.suptitle(f"ECI Trajectory Projections for PRN {PRN_ID}", fontsize=14)
 plt.tight_layout(rect=[0, 0, 1, 0.92])
 
-# =========================
-# 3D ECI trajectory
-# =========================
-fig3d = plt.figure(figsize=(8, 6))
-ax3d = fig3d.add_subplot(111, projection="3d")
-ax3d.plot(
-    traj_pos_km[:, 0],
-    traj_pos_km[:, 1],
-    traj_pos_km[:, 2],
-    label="Propagated path",
-    color="tab:blue",
-)
-ax3d.scatter(
-    start_pos_km[0],
-    start_pos_km[1],
-    start_pos_km[2],
-    color="tab:green",
-    marker="*",
-    s=120,
-    label="Start",
-)
-ax3d.scatter(
-    pred_final_pos_km[0],
-    pred_final_pos_km[1],
-    pred_final_pos_km[2],
-    color="tab:red",
-    marker="o",
-    s=70,
-    label="Propagated end",
-)
-ax3d.scatter(
-    actual_final_pos_km[0],
-    actual_final_pos_km[1],
-    actual_final_pos_km[2],
-    color="tab:purple",
-    marker="X",
-    s=90,
-    label="RINEX end",
-)
-ax3d.set_xlabel("X [km]")
-ax3d.set_ylabel("Y [km]")
-ax3d.set_zlabel("Z [km]")
-ax3d.set_title(f"ECI 3D Trajectory for PRN {PRN_ID}")
-ax3d.grid(True, linestyle="--", alpha=0.5)
-ax3d.set_box_aspect(
-    (
-        np.ptp(traj_pos_km[:, 0]),
-        np.ptp(traj_pos_km[:, 1]),
-        np.ptp(traj_pos_km[:, 2]),
-    )
-)
-ax3d.legend(loc="upper left")
-
 plt.show()
-
-
 
 
 
