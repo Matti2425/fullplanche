@@ -2,9 +2,9 @@
 close all; clearvars
 
 %% User parameters
-animation = false;
-do_plots = true;
-n_steps = 6000;
+animation = true;
+do_plots = false;
+n_steps = 600;
 
 %% Initial data
 

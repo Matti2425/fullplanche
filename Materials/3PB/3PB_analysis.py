@@ -15,9 +15,9 @@ output_folder.mkdir(exist_ok=True)
 
 # Dimensiones de las muestras (mm)
 sample_dimensions = {
-    "PP": {"L": 80, "b": 10, "h": 4},
-    "PP_Short_GF": {"L": 80, "b": 10, "h": 4},
-    "Twintex": {"L": 80, "b": 20, "h": 2.3},
+    "PP": {"L": 64, "b": 10, "h": 4},
+    "PP_Short_GF": {"L": 64, "b": 10, "h": 4},
+    "Twintex": {"L": 40, "b": 20, "h": 2.3},
     "Sandwich": {"L": 80, "b": 40, "h": 19.5},
 }
 
