@@ -1,0 +1,10 @@
+clearvars; close all; clc;
+fprintf("Initializing Burgers simulation...\n");
+params = readInputData();
+fprintf("Loaded parameters: Re=%d, cases=%d\n", params.Re, numel(params.N_values));
+fprintf("Running simulations...\n");
+results = runSimulation(params);
+fprintf("Simulation runs completed. Generating figures...\n");
+plotEnergySpectrum(results, params);
+plotEnergyEvolution(results);
+fprintf("All outputs generated.\n");
