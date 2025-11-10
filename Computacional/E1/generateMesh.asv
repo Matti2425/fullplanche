@@ -1,0 +1,40 @@
+function [X,Y] = generateMesh(Geometry, NumericalParameters)
+%UNTITLED3 Summary of this function goes here
+%   Detailed explanation goes here
+    
+NumericalParameters.N=10
+
+    % Reanomenem variables
+    N = NumericalParameters.N;
+    M = NumericalParameters.M;
+
+    % Predef
+    X = zeros(N+2, M+2);
+    Y = zeros(N+2, M+2);
+    
+    % Increments
+    deltaL = Geometry.L / N;
+    deltaH = Geometry.H / M;
+
+    % Saving
+    Geometry.deltaX = deltaL;
+    Geometry.deltaY = deltaH;
+    
+    % Vectors límit
+    xVec = (0.5 : N-0.5) * deltaL;
+    yVec = (0.5 : M-0.5) * deltaH;
+    
+    % Mallat
+    [Xsub, Ysub] = meshgrid(xVec, yVec);
+    X(2:N+1, 2:M+1) = Xsub';
+    Y(2:N+1, 2:M+1) = Ysub';
+
+    % Límits
+    X(:, 1) = [0 xVec Geometry.L];
+    X(:, end) = [0 xVec Geometry.L];
+    X(end,:) = Geometry.L;
+    Y(1, :) = [0 yVec Geometry.H];
+    Y(end, :) = [0 yVec Geometry.H];
+    Y(:,end) = Geometry.H;
+
+end
