@@ -11,6 +11,6 @@ function [N_list, Re, tmax, CFL, CK, m, usr] = readInputData()
 
     % User Visualization
     usr.displayProgress = true;
-    usr.doPlots = false;
+    usr.doPlots = true;
 
 end
