@@ -1,9 +1,9 @@
 %% PART I - BEAM MODELLING (TEMPLATE)
 
 % Useful commands to initialize script
-clear
+%clear
 close all
-clear all
+%clear all
 
 %% DATA
 
@@ -91,7 +91,7 @@ if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
 
     %--section 2--------------------------------------
     Ndof = 6*N_nodes;
-    K=zeros(Ndof,Ndof);
+    K2=zeros(Ndof,Ndof);
     M=zeros(Ndof,Ndof);
 
     for e=1:1:N_elements
@@ -179,7 +179,7 @@ if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
             Idof(6+jj,1)=6*(Tn(e,2)-1)+jj;
         end
 
-        K(Idof,Idof)=K(Idof,Idof) + Ka(:,:,e) + Kb(:,:,e) + Ks(:,:,e) + Kt(:,:,e);
+        K2(Idof,Idof)=K2(Idof,Idof) + Ka(:,:,e) + Kb(:,:,e) + Ks(:,:,e) + Kt(:,:,e);
         M(Idof,Idof)=M(Idof,Idof) + Me(:,:,e);
 
     end
@@ -230,8 +230,8 @@ if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
 
 
         %--section 5--------------------------------------
-        u(If,1) = K(If,If)\(f(If,1)-(K(If,Ip)*u(Ip,1)));
-        fR = K*u-f;
+        u(If,1) = K2(If,If)\(f(If,1)-(K2(If,Ip)*u(Ip,1)));
+        fR = K2*u-f;
 
         
         %--section 6--------------------------------------
@@ -259,7 +259,7 @@ if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
 
         %--section modal--------------------------------------
 
-    [V,D] = MAIN_modal(K,M,If,Nm);
+    [V,D] = MAIN_modal(K2,M,If,Nm);
 
     Phi = zeros(Ndof,Nm);
     lambda = zeros(1,Nm);
@@ -289,14 +289,14 @@ if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
 
     
     % Once (re)computed, save them to a separate data file
-    save('beam_matrices.mat','K','M'); 
+    save('beam_matrices.mat','K2','M'); 
     % TIP: Add other potential results that can be reused in other parts
     % (e.g. element's length 'l', elements rotations matrices 'R', etc.)
     
 else
 
     % Load previously computed results
-    load('beam_matrices.mat','K','M');
+    load('beam_matrices.mat','K2','M');
 
 end
 
