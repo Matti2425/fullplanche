@@ -6,7 +6,7 @@ close all
 
 %% DATA
 
-problem_case = "bending"; % bending or torsion
+problem_type = 1; %1 for bending. 2 for torsion.
 Nm = 6;
 
 % Define the problem's data (e.g. dimensions, material properties, etc.)
@@ -53,10 +53,10 @@ Up = [0 1 1; % displacement, node, dof
       0 1 6];
 
 % External forces (force, node, dof)
-switch(problem_case)
-    case "bending"
+switch(problem_type)
+    case 1
     Fe = [1 N_nodes 3];
-    case "torsion"
+    case 2
     Fe = [1 N_nodes 4];
 end
 
@@ -196,7 +196,7 @@ if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
     fprintf('--- Applying boundary conditions and loads ---\n');
     
     % --- External Force Vector ---
-    F = zeros(N_dof, 1);
+    F = zeros(Ndof, 1);
     F_node = Fe(1,2);
     F_dof = Fe(1,3);
     F_global = (F_node - 1) * 6 + F_dof;
@@ -204,10 +204,10 @@ if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
     
     % --- Apply Boundary Conditions ---
     prescribed_dofs = (Up(:,2) - 1) * 6 + Up(:,3);
-    free_dofs = setdiff(1:N_dof, prescribed_dofs);
+    free_dofs = setdiff(1:Ndof, prescribed_dofs);
     
     % --- Solve system ---
-    U = zeros(N_dof, 1);
+    U = zeros(Ndof, 1);
     U(free_dofs) = K(free_dofs, free_dofs) \ F(free_dofs);
     
     fprintf('--- Static solution complete ---\n');
@@ -235,25 +235,3 @@ save('beam_results.mat');
 
 % Include plot functions
 % ...
-
-function [Ke, Me] = beamElementMatrices(E, G, A, Iy, Iz, J, ky, kz, kt, rho, L)
-% Computes local stiffness and consistent mass matrices for a 3D Timoshenko beam
-
-% Stiffness (simplified generic form)
-EA_L = E*A/L;
-GJ_L = G*J/L;
-
-% Axial and torsional
-K_ax = [ EA_L -EA_L; -EA_L EA_L ];
-K_tor = [ GJ_L -GJ_L; -GJ_L GJ_L ];
-
-% Placeholder 12x12 (replace with your full beam formulation)
-Ke = zeros(12);
-Ke(1,1)=EA_L; Ke(1,7)=-EA_L; Ke(7,1)=-EA_L; Ke(7,7)=EA_L;
-Ke(4,4)=GJ_L; Ke(4,10)=-GJ_L; Ke(10,4)=-GJ_L; Ke(10,10)=GJ_L;
-
-% Mass matrix (lumped approximation)
-m = rho * A * L;
-Me = (m/2) * eye(12);
-Me(7:end,7:end) = (m/2) * eye(6);
-end
