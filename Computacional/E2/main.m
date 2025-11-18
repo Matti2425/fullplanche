@@ -17,9 +17,9 @@ case_study = 1;
 % diag = 1: Diagonal flow test case
 diag = 0;
 
-% Override for diagnostic mode
+% Override for diagonal case
 if diag == 1
-    case_study = 1;  % Use Upwind for diagonal case
+    case_study = 1;
 end
 
 %% READ INPUT DATA
