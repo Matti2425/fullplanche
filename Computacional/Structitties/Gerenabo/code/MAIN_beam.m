@@ -1,12 +1,15 @@
-%% PART I - BEAM MODELLING (TEMPLATE)
+%% PART I - BEAM MODELLING 
+% Gerard Martínez Vilella
+% David Rodríguez López
 
 % Useful commands to initialize script
 clear
 close all
+clearvars
 
 %% DATA
 
-problem_type = 1; %1 for bending. 2 for torsion.
+problem_type = "torsion"; %1 for bending. 2 for torsion.
 Nm = 6;
 
 % Define the problem's data (e.g. dimensions, material properties, etc.)
@@ -54,10 +57,10 @@ Up = [0 1 1; % displacement, node, dof
 
 % External forces (force, node, dof)
 switch(problem_type)
-    case 1
+    case "bending"
     Fe = [1 N_nodes 3];
-    case 2
-    Fe = [1 N_nodes 4];
+    case "torsion"
+    Fe = [1 N_nodes 5];
 end
 
 % Distributed forces (force, node, dof)
@@ -221,11 +224,6 @@ if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
     fprintf('Natural frequencies [Hz]:\n');
     disp(frequencies');
     
-    % Compute external forces vector
-    % ...
-    
-    % Solve system
-    % ...
 end
 %% POSTPROCESS
 
@@ -233,5 +231,65 @@ end
 % from different runs need to be compared)
 save('beam_results.mat');
 
-% Include plot functions
-% ...
+% --- 1. Extract Displacements from Global Vector U ---
+% U is stored as [ux1; uy1; uz1; thx1; thy1; thz1; ux2; ... ]
+u_x = U(1:6:end);       % Axial displacement
+u_y = U(2:6:end);       % Lateral displacement (Y)
+u_z = U(3:6:end);       % Vertical displacement (Z)
+theta_x = U(4:6:end);   % Torsion/Twist
+theta_y = U(5:6:end);   % Bending rotation about Y
+theta_z = U(6:6:end);   % Bending rotation about Z
+
+% Define x-axis for plotting (Spanwise coordinate)
+x_span = xn(:,1); 
+
+% --- 2. Plot Translational Displacements (ux, uy, uz) ---
+figure('Name', 'Translational Displacements', 'NumberTitle', 'off');
+
+subplot(3,1,1);
+plot(x_span, u_x, 'LineWidth', 1.5);
+title('Axial Displacement (u_x)');
+ylabel('u_x (m)'); grid on;
+
+subplot(3,1,2);
+plot(x_span, u_y, 'LineWidth', 1.5);
+title('Lateral Displacement (u_y)');
+ylabel('u_y (m)'); grid on;
+
+subplot(3,1,3);
+plot(x_span, u_z, 'LineWidth', 1.5);
+title('Vertical Deflection (u_z)');
+xlabel('Span x (m)'); ylabel('u_z (m)'); grid on;
+
+% Add legend based on problem type
+switch(problem_type)
+    case "bending"
+        sgtitle('Static Solution: Bending Test (Translations)');
+    case "torsion"
+        sgtitle('Static Solution: Torsion Test (Translations)');
+end
+
+% --- 3. Plot Rotational Displacements (theta_x, theta_y, theta_z) ---
+figure('Name', 'Rotational Displacements', 'NumberTitle', 'off');
+
+subplot(3,1,1);
+plot(x_span, theta_x, 'LineWidth', 1.5);
+title('Twist Angle (\theta_x)');
+ylabel('\theta_x (rad)'); grid on;
+
+subplot(3,1,2);
+plot(x_span, theta_y, 'LineWidth', 1.5);
+title('Rotation about Y (\theta_y)');
+ylabel('\theta_y (rad)'); grid on;
+
+subplot(3,1,3);
+plot(x_span, theta_z, 'LineWidth', 1.5);
+title('Rotation about Z (\theta_z)');
+xlabel('Span x (m)'); ylabel('\theta_z (rad)'); grid on;
+
+switch(problem_type)
+    case "bending"
+        sgtitle('Static Solution: Bending Test (Rotations)');
+    case "torsion"
+        sgtitle('Static Solution: Torsion Test (Rotations)');
+end
