@@ -23,8 +23,8 @@ Isp = 900;                      % s
 g0 = 9.80665;                    % m/s^2
 c_e = Isp * g0;
 
-Earth = makeBody('Earth', mass_earth, mu_sun, a_earth, R_earth);
-Mars  = makeBody('Mars' , mass_mars , mu_sun, a_mars , R_mars);
+Earth = makeBody('Earth', mass_earth, mu_earth, a_earth, R_earth);
+Mars  = makeBody('Mars' , mass_mars , mu_mars, a_mars , R_mars);
 Sun   = makeBody('Sun'  , mass_sun  , mu_sun, 0       , 696340e3);
 
 % CONSTANTS FOR PART 3
@@ -52,8 +52,8 @@ fprintf('Earth: a = %.3e km\n', Earth.a/1e3);
 fprintf('Mars : a = %.3e km\n\n', Mars.a/1e3);
 
 %% CUESTIÓN 2: Radii of spheres of influence
-rSOI_Earth = computeSOI(Earth.mass, Sun.mass, Earth.a);
-rSOI_Mars  = computeSOI(Mars.mass , Sun.mass, Mars.a );
+rSOI_Earth = computeSOI(Earth, Sun, Earth.a);
+rSOI_Mars  = computeSOI(Mars , Sun, Mars.a );
 
 fprintf('PART 1 - Q2: Spheres of Influence\n');
 fprintf('Earth SOI = %.3f km\n', rSOI_Earth/1e3);
@@ -77,7 +77,7 @@ fprintf('\n================ PART 2 ================\n');
 fprintf('--- INICIANDO Q4: ESCAPE DE LA TIERRA ---\n');
 
 r_park_E = 20000e3;
-v_park_E = sqrt(mu_earth / r_park_E);
+v_park_E = sqrt(Earth.mu / r_park_E);
 y0_E = [r_park_E; 0; 0; v_park_E; m0_earth];
 
 % Parámetros de búsqueda
@@ -110,7 +110,7 @@ for iter = 1:max_iter
     end
     
     v_final = sqrt(y_out(end,3)^2 + y_out(end,4)^2);
-    error_v = v_final - hoh.dV1;
+    error_v = v_final + sqrt(Sun.mu/Earth.a) - hoh.v1;
     
     %fprintf('Iter %d: F=%.1f N -> V=%.2f m/s (error=%.2f)\n', iter, F_try, v_final, error_v);
     
@@ -124,6 +124,14 @@ for iter = 1:max_iter
         F_max = F_try;
     end
 end
+
+angulo_salida = mod(y_out(end,2) + atan(y_out(end,4)/y_out(end,3)),2*pi);
+
+% Re-solucionamos brevemente con la nueva C.I. de anom. verdadera para que
+% el ángulo de salida sea el desado
+y0_E = [r_park_E; -angulo_salida+pi/2; 0; v_park_E; m0_earth];
+[t_out, y_out, te, ye, ie] = ode45(@(t,y) dynamics_2D(t,y,F_try,c_e,mu_earth,1), ...
+                                        [0 1e8], y0_E, options);
 
 if ~converged_Q4
     warning('No se convergió en Q4. Usando último valor F.');
@@ -471,47 +479,6 @@ fprintf('Vtheta(0)= %.6f km/s\n', Vtheta0/1e3);
 fprintf('Vphi(0)  = %.6f km/s\n', Vphi0/1e3);
 fprintf('m(0)     = %.3f kg\n\n', m0_sat);
 
-%% ============== SPHERICAL ODE ===================
-function dy = satDynamics(t,y,mu,F,ce,alpha_max)
-    r=y(1); th=y(2); ph=y(3);
-    Vr=y(4); Vt=y(5); Vp=y(6);
-    m=y(7);
-
-    V = sqrt(Vr^2+Vt^2+Vp^2);
-    alpha = alpha_max*cos(ph);
-
-    % F_in = F*cos(alpha);
-    % F_perp = F*sin(alpha);
-    % 
-    % Fr = F_in*(Vr/max(V,1e-12));
-    % % Ftheta = 0;
-    % Fphi = F_perp;
-
-    Ftheta = F*cos(alpha);
-    Fr = F*sin(alpha);
-    Fphi = 0; %?  
-   
-    dy=zeros(7,1);
-
-    dy(1)=Vr;
-    dy(2)=Vt/r;
-    dy(3)=Vp/(r*sin(th));
-
-    dy(4)= -mu/r^2 + (Vt^2+Vp^2)/r + Fr/m;
-    dy(5)= -(Vr*Vt)/r + Vp^2/(r*tan(th)) + Ftheta/m;
-    dy(6)= -(Vr*Vp)/r - (Vt*Vp)/(r*tan(th)) + Fphi/m;
-
-    dy(7)= -F/ce;
-end
-
-%% EVENT: stop when inclination = 0°
-function [value,isterminal,direction] = eventInPlane(t,y)
-    i = pi/2 - y(2);
-    value = i;              
-    isterminal = 1;
-    direction = -1;
-end
-
 options_sat = odeset('Events',@eventInPlane,'RelTol',1e-9,'AbsTol',1e-12);
 
 fprintf('Integrating until inclination reaches zero...\n');
@@ -553,3 +520,44 @@ aT = F_sat / m_end;
 t_phase = phi_shift / aT;
 
 fprintf('Phase shift time = %.6f s (%.4f hours)\n', t_phase, t_phase/3600);
+
+%% ============== SPHERICAL ODE ===================
+function dy = satDynamics(t,y,mu,F,ce,alpha_max)
+    r=y(1); th=y(2); ph=y(3);
+    Vr=y(4); Vt=y(5); Vp=y(6);
+    m=y(7);
+
+    V = sqrt(Vr^2+Vt^2+Vp^2);
+    alpha = alpha_max*cos(ph);
+
+    % F_in = F*cos(alpha);
+    % F_perp = F*sin(alpha);
+    % 
+    % Fr = F_in*(Vr/max(V,1e-12));
+    % % Ftheta = 0;
+    % Fphi = F_perp;
+
+    Ftheta = F*cos(alpha);
+    Fr = F*sin(alpha);
+    Fphi = 0; %?  
+   
+    dy=zeros(7,1);
+
+    dy(1)=Vr;
+    dy(2)=Vt/r;
+    dy(3)=Vp/(r*sin(th));
+
+    dy(4)= -mu/r^2 + (Vt^2+Vp^2)/r + Fr/m;
+    dy(5)= -(Vr*Vt)/r + Vp^2/(r*tan(th)) + Ftheta/m;
+    dy(6)= -(Vr*Vp)/r - (Vt*Vp)/(r*tan(th)) + Fphi/m;
+
+    dy(7)= -F/ce;
+end
+
+%% EVENT: stop when inclination = 0°
+function [value,isterminal,direction] = eventInPlane(t,y)
+    i = pi/2 - y(2);
+    value = i;              
+    isterminal = 1;
+    direction = -1;
+end

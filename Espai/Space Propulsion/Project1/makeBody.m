@@ -1,7 +1,7 @@
-function body = makeBody(name, mass, mu_central, a, radius)
+function body = makeBody(name, mass,mu, a, radius)
     body.name = name; 
     body.mass = mass; 
-    body.mu_central = mu_central;
     body.a = a; 
     body.radius = radius;
+    body.mu = mu;
 end
