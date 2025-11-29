@@ -1,7 +1,5 @@
-% MissionToMars_Part1.m
-% MATLAB script (and local helper functions) to solve PART 1 of the project.
-% - Written to be idiomatic MATLAB, modular and function-oriented.
-% - Includes a scaled graphical representation of orbits and transfer.
+% MissionToMars_
+% MATLAB script to solve  the project.
 
 clear; close all; clc;
 
@@ -20,8 +18,8 @@ R_mars  = 3389.5e3;              % m
 a_earth = 1.00000011 * AU;       % m
 a_mars  = 1.523679 * AU;         % m
 
-m0_earth = 25000;                % kg
-Isp = 1000;                      % s
+m0_earth = 30000;                % kg
+Isp = 900;                      % s
 g0 = 9.80665;                    % m/s^2
 c_e = Isp * g0;
 
@@ -29,12 +27,31 @@ Earth = makeBody('Earth', mass_earth, mu_sun, a_earth, R_earth);
 Mars  = makeBody('Mars' , mass_mars , mu_sun, a_mars , R_mars);
 Sun   = makeBody('Sun'  , mass_sun  , mu_sun, 0       , 696340e3);
 
-%% 1) Orbital elements
+% CONSTANTS FOR PART 3
+muM = mu_mars;
+Isp_sat = 3000;                   
+c_e_sat = Isp_sat * g0;           
+
+F_sat = 0.2;                      
+m0_sat = 200;                     
+
+alpha_max = deg2rad(60);          
+delta_i_total = deg2rad(30);      
+
+T_rot_Mars = 1.02595675 * 86400;  % Mars sideral rotation period
+
+
+%% ---------------Parte 1-----------------------------------------
+
+fprintf('\n================ PART 1 ================\n');
+
+
+%% CUESTIÓN 1: Orbital elements
 fprintf('PART 1 - Q1: Orbital elements (circular, coplanar)\n');
 fprintf('Earth: a = %.3e km\n', Earth.a/1e3);
 fprintf('Mars : a = %.3e km\n\n', Mars.a/1e3);
 
-%% 2) Radii of spheres of influence
+%% CUESTIÓN 2: Radii of spheres of influence
 rSOI_Earth = computeSOI(Earth.mass, Sun.mass, Earth.a);
 rSOI_Mars  = computeSOI(Mars.mass , Sun.mass, Mars.a );
 
@@ -42,7 +59,7 @@ fprintf('PART 1 - Q2: Spheres of Influence\n');
 fprintf('Earth SOI = %.3f km\n', rSOI_Earth/1e3);
 fprintf('Mars  SOI = %.3f km\n\n', rSOI_Mars/1e3);
 
-%% 3) Hohmann transfer
+%% CUESTIÓN 3: Hohmann transfer
 hoh = hohmannTransfer(mu_sun, Earth.a, Mars.a);
 phase_rad = requiredPhaseAngle(mu_sun, Earth.a, Mars.a);
 
@@ -52,6 +69,9 @@ fprintf('TOF = %.2f days\n', hoh.t_to_flight/86400);
 fprintf('dV1 = %.3f km/s, dV2 = %.3f km/s\n', hoh.dV1/1e3, hoh.dV2/1e3);
 fprintf('Phase angle = %.2f deg\n\n', rad2deg(phase_rad));
 
+%% ---------------Parte 2-----------------------------------------
+
+fprintf('\n================ PART 2 ================\n');
 
 %% CUESTIÓN 4: ESCAPE DE LA TIERRA
 fprintf('--- INICIANDO Q4: ESCAPE DE LA TIERRA ---\n');
@@ -92,8 +112,7 @@ for iter = 1:max_iter
     v_final = sqrt(y_out(end,3)^2 + y_out(end,4)^2);
     error_v = v_final - hoh.dV1;
     
-    fprintf('Iter %d: F=%.1f N -> V=%.2f m/s (error=%.2f)\n', ...
-            iter, F_try, v_final, error_v);
+    %fprintf('Iter %d: F=%.1f N -> V=%.2f m/s (error=%.2f)\n', iter, F_try, v_final, error_v);
     
     if abs(error_v) < velocity_tolerance
         F_opt_Earth = F_try;
@@ -124,11 +143,11 @@ results_Q4.t = t_out;
 results_Q4.time_days = time_Q4_days;
 results_Q4.propellant_used = propellant_Q4;
 
-fprintf('>>> Q4: F = %.2f N, Masa Final = %.2f kg\n', F_opt_Earth, results_Q4.m_final);
-fprintf('>>> Tiempo de vuelo: %.2f días\n', time_Q4_days);
-fprintf('>>> Propelente usado: %.2f kg\n\n', propellant_Q4);
+fprintf(' PART 2 - Q4: F = %.2f N, Masa Final = %.2f kg\n', F_opt_Earth, results_Q4.m_final);
+fprintf(' Tiempo de vuelo: %.2f días\n', time_Q4_days);
+fprintf(' Propelente usado: %.2f kg\n\n', propellant_Q4);
 
-%% 4. CUESTIÓN 5: CAPTURA EN MARTE
+%% CUESTIÓN 5: CAPTURA EN MARTE
 fprintf('--- INICIANDO Q5: CAPTURA EN MARTE ---\n');
 
 r_circ_M = R_mars + 30000e3;
@@ -188,8 +207,7 @@ for i_mass = 1:15
     end
     
     err_m = m_soi_reached - target_mass_SOI;
-    fprintf('Iter Masa %d: m_dry = %.1f -> m_SOI = %.1f (Target: %.1f) | F = %.1f N\n', ...
-            i_mass, m_dry_guess, m_soi_reached, target_mass_SOI, F_M);
+    %fprintf('Iter Masa %d: m_dry = %.1f -> m_SOI = %.1f (Target: %.1f) | F = %.1f N\n', i_mass, m_dry_guess, m_soi_reached, target_mass_SOI, F_M);
     
     if abs(err_m) < mass_tolerance
         m_dry_final = m_dry_guess;
@@ -217,11 +235,11 @@ propellant_Q5 = target_mass_SOI - m_dry_final;
 m_dot_Q5 = F_opt_Mars / c_e;
 theoretical_time_Q5 = propellant_Q5 / m_dot_Q5 / 86400;
 
-fprintf('>>> Q5: Empuje = %.2f N, Masa Orbita Marte = %.2f kg\n', F_opt_Mars, m_dry_final);
-fprintf('>>> Tiempo de vuelo: %.2f días\n', time_Q5_days);
-fprintf('>>> Propelente usado: %.2f kg\n\n', propellant_Q5);
+fprintf('PART 2 - Q5: Empuje = %.2f N, Masa Orbita Marte = %.2f kg\n', F_opt_Mars, m_dry_final);
+fprintf(' Tiempo de vuelo: %.2f días\n', time_Q5_days);
+fprintf(' Propelente usado: %.2f kg\n\n', propellant_Q5);
 
-%% 5. CÁLCULO DE ÓRBITA Y TIEMPOS TOTALES
+%% RESULTADOS CÁLCULO DE ÓRBITA Y TIEMPOS TOTALES
 
 % Tiempo de transferencia heliocéntrica (de Parte 1)
 TOF_hohmann = pi * sqrt(hoh.a_t^3 / mu_sun);
@@ -255,7 +273,9 @@ fprintf('  Propelente total: %.1f kg\n', total_propellant);
 fprintf('  Masa final/orbita Marte: %.1f kg\n', m_dry_final);
 
 
-%% 4) Graphical representation (scaled)
+%% GRAFICOS
+
+%PARTE 1
 figure('Name','Earth–Mars Hohmann Transfer','Color','w'); hold on; axis equal;
 
 % Orbits
@@ -272,7 +292,8 @@ legend('Location','bestoutside');
 xlabel('x (m)'); ylabel('y (m)'); title('Hohmann Transfer: Earth to Mars');
 grid on;
 
-%% 6. GRÁFICOS MEJORADOS
+
+%PARTE 2
 
 % Gráfico de trayectorias
 figure('Name','Trayectorias Completa','Color','w', 'Position', [100 100 1200 500]);
@@ -293,7 +314,7 @@ theta_circle = linspace(0, 2*pi, 500);
 polarplot(theta_circle, r_circ_M/1000 * ones(size(theta_circle)), ...
           'r--', 'LineWidth', 1.8);
 
-legend('Trayectoria', 'Órbita 30,000 km', 'Location','best');
+legend('Trayectoria', 'Órbita', 'Location','best');
 
 % Gráfico de evolución de masa
 figure('Name','Evolución de Masa','Color','w');
@@ -350,25 +371,78 @@ title('Fase Marte: Velocidad Total');
 legend('Velocidad', 'Objetivo', 'Location', 'best');
 grid on;
 
-%% ================================================================
-%                  PART 3 — SATELLITE AT MARS 
-% ================================================================
+
+% ANÁLISIS DE VELOCIDAD - Q4 (ESCAPE DE LA TIERRA)
+figure('Name','Q4: Análisis de Velocidad (Tierra)','Color','w', 'Position', [100 100 800 600]);
+
+% Datos Q4
+t_days_Q4 = results_Q4.t / 86400;
+Vr_Q4 = results_Q4.y(:,3); 
+Vt_Q4 = results_Q4.y(:,4); 
+V_tot_Q4 = sqrt(Vr_Q4.^2 + Vt_Q4.^2); % Velocidad Total
+
+% Subplot 1: Velocidad Tangencial
+subplot(2,1,1);
+plot(t_days_Q4, V_tot_Q4/1e3, 'k-', 'LineWidth', 1.5, 'DisplayName', 'Velocidad Total |V|');
+hold on;
+plot(t_days_Q4, Vt_Q4/1e3, 'b-', 'LineWidth', 1, 'DisplayName', 'V_{\theta} (Tangencial)');
+ylabel('Velocidad [km/s]'); 
+xlabel('Tiempo [días]');
+title('Q4 (Tierra): Evolución de la Velocidad Total');
+legend('Location','best'); 
+grid on;
+
+% Subplot 2: Velocidad Radial 
+subplot(2,1,2);
+plot(t_days_Q4, V_tot_Q4/1e3, 'k-', 'LineWidth', 1.5, 'DisplayName', 'Velocidad Total |V|');
+hold on;
+plot(t_days_Q4, Vr_Q4/1e3, 'r-', 'LineWidth', 1, 'DisplayName', 'V_r (Radial)');
+ylabel('V_r [km/s]'); 
+xlabel('Tiempo [días]');
+title('Q4 (Tierra): Componente Radial (Oscilaciones debido al empuje)');
+legend('Location','best'); 
+grid on;
+
+
+% ANÁLISIS DE VELOCIDAD - Q5 (CAPTURA EN MARTE)
+figure('Name','Q5: Análisis de Velocidad (Marte)','Color','w', 'Position', [950 100 800 600]);
+
+% Datos Q5
+t_days_Q5 = results_Q5.t / 86400;
+Vr_Q5 = results_Q5.y(:,3); 
+Vt_Q5 = results_Q5.y(:,4); 
+V_tot_Q5 = sqrt(Vr_Q5.^2 + Vt_Q5.^2); % Velocidad Total
+
+% Subplot 1: Velocidad  Tangencial
+subplot(2,1,1);
+plot(t_days_Q5, V_tot_Q5/1e3, 'k-', 'LineWidth', 1.5, 'DisplayName', 'Velocidad Total |V|');
+hold on;
+plot(t_days_Q5, Vt_Q5/1e3, 'b-', 'LineWidth', 1, 'DisplayName', 'V_{\theta} (Tangencial)');
+ylabel('Velocidad [km/s]'); 
+xlabel('Tiempo de Simulación (Desde Órbita Baja hacia SOI) [días]');
+title('Q5 (Marte): Evolución de la Velocidad Total');
+legend('Location','best'); 
+grid on;
+
+% Subplot 2: Velocidad Radial
+subplot(2,1,2);
+plot(t_days_Q5, V_tot_Q5/1e3, 'k-', 'LineWidth', 1.5, 'DisplayName', 'Velocidad Total |V|');
+hold on;
+
+plot(t_days_Q5, Vr_Q5/1e3, 'r-', 'LineWidth', 1, 'DisplayName', 'V_r (Radial)');
+ylabel('Velocidad [km/s]'); 
+xlabel('Tiempo de Simulación [días]');
+title('Q5 (Marte): Componente Radial (Oscilaciones)');
+legend('Location','best'); 
+grid on;
+
+
+%% ---------------Parte 3-----------------------------------------
+
 fprintf('\n================ PART 3 ================\n');
 
-%% CONSTANTS FOR PART 3
-muM = mu_mars;
-Isp_sat = 3000;                   
-c_e_sat = Isp_sat * g0;           
 
-F_sat = 0.2;                      
-m0_sat = 200;                     
-
-alpha_max = deg2rad(60);          
-delta_i_total = deg2rad(30);      
-
-T_rot_Mars = 1.02595675 * 86400;  % Mars sideral rotation period
-
-%% 6) SYNCHRONOUS ORBIT
+%% CUESTIÓN 6: SYNCHRONOUS ORBIT
 T_sync = T_rot_Mars;  
 r_sync = (muM * (T_sync/(2*pi))^2 )^(1/3);
 
@@ -470,7 +544,7 @@ fprintf('i(t_end)     = %.6f deg\n\n', rad2deg(i_end));
 results_P3.t = t_sat;
 results_P3.y = y_sat;
 
-%% --- Q7: PHASE SHIFT ---
+%% CUESTIÓN 7: PHASE SHIFT ---
 fprintf('\n--- Q7: Phase shift 20 degrees eastward ---\n');
 
 phi_shift = deg2rad(20);
