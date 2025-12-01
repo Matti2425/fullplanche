@@ -110,7 +110,7 @@ for iter = 1:max_iter
     end
     
     v_final = sqrt(y_out(end,3)^2 + y_out(end,4)^2);
-    error_v = v_final + sqrt(Sun.mu/Earth.a) - hoh.dV1;
+    error_v = v_final + sqrt(Sun.mu/Earth.a) - hoh.v1;
     
     %fprintf('Iter %d: F=%.1f N -> V=%.2f m/s (error=%.2f)\n', iter, F_try, v_final, error_v);
     
@@ -124,6 +124,14 @@ for iter = 1:max_iter
         F_max = F_try;
     end
 end
+
+angulo_salida = mod(y_out(end,2) + atan(y_out(end,4)/y_out(end,3)),2*pi);
+
+% Re-solucionamos brevemente con la nueva C.I. de anom. verdadera para que
+% el ángulo de salida sea el desado
+y0_E = [r_park_E; -angulo_salida+pi/2; 0; v_park_E; m0_earth];
+[t_out, y_out, te, ye, ie] = ode45(@(t,y) dynamics_2D(t,y,F_try,c_e,mu_earth,1), ...
+                                        [0 1e8], y0_E, options);
 
 if ~converged_Q4
     warning('No se convergió en Q4. Usando último valor F.');
@@ -167,7 +175,7 @@ for i_mass = 1:15
     F_low = 50;
     F_high = 200;
     F_M = NaN;
-    y0_M = [r_circ_M; 0; 0; v_circ_M; m_dry_guess];
+    y0_M = [r_circ_M; 0; 0; -v_circ_M; m_dry_guess];
     
     for i_force = 1:25
         F_try = (F_low + F_high)/2;
@@ -228,6 +236,15 @@ if ~converged_Q5
     results_Q5.y = ym;
     m_dry_final = m_dry_guess;
 end
+
+angulo_llegada = mod(ym(end,2) + atan(ym(end,4)/ym(end,3)),2*pi);
+
+% Re-solucionamos brevemente con la nueva C.I. de anom. verdadera para que
+% el ángulo de llegada sea el desado
+y0_M = [r_circ_M; -angulo_llegada+pi/2; 0; -v_circ_M; m_dry_final];
+[t_m, y_m, te, ye, ie] = ode45(@(t,y) dynamics_2D(t,y,F_try,c_e,Mars.mu,1), ...
+                                        [0 1e8], y0_E, options);
+
 
 % Calcular tiempo de vuelo y propelente usado para Q5
 time_Q5_days = results_Q5.t(end) / 86400;

@@ -175,7 +175,7 @@ for i_mass = 1:15
     F_low = 50;
     F_high = 200;
     F_M = NaN;
-    y0_M = [r_circ_M; 0; 0; v_circ_M; m_dry_guess];
+    y0_M = [r_circ_M; 0; 0; -v_circ_M; m_dry_guess];
     
     for i_force = 1:25
         F_try = (F_low + F_high)/2;
@@ -237,6 +237,15 @@ if ~converged_Q5
     m_dry_final = m_dry_guess;
 end
 
+angulo_llegada = mod(ym(end,2) + atan(ym(end,4)/ym(end,3)),2*pi)+0.06;
+
+% Re-solucionamos brevemente con la nueva C.I. de anom. verdadera para que
+% el ángulo de llegada sea el desado
+y0_M = [r_circ_M; -angulo_llegada+pi/2; 0; -v_circ_M; m_dry_final];
+[results_Q5.t, results_Q5.y, te, ye, ie] = ode45(@(t,y) dynamics_2D(t,y,F_opt_Mars,c_e,Mars.mu,1), ...
+                                        [0 1e8], y0_M, options);
+
+
 % Calcular tiempo de vuelo y propelente usado para Q5
 time_Q5_days = results_Q5.t(end) / 86400;
 propellant_Q5 = target_mass_SOI - m_dry_final;
@@ -250,8 +259,7 @@ fprintf(' Propelente usado: %.2f kg\n\n', propellant_Q5);
 %% RESULTADOS CÁLCULO DE ÓRBITA Y TIEMPOS TOTALES
 
 % Tiempo de transferencia heliocéntrica (de Parte 1)
-TOF_hohmann = pi * sqrt(hoh.a_t^3 / mu_sun);
-TOF_hohmann_days = TOF_hohmann / 86400;
+TOF_hohmann_days = hoh.t_to_flight;
 
 % Tiempos totales de misión
 total_mission_time = time_Q4_days + TOF_hohmann_days + time_Q5_days;
@@ -507,6 +515,8 @@ fprintf('Vphi(t_end)  = %.6f km/s\n', Vphi_end/1e3);
 fprintf('m(t_end)     = %.6f kg\n', m_end);
 fprintf('i(t_end)     = %.6f deg\n\n', rad2deg(i_end));
 
+spherical_plot(y_sat(1,:),y_sat(2,:),y_sat(3,:))
+
 %% STORE
 results_P3.t = t_sat;
 results_P3.y = y_sat;
@@ -520,39 +530,6 @@ aT = F_sat / m_end;
 t_phase = phi_shift / aT;
 
 fprintf('Phase shift time = %.6f s (%.4f hours)\n', t_phase, t_phase/3600);
-
-%% ============== SPHERICAL ODE ===================
-function dy = satDynamics(t,y,mu,F,ce,alpha_max)
-    r=y(1); th=y(2); ph=y(3);
-    Vr=y(4); Vt=y(5); Vp=y(6);
-    m=y(7);
-
-    V = sqrt(Vr^2+Vt^2+Vp^2);
-    alpha = alpha_max*cos(ph);
-
-    % F_in = F*cos(alpha);
-    % F_perp = F*sin(alpha);
-    % 
-    % Fr = F_in*(Vr/max(V,1e-12));
-    % % Ftheta = 0;
-    % Fphi = F_perp;
-
-    Ftheta = F*cos(alpha);
-    Fr = F*sin(alpha);
-    Fphi = 0; %?  
-   
-    dy=zeros(7,1);
-
-    dy(1)=Vr;
-    dy(2)=Vt/r;
-    dy(3)=Vp/(r*sin(th));
-
-    dy(4)= -mu/r^2 + (Vt^2+Vp^2)/r + Fr/m;
-    dy(5)= -(Vr*Vt)/r + Vp^2/(r*tan(th)) + Ftheta/m;
-    dy(6)= -(Vr*Vp)/r - (Vt*Vp)/(r*tan(th)) + Fphi/m;
-
-    dy(7)= -F/ce;
-end
 
 %% EVENT: stop when inclination = 0°
 function [value,isterminal,direction] = eventInPlane(t,y)
