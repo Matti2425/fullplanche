@@ -9,19 +9,23 @@ problem_type = 1; % 1 for bending (Force), 2 for torsion (Torque)
 Nm = 6; % Number of modes to extract
 
 % Dimensions and Material Properties
-E = 71e9; % Pa
-v_poisson = 0.33;
-rho = 2300; % kg/m3
+E = 75e9; % Pa
+v_poisson = 0.3;
+rho = 2200; % kg/m3
 
 % Load definition
 F_load = 1; % N (Force)
 T_load = 1; % Nm (Torque)
 
 % Geometric definitions
-c = 0.8; b = 5.5;
-y0 = 0.3083; y1 = 0.176; y2 = 0.464;
-yc = 0.2954; % Shear center approx
-h1 = 17.5e-3; h2 = 15e-3; h3 = 6e-3;
+c = 0.85; b = 3;
+y0 = 0.924; %m
+y1 = 0.125; %m
+y2 = 0.475; %m
+yc = 0.285; %m % Shear center approx
+h1 = 35e-3; %m
+h2 = 30e-3; %m
+h3 = 25e-3; %m
 
 %% PREPROCESS
 % Load mesh data

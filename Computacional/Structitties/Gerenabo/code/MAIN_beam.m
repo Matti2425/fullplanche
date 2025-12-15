@@ -13,26 +13,26 @@ problem_type = "torsion"; %1 for bending. 2 for torsion.
 Nm = 6;
 
 % Define the problem's data (e.g. dimensions, material properties, etc.)
-E = 71e9; %Pa
-v_poisson = 0.33;
+E = 75e9; %Pa
+v_poisson = 0.3;
 G = E/(2*(1+v_poisson));
-rho = 2300; %kg/m3
-c = 0.8; %m
-b = 5.5; %m
-y0 = 0.3083; %m
-y1 = 0.176; %m
-y2 = 0.464; %m
-h1 = 17.5e-3; %m
-h2 = 15e-3; %m
-h3 = 6e-3; %m
-A = 0.0062; %m2
-Iy = 8.801e-6; %m4
-Iz = 8.069e-5; %m4
-J = 8.949e-5; %m4
-ky = 0.5457;
-kz = 0.1767;
-kt = 0.2920;
-yc = 0.2954; %m
+rho = 2200; %kg/m3
+c = 0.85; %m
+b = 3; %m
+y0 = 0.924; %m
+y1 = 0.125; %m
+y2 = 0.475; %m
+h1 = 35e-3; %m
+h2 = 30e-3; %m
+h3 = 25e-3; %m
+A = 0.0246; %m2
+Iy = 0.727e-4; %m4
+Iz = 4.002e-4; %m4
+J = 4.729e-4; %m4
+ky = 0.6873;
+kz = 0.1843;
+kt = 0.4602;
+yc = 0.285; %m
 
 %% PREPROCESS
 zeros(0,3);
