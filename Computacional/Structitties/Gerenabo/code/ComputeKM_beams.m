@@ -1,135 +1,183 @@
-function [K,M,f] = ComputeKM_beams(xn,N_nodes,N_elements,Tn,Tm,E_vector,G_vector,rho_vector,j_orientations,A_vector,Iy_vector,Iz_vector,J_vector,ky_vector,kz_vector,kt_vector,Fe,Be,Qe)
-
-    % Compute system matrices (as long as parameters don't change there is 
-    % no need to repeat the matrix assembly on every run)
-
-    %--section 2--------------------------------------
-    Ndof = 6*N_nodes;
-    K=sparse(Ndof,Ndof);
-    M=sparse(Ndof,Ndof);
-
-    for e=1:1:N_elements
-
-        l(e) = norm(xn(Tn(e,2),:)-xn(Tn(e,1),:));
-        i = ((xn(Tn(e,2),:))' - (xn(Tn(e,1),:))')/l(e);
-        j = j_orientations(Tm(e,1),:)';
-        k = cross(i,j);
-        Rp = [i(1,1) j(1,1) k(1,1) 0 0 0;
-             i(2,1) j(2,1) k(2,1) 0 0 0;
-             i(3,1) j(3,1) k(3,1) 0 0 0;
-             0 0 0 i(1,1) j(1,1) k(1,1);
-             0 0 0 i(2,1) j(2,1) k(2,1);
-             0 0 0 i(3,1) j(3,1) k(3,1)]';
-
-        R(:,:,e) = [Rp(1,1) Rp(1,2) Rp(1,3) Rp(1,4) Rp(1,5) Rp(1,6) 0 0 0 0 0 0;
-                    Rp(2,1) Rp(2,2) Rp(2,3) Rp(2,4) Rp(2,5) Rp(2,6) 0 0 0 0 0 0;
-                    Rp(3,1) Rp(3,2) Rp(3,3) Rp(3,4) Rp(3,5) Rp(3,6) 0 0 0 0 0 0;
-                    Rp(4,1) Rp(4,2) Rp(4,3) Rp(4,4) Rp(4,5) Rp(4,6) 0 0 0 0 0 0;
-                    Rp(5,1) Rp(5,2) Rp(5,3) Rp(5,4) Rp(5,5) Rp(5,6) 0 0 0 0 0 0;
-                    Rp(6,1) Rp(6,2) Rp(6,3) Rp(6,4) Rp(6,5) Rp(6,6) 0 0 0 0 0 0;
-                    0 0 0 0 0 0 Rp(1,1) Rp(1,2) Rp(1,3) Rp(1,4) Rp(1,5) Rp(1,6);
-                    0 0 0 0 0 0 Rp(2,1) Rp(2,2) Rp(2,3) Rp(2,4) Rp(2,5) Rp(2,6);
-                    0 0 0 0 0 0 Rp(3,1) Rp(3,2) Rp(3,3) Rp(3,4) Rp(3,5) Rp(3,6);
-                    0 0 0 0 0 0 Rp(4,1) Rp(4,2) Rp(4,3) Rp(4,4) Rp(4,5) Rp(4,6);
-                    0 0 0 0 0 0 Rp(5,1) Rp(1,2) Rp(5,3) Rp(5,4) Rp(5,5) Rp(5,6);
-                    0 0 0 0 0 0 Rp(6,1) Rp(6,2) Rp(6,3) Rp(6,4) Rp(6,5) Rp(6,6)];
-        
-        Nx(1)=-1/l(e);
-        Nx(2)=1/l(e);
-        Ba(1,:,e) = [Nx(1) 0 0 0 0 0 Nx(2) 0 0 0 0 0];
-        Ca = E_vector(Tm(e,1),1)*A_vector(Tm(e,1),1);
-        Ka(:,:,e) = l(e)*R(:,:,e)'*Ba(1,:,e)'*Ca*Ba(1,:,e)*R(:,:,e);
-
-        Bb(:,:,e) = [0 0 0 0 Nx(1) 0 0 0 0 0 Nx(2) 0;
-                     0 0 0 0 0 Nx(1) 0 0 0 0 0 Nx(2)];
-
-        Cb = E_vector(Tm(e,1),1)*[Iy_vector(Tm(e,1),1) 0;
-                                  0 Iz_vector(Tm(e,1),1)];
-
-        Kb(:,:,e) = l(e)*R(:,:,e)'*Bb(:,:,e)'*Cb*Bb(:,:,e)*R(:,:,e);
-
-        N_Gauss = 1/2;
-
-        Bs(:,:,e) = [0 Nx(1) 0 0 0 -N_Gauss 0 Nx(2) 0 0 0 -N_Gauss;
-                     0 0 Nx(1) 0 N_Gauss 0 0 0 Nx(2) 0 N_Gauss 0];
-
-        Cs = G_vector(Tm(e,1),1)*A_vector(Tm(e,1),1)*[ky_vector(Tm(e,1),1) 0;
-                                                      0 kz_vector(Tm(e,1),1)];
-
-        Ks(:,:,e)=l(e)*R(:,:,e)'*Bs(:,:,e)'*Cs*Bs(:,:,e)*R(:,:,e);
-
-        Bt(1,:,e) = [0 0 0 Nx(1) 0 0 0 0 0 Nx(2) 0 0];
-        Ct = G_vector(Tm(e,1),1)*J_vector(Tm(e,1),1)*kt_vector(Tm(e,1),1);
-        Kt(:,:,e) = l(e)*R(:,:,e)'*Bt(1,:,e)'*Ct*Bt(1,:,e)*R(:,:,e);
-        
-        Xi = [-1/sqrt(3);
-               1/sqrt(3)];
-        w = [1;
-             1];
-
-        rho_matrix = rho_vector(Tm(e,1),1)*[A_vector(Tm(e,1),1) 0 0 0 0 0;
-                                            0 A_vector(Tm(e,1),1) 0 0 0 0;
-                                            0 0 A_vector(Tm(e,1),1) 0 0 0;
-                                            0 0 0 J_vector(Tm(e,1),1) 0 0;
-                                            0 0 0 0 Iy_vector(Tm(e,1),1) 0;
-                                            0 0 0 0 0 Iz_vector(Tm(e,1),1)];
-        Me(:,:,e)=zeros(12,12);
-
-        for kk=1:1:2
-            N(1) = (1-Xi(kk))/2;
-            N(2) = (1+Xi(kk))/2;
-            N_matrix(:,:,e,kk)=[N(1) 0 0 0 0 0 N(2) 0 0 0 0 0;
-                                0 N(1) 0 0 0 0 0 N(2) 0 0 0 0;
-                                0 0 N(1) 0 0 0 0 0 N(2) 0 0 0;
-                                0 0 0 N(1) 0 0 0 0 0 N(2) 0 0;
-                                0 0 0 0 N(1) 0 0 0 0 0 N(2) 0;
-                                0 0 0 0 0 N(1) 0 0 0 0 0 N(2)];
-            Me(:,:,e) = Me(:,:,e) + (w(kk)*l(e)*R(:,:,e)'*N_matrix(:,:,e,kk)'*rho_matrix*N_matrix(:,:,e,kk)*R(:,:,e))/2;
-
+function [K, M, f] = ComputeKM_beams(xn, N_nodes, N_elements, Tn, Tm, E_vector, G_vector, rho_vector, j_orientations, A_vector, Iy_vector, Iz_vector, J_vector, ky_vector, kz_vector, kt_vector, Fe, Be, Qe)
+    
+    % --- 1. Inicialización y Pre-computación ---
+    Ndof = 6 * N_nodes;
+    
+    % Pre-asignación para el ensamblaje disperso (Sparse)
+    % Cada elemento viga 3D tiene 12 DOFs, así que la matriz local es 12x12 = 144 entradas.
+    max_entries = N_elements * 144;
+    I_idx = zeros(max_entries, 1); % Índices de fila
+    J_idx = zeros(max_entries, 1); % Índices de columna
+    K_val = zeros(max_entries, 1); % Valores de Rigidez
+    M_val = zeros(max_entries, 1); % Valores de Masa
+    
+    % Inicialización del vector de fuerzas
+    f = zeros(Ndof, 1);
+    
+    % Constantes de integración de Gauss (2 puntos) fuera del bucle
+    Xi = [-1/sqrt(3); 1/sqrt(3)];
+    w = [1; 1];
+    
+    % Convertir cargas puntuales directamente (Vectorización)
+    % Fe: [Valor, Nodo, DOF]
+    if ~isempty(Fe)
+        indices_f = 6*(Fe(:,2)-1) + Fe(:,3);
+        f = f + accumarray(indices_f, Fe(:,1), [Ndof, 1]);
+    end
+    
+    % Pre-procesamiento de cargas distribuidas en nodos (Qe y Be)
+    % Acumulamos en matrices nodales para acceso rápido
+    Q_nodes = zeros(N_nodes, 6);
+    if ~isempty(Qe)
+        for r = 1:size(Qe, 1)
+            Q_nodes(Qe(r,2), Qe(r,3)) = Q_nodes(Qe(r,2), Qe(r,3)) + Qe(r,1);
         end
-
-        for jj=1:1:6
-            Idof(jj,1)=6*(Tn(e,1)-1)+jj;
-            Idof(6+jj,1)=6*(Tn(e,2)-1)+jj;
+    end
+    
+    B_nodes = zeros(N_nodes, 6);
+    if ~isempty(Be)
+        for s = 1:size(Be, 1)
+            B_nodes(Be(s,2), Be(s,3)) = B_nodes(Be(s,2), Be(s,3)) + Be(s,1);
         end
-
-        K(Idof,Idof)=K(Idof,Idof) + Ka(:,:,e) + Kb(:,:,e) + Ks(:,:,e) + Kt(:,:,e);
-        M(Idof,Idof)=M(Idof,Idof) + Me(:,:,e);
-
     end
 
-    %--section 3--------------------------------------
-        f=zeros(Ndof,1);
-        for q=1:1:size(Fe,1)
-            f(6*(Fe(q,2)-1)+Fe(q,3),1) = f(6*(Fe(q,2)-1)+Fe(q,3),1) + Fe(q,1);
+    % --- 2. Bucle sobre Elementos ---
+    idx_count = 0; % Contador para llenar los vectores sparse
+    
+    for e = 1:N_elements
+        % Nodos y Material del elemento actual
+        n1 = Tn(e, 1);
+        n2 = Tn(e, 2);
+        mat_idx = Tm(e, 1);
+        
+        % Geometría
+        p1 = xn(n1, :)';
+        p2 = xn(n2, :)';
+        vec_L = p2 - p1;
+        Le = norm(vec_L);
+        
+        % Sistema de Coordenadas Local (Matriz de Rotación)
+        u = vec_L / Le;           % Eje x local
+        v_temp = j_orientations(mat_idx, :)';
+        w_vec = cross(u, v_temp); % Eje z local
+        w_vec = w_vec / norm(w_vec); % Normalizar por seguridad
+        v_vec = cross(w_vec, u);  % Eje y local recalculado ortogonalmente
+        
+        % Matriz de rotación base (3x3)
+        R0 = [u, v_vec, w_vec]'; 
+        % Matriz de rotación total (12x12) usando bloque diagonal
+        Re = blkdiag(R0, R0, R0, R0);
+        
+        % --- Matrices de Rigidez (Stiffness) ---
+        % Propiedades
+        E = E_vector(mat_idx); 
+        G = G_vector(mat_idx);
+        A = A_vector(mat_idx);
+        Iy = Iy_vector(mat_idx); Iz = Iz_vector(mat_idx);
+        Jt = J_vector(mat_idx);
+        ky = ky_vector(mat_idx); kz = kz_vector(mat_idx);
+        
+        % Funciones de forma derivadas (constantes)
+        invL = 1/Le;
+        Nx_diff = [-invL, invL]; % dN/dx
+        
+        % Axial (Ka)
+        Ba = zeros(1, 12);
+        Ba([1, 7]) = Nx_diff;
+        Ka = (Le * E * A) * (Ba' * Ba);
+        
+        % Bending (Kb)
+        Bb = zeros(2, 12);
+        Bb(1, [5, 11]) = Nx_diff; % Derivada para rotación y
+        Bb(2, [6, 12]) = Nx_diff; % Derivada para rotación z
+        Cb = diag([E*Iy, E*Iz]);
+        Kb = Le * (Bb' * Cb * Bb);
+        
+        % Shear (Ks)
+        N_Gauss = 0.5; % Valor medio para integración reducida en cortante
+        Bs = zeros(2, 12);
+        % Filas correspondientes a cortante en y y z
+        Bs(1, [2, 6, 8, 12]) = [Nx_diff(1), -N_Gauss, Nx_diff(2), -N_Gauss]; 
+        Bs(2, [3, 5, 9, 11]) = [Nx_diff(1),  N_Gauss, Nx_diff(2),  N_Gauss];
+        Cs = G * A * diag([ky, kz]);
+        Ks = Le * (Bs' * Cs * Bs);
+        
+        % Torsion (Kt)
+        Bt = zeros(1, 12);
+        Bt([4, 10]) = Nx_diff;
+        Kt = (Le * G * Jt * kt_vector(mat_idx)) * (Bt' * Bt);
+        
+        % Rigidez Local Total (en coordenadas locales)
+        Ke_local = Ka + Kb + Ks + Kt;
+        
+        % Rotar a coordenadas globales: K_global = R' * K_local * R
+        % Nota: En tu código original hacías R'*B'*C*B*R. 
+        % Matemáticamente (R'*B'*C*B*R) es lo mismo que R'*(K_local)*R
+        Ke_global = Re' * Ke_local * Re;
+        
+        % --- Matriz de Masa (Mass) y Fuerzas Distribuidas ---
+        Me_local = zeros(12, 12);
+        fe_local_dist = zeros(12, 1);
+        
+        rho = rho_vector(mat_idx);
+        Rho_mat = diag([rho*A, rho*A, rho*A, rho*Jt, rho*Iy, rho*Iz]);
+        
+        % Cargas en los nodos del elemento actual
+        q_vec = [Q_nodes(n1, :), Q_nodes(n2, :)]';
+        b_vec = [B_nodes(n1, :), B_nodes(n2, :)]';
+        
+        % Integración de Gauss
+        for k = 1:2
+            Ni = (1 + Xi(k)*[-1, 1]) / 2; % [N1, N2]
+            
+            % Matriz de funciones de forma N (6x12)
+            % Se puede construir usando producto de Kronecker para eficiencia
+            % N_mat = [N1*I, N2*I] donde I es identidad 6x6
+            N_mat = kron(Ni, eye(6)); 
+            
+            % Masa
+            detJ = Le / 2; % Determinante del Jacobiano
+            Me_local = Me_local + (w(k) * detJ * (N_mat' * Rho_mat * N_mat));
+            
+            % Fuerzas Distribuidas (Integración)
+            % fe = Integral(N' * N * q) + Masa * b
+            % Nota: Tu código original multiplica por R al principio y al final.
+            % Asumiré que q y b están en globales y deben rotarse o proyectarse.
+            % Siguiendo lógica original:
+            term_force = N_mat' * N_mat * Re * q_vec; 
+            fe_local_dist = fe_local_dist + (w(k) * detJ * Re' * term_force);
         end
-
-        Q = zeros(N_nodes,6);
-
-        for r=1:1:size(Qe,1)
-            Q(Qe(r,2),Qe(r,3)) = Q(Qe(r,2),Qe(r,3)) + Qe(r,1);
-        end
-
-        B = zeros(N_nodes,6);
-
-        for s=1:1:size(Be,1)
-            B(Be(s,2),Be(s,3)) = B(Be(s,2),Be(s,3)) + Be(s,1);
-        end
-
-        for e=1:1:N_elements
-            bb(:,e) = [B(Tn(e,1),:),B(Tn(e,2),:)]';
-            qq(:,e) = [Q(Tn(e,1),:),Q(Tn(e,2),:)]';
-            fe(:,e) = Me(:,:,e)*bb(:,e);
-            for kk=1:1:2
-                fe(:,e) = fe(:,e) + (w(kk)*l(e)*R(:,:,e)'*N_matrix(:,:,e,kk)'*N_matrix(:,:,e,kk)*R(:,:,e)*qq(:,e))/2;
-            end
-
-            for jj=1:1:6
-                Idof(jj,1) = 6*(Tn(e,1)-1)+jj;
-                Idof(6+jj,1) = 6*(Tn(e,2)-1)+jj;
-            end
-
-            f(Idof,1) = f(Idof,1) + fe(:,e);
-        end
-
+        
+        % Rotar matriz de masa
+        Me_global = Re' * Me_local * Re;
+        
+        % Añadir contribución de fuerzas de cuerpo (Me * b_vec)
+        fe_total = fe_local_dist + Me_global * b_vec;
+        
+        % --- Preparar Índices para Ensamblaje ---
+        dof_indices = [ (6*(n1-1)+1 : 6*n1), (6*(n2-1)+1 : 6*n2) ];
+        
+        % Generar rejilla de índices (meshgrid es rápido)
+        [C_idx, R_idx] = meshgrid(dof_indices, dof_indices);
+        
+        % Llenar vectores de almacenamiento
+        start_idx = idx_count + 1;
+        end_idx = idx_count + 144;
+        
+        I_idx(start_idx:end_idx) = R_idx(:);
+        J_idx(start_idx:end_idx) = C_idx(:);
+        K_val(start_idx:end_idx) = Ke_global(:);
+        M_val(start_idx:end_idx) = Me_global(:);
+        
+        idx_count = end_idx;
+        
+        % Ensamblar vector de fuerza directamente (es denso y rápido)
+        f(dof_indices) = f(dof_indices) + fe_total;
+    end
+    
+    % --- 3. Ensamblaje Final de Matrices ---
+    % Sumar duplicados automáticamente con sparse
+    K = sparse(I_idx, J_idx, K_val, Ndof, Ndof);
+    M = sparse(I_idx, J_idx, M_val, Ndof, Ndof);
+    
 end
