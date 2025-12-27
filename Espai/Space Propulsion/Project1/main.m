@@ -467,29 +467,26 @@ fprintf('Synchronous radius r_sync = %.6e m   (%.3f km)\n', r_sync, r_sync/1e3);
 
 %% INITIAL CONDITIONS
 i0 = deg2rad(30);
-theta0 = pi/2 - i0;
+theta0 = pi/2;
 phi0   = 0;
-
 Vr0 = 0;
-% Vtheta0 = 0; % V1?
-% Vphi0 = sqrt(muM / r_sync);
-Vtheta0 = sqrt(muM / r_sync); % V1?
-Vphi0 = 0;
+Vtheta0 = cos(i0) * sqrt(Mars.mu/r_sync);
+Vphi0 = sin(i0) * sqrt(Mars.mu/r_sync);
 
 y0_sat = [r_sync; theta0; phi0; Vr0; Vtheta0; Vphi0; m0_sat];
 
-fprintf('\n--- INITIAL CONDITIONS ---\n');
-fprintf('r(0)     = %.6e m   (%.3f km)\n', r_sync, r_sync/1e3);
-fprintf('theta(0) = %.6f rad\n', theta0);
-fprintf('phi(0)   = %.6f rad\n', phi0);
-fprintf('Vr(0)    = %.6f km/s\n', Vr0/1e3);
-fprintf('Vtheta(0)= %.6f km/s\n', Vtheta0/1e3);
-fprintf('Vphi(0)  = %.6f km/s\n', Vphi0/1e3);
-fprintf('m(0)     = %.3f kg\n\n', m0_sat);
+% fprintf('\n--- INITIAL CONDITIONS ---\n');
+% fprintf('r(0)     = %.6e m   (%.3f km)\n', r_sync, r_sync/1e3);
+% fprintf('theta(0) = %.6f rad\n', theta0);
+% fprintf('phi(0)   = %.6f rad\n', phi0);
+% fprintf('Vr(0)    = %.6f km/s\n', Vr0/1e3);
+% fprintf('Vtheta(0)= %.6f km/s\n', Vtheta0/1e3);
+% fprintf('Vphi(0)  = %.6f km/s\n', Vphi0/1e3);
+% fprintf('m(0)     = %.3f kg\n\n', m0_sat);
 
 options_sat = odeset('Events',@eventInPlane,'RelTol',1e-9,'AbsTol',1e-12);
 
-fprintf('Integrating until inclination reaches zero...\n');
+% fprintf('Integrating until inclination reaches zero...\n');
 
 [t_sat, y_sat] = ode45(@(t,y) satDynamics(t,y,muM,F_sat,c_e_sat,alpha_max), ...
                        [0 5e7], y0_sat, options_sat);
@@ -504,16 +501,16 @@ Vphi_end = y_sat(end,6);
 m_end = y_sat(end,7);
 i_end = pi/2 - theta_end;
 
-fprintf('\n--- FINAL STATE (COMPARE WITH EXPECTED RESULTS) ---\n');
-fprintf('t_end        = %.6e s  (%.6f days)\n', t_sat(end), t_sat(end)/86400);
-fprintf('r(t_end)     = %.6e m   (%.6f km)\n', r_end, r_end/1e3);
-fprintf('theta(t_end) = %.6f rad\n', theta_end);
-fprintf('phi(t_end)   = %.6f rad\n', phi_end);
-fprintf('Vr(t_end)    = %.6f km/s\n', Vr_end/1e3);
-fprintf('Vtheta(t_end)= %.6e km/s\n', Vtheta_end/1e3);
-fprintf('Vphi(t_end)  = %.6f km/s\n', Vphi_end/1e3);
-fprintf('m(t_end)     = %.6f kg\n', m_end);
-fprintf('i(t_end)     = %.6f deg\n\n', rad2deg(i_end));
+% fprintf('\n--- FINAL STATE (COMPARE WITH EXPECTED RESULTS) ---\n');
+% fprintf('t_end        = %.6e s  (%.6f days)\n', t_sat(end), t_sat(end)/86400);
+% fprintf('r(t_end)     = %.6e m   (%.6f km)\n', r_end, r_end/1e3);
+% fprintf('theta(t_end) = %.6f rad\n', theta_end);
+% fprintf('phi(t_end)   = %.6f rad\n', phi_end);
+% fprintf('Vr(t_end)    = %.6f km/s\n', Vr_end/1e3);
+% fprintf('Vtheta(t_end)= %.6e km/s\n', Vtheta_end/1e3);
+% fprintf('Vphi(t_end)  = %.6f km/s\n', Vphi_end/1e3);
+% fprintf('m(t_end)     = %.6f kg\n', m_end);
+% fprintf('i(t_end)     = %.6f deg\n\n', rad2deg(i_end));
 
 spherical_plot(y_sat(1,:),y_sat(2,:),y_sat(3,:))
 

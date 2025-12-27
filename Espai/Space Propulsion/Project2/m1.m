@@ -1,0 +1,69 @@
+%%% Análisision thruster, modelo 1D, Child-Langmuir.
+%% Init
+clear; close all; clc; clearvars
+
+%% Parámetros físicos y del problema
+epsilon0 = 8.854187817e-12;   % Permitividad del vacío (F/m)
+e_charge = 1.602176634e-19;   % Carga elemental (C)
+m_xenon = 2.1802e-25;         % Masa del ion Xenon (kg)
+g0 = 9.80665;                 % Gravedad estándar (m/s^2)
+
+V = 900;                      % Voltaje total de aceleración (V)
+d_a = 1.0e-3;                 % Gap acelerador d_a = 1 mm (m)
+d_d = 1.2e-3;                 % Gap decelerador d_d = 1.2 mm (m)
+
+%% 1) Densidad de corriente iónica j (Child-Langmuir 1D)
+j = child_langmuir_current_density(V, d_a, m_xenon, epsilon0, e_charge);
+
+%% 2) Voltaje neto mínimo VN que preserva la densidad de corriente
+% Relación del apunte:
+%   d_d/d_a = 1 - R^(5/2)/(1 + 2 R^(5/2))
+% con R = VN / V
+
+R_min = solve_minimum_R_for_gap_ratio(d_a, d_d);
+VN_min = R_min * V;
+
+%% 3) Impulso específico asociado a VN
+% Velocidad de salida del ion
+c = sqrt(2 * e_charge * VN_min / m_xenon);   % m/s
+Isp = c / g0;                                % s
+
+%% 4) Densidad de empuje F/A
+% Flujo másico por unidad de área
+m_dot_per_area = (j / e_charge) * m_xenon;   % kg/(s·m^2)
+
+% Densidad de empuje
+F_per_area = m_dot_per_area * c;              % N/m^2
+
+%% Resultados
+fprintf('\n=== RESULTS IONIC ENGINE ===\n')
+fprintf('1. Ion current density (j): %.4f A/m^2\n', j)
+fprintf('2. Limit minimum net voltage (VN): %.4f V\n', VN_min)
+fprintf('3. Specific impulse (Isp): %.4f s\n', Isp)
+fprintf('4. Thrust density (F/A): %.4f N/m^2\n', F_per_area)
+fprintf('=============================\n\n')
+
+%% --- Funciones auxiliares ---
+
+function j = child_langmuir_current_density(V, d, m_i, epsilon0, e_charge)
+% Ley de Child-Langmuir 1D
+    j = (4/9) * epsilon0 * sqrt(2 * e_charge / m_i) * V^(3/2) / d^2;
+end
+
+function R_min = solve_minimum_R_for_gap_ratio(d_a, d_d)
+% Devuelve el valor mínimo R = VN/V físicamente admisible
+% según la condición del ion thruster del apunte
+
+    ratio = d_d / d_a;
+
+    if ratio <= 1
+        % Caso general (poco habitual aquí): resolver igualdad
+        f = @(R) ratio - (1 - R.^(5/2) ./ (1 + 2 * R.^(5/2)));
+        R_min = fzero(f, [1e-6, 1]);
+    else
+        % Caso típico del enunciado: d_d > d_a
+        % Valor crítico obtenido del límite físico del potencial
+        R_min = 0.609;   % valor tabulado / deducido en las slides
+    end
+end
+

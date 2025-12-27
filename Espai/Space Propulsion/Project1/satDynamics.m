@@ -3,7 +3,6 @@ function dy = satDynamics(t,y,mu,F,ce,alpha_max)
     Vr=y(4); Vt=y(5); Vp=y(6);
     m=y(7);
 
-    V = sqrt(Vr^2+Vt^2+Vp^2);
     alpha = alpha_max*cos(ph);
 
     % F_in = F*cos(alpha);
@@ -14,18 +13,15 @@ function dy = satDynamics(t,y,mu,F,ce,alpha_max)
     % Fphi = F_perp;
 
     Ftheta = F*cos(alpha);
-    Fr = F*sin(alpha);
-    Fphi = 0; %?  
+    Fr = 0;
+    Fphi = F*sin(alpha); %?  
    
-    dy=zeros(7,1);
 
-    dy(1)=Vr;
-    dy(2)=Vt/r;
-    dy(3)=Vp/(r*sin(th));
-
-    dy(4)= -mu/r^2 + (Vt^2+Vp^2)/r + Fr/m;
-    dy(5)= -(Vr*Vt)/r + Vp^2/(r*tan(th)) + Ftheta/m;
-    dy(6)= -(Vr*Vp)/r - (Vt*Vp)/(r*tan(th)) + Fphi/m;
-
-    dy(7)= -F/ce;
+    dy = [Vr;
+        Vt/r;
+        Vp/(r*sin(th));
+        -mu/r^2 + (Vt^2+Vp^2)/r + Fr/m;
+        -(Vr*Vt)/r + Vp^2/(r*tan(th)) + Ftheta/m;
+        -(Vr*Vp)/r - (Vt*Vp)/(r*tan(th)) + Fphi/m;
+        -F/ce];
 end
