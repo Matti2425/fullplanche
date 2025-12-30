@@ -9,6 +9,7 @@ AU_KM = 149_597_870.7               # 1 AU in km (IAU 2012) IAU 2012, Resolution
 SECONDS_PER_DAY = 86400.0
 
 DEG2RAD = np.pi / 180.0
+TWOPI = np.pi * 2
 
 # ======================================
 # Time: Julian Date (JD) and Julian Century (JC)
@@ -163,29 +164,34 @@ def au_per_day_to_km_per_s(v_au_day):
 # ======================================
 # Step 6: Kepler equation solver (degrees in, radians out)
 # ======================================
-def kepler_newton_deg(M_deg, e, tol=1e-12, max_iter=50):
+def halley_solver(M_deg, e, tol=1e-12, max_iter=30):
     """
-    Solve Kepler's equation M = E - e sin(E) with Newton iteration.
-    Algorithm: Standard Newton–Raphson as in Curtis (2014), Sec. 3.6.
+    Halley's method for solving Kepler's equation with stability control.
     """
     M = np.deg2rad(M_deg)
-    twopi = 2.0 * np.pi
-
     # normalize M
-    M = M % twopi
-
+    M = M % TWOPI
     # initial guess
     E = M if e < 0.8 else np.pi
-
-    for _ in range(max_iter):
+    history = [E]
+    for i in range(max_iter):
         f = E - e * np.sin(E) - M
-        fp = 1.0 - e * np.cos(E)
-        dE = -f / fp
-        E += dE
-        if abs(dE) < tol:
-            break
+        f1 = 1 - e * np.cos(E)
+        f2 = e * np.sin(E)
 
-    return E % twopi
+        denom = f1 - 0.5 * f * f2 / f1 if abs(f1) > 1e-14 else 1e-14
+
+        # Avoid dividing by extremely small values
+        if abs(denom) < 1e-14:
+            denom = np.sign(denom) * 1e-14 if denom != 0 else 1e-14
+
+        dE = -f / denom
+        E += dE
+        history.append(E)
+
+        if abs(dE) < tol:
+            return E, i + 1, np.array(history)
+    return E, max_iter, np.array(history)
 
 # ======================================
 # Step 7: True anomaly θ
@@ -264,7 +270,7 @@ def planet_state(planet_name, year, month, day, model="full",
     # 2) Compute derived angles and anomalies
     h = angular_momentum(elem["a"], elem["e"])
     M_deg = mean_anomaly_deg(elem["L"], elem["w_bar"])
-    E = kepler_newton_deg(M_deg, elem["e"])
+    E, n_i, hist = halley_solver(M_deg, elem["e"])
     theta = true_anomaly(E, elem["e"])
 
     # 3) PQW -> ecliptic
@@ -673,7 +679,7 @@ print("---- fourth test case: Hohmann Transfer----")
 r1_vec = np.array([1.0, 0.0, 0.0])
 r2_vec = np.array([-2.0, 0.0, 0.0])   # exactly opposite
 
-# Hohmann time of flight (half period of transfer ellipse)
+# fourth test case. Hohmann time of flight (half period of transfer ellipse)
 a = 0.5*(1.0 + 2.0)
 dt = np.pi * np.sqrt(a**3 / mu)
 
