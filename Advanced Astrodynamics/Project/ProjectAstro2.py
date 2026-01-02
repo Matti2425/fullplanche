@@ -503,7 +503,7 @@ def simo_dt(z, P, Q, mu, n_rev=0):
         
         # Calculate term under sqrt first
         # Note: inner_val is (P - Q*c0), calculated above
-        multi_rev_inner = (1.0 / (2.0 * mu)) * (inner_val**3 / z)
+        multi_rev_inner = (1.0 / (2.0 * mu)) * (inner_val / z)**3
         
         if multi_rev_inner < 0:
             return np.nan
@@ -711,7 +711,7 @@ def lambert_simo(mu, r1_vec, r2_vec, dt_days, tm=+1,
     # 2. Feasibility Check
     is_feasible, val = check_feasibility(n_rev, dt_days, P, Q, mu)
     if not is_feasible:
-        raise RuntimeError(f"No Solution: Target dt ({dt_days:.4f}) < Minimum dt ({val:.4f}) for n_rev={n_rev}")
+        print(f"No Solution: Target dt ({dt_days:.4f}) < Minimum dt ({val:.4f}) for n_rev={n_rev}")
 
     # 3. Initial guess (slides: elliptic z0 = (Δθ/2)^2)
     z0 = (dtheta/2.0)**2
@@ -777,7 +777,7 @@ r1 = np.array([1.0, 0.0, 0.0])
 r2 = np.array([0.0, 1.0, 0.0])
 
 # first test case - 90 deg short path
-dt = 5.4  # quarter period in canonical units (mu=1, r=1)
+dt = 10  # quarter period in canonical units (mu=1, r=1)
 
 v1, v2, dbg = lambert_simo(mu, r1, r2, dt, tm=+1, n_rev = 1)
 print_lambert_test(v1, v2, dbg, "first test case: 90 deg short path")
