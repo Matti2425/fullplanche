@@ -460,46 +460,109 @@ def lambert_geometry(r1_vec, r2_vec, tm=+1):
 # (slide "Simó (1973): transfer time equation")
 # ---------------------------
 # Simó transfer-time equation: it predicts the time-of-flight for a given z.
-def simo_dt(z, P, Q, mu):
-    # 1. Calculate Stumpff functions for z
-    # Corresponds to c0(z), c1(z) in the equation
+def simo_dt(z, P, Q, mu, n_rev=0):
+    """
+    Calculates Δt according to Simó's equation.
+    Now includes the multi-revolution term (blue part of the slide).
+    """
+    # 1. Stumpff functions
     c0, c1, _, _ = stumpff_c0c1c2c3(z)
-    
-    # 2. Calculate Stumpff functions for 4*z
-    # Corresponds to c2(4z), c3(4z) in the equation
-    # Note: Renamed variables because python variables cannot start with a number (e.g., 4c0)
     _, _, c2_4z, c3_4z = stumpff_c0c1c2c3(4.0 * z)
     
-    # Denominator: [c1(z)]^3
-    denom = c1**3
-    if abs(denom) < 1e-14:
+    # Safety: c1(z) is in the denominator.
+    # c1(z) -> 0 when z -> (k*pi)^2. This creates singularities.
+    if abs(c1) < 1e-12:
         return np.nan
-        
-    # 3. Square Root Term
-    # Equation: sqrt( 2 * (P - Q*c0(z)) / mu )
-    # Note the added factor of 2.0 and the use of c0(z)
+
+    denom = c1**3
+    
+    # 2. Main Term (Principal Value)
     inner_val = (P - Q * c0)
+    
+    # For real solutions, the term under sqrt must be >= 0
     if inner_val < 0.0:
         return np.nan
-    inner_sqrt = 2.0 * inner_val / mu
-    
-    if inner_sqrt < 0.0:
-        return np.nan
         
-    sqrt_term = np.sqrt(inner_sqrt)
-
-    # 4. Numerator Terms
-    # Term 1: 2 * P * c3(4z)
-    term1 = 2.0 * P * c3_4z
+    sqrt_term_principal = np.sqrt(2.0 * inner_val / mu)
     
-    # Term 2: Q * [ c1(z)*c2(4z) - 2*c0(z)*c3(4z) ]
+    term1 = 2.0 * P * c3_4z
     term2 = Q * (c1 * c2_4z - 2.0 * c0 * c3_4z)
     
-    # 5. Final Calculation
-    # dt = (Numerator / Denominator) * SqrtTerm
-    time = ((term1 + term2) / denom) * sqrt_term
+    dt_principal = ((term1 + term2) / denom) * sqrt_term_principal
     
-    return time
+    # 3. Multi-Revolution Term
+    dt_multirev = 0.0
+    if n_rev > 0:
+        # Multi-rev is only possible for Elliptical orbits (z > 0)
+        # As z -> 0 (parabolic), Period -> infinity.
+        if z <= 1e-15: 
+            return np.inf 
+            
+        # The term from the image:
+        # (pi * n_rev / c1^3) * sqrt( (1/2mu) * ( (P - Q*c0)^3 / z ) )
+        
+        # Calculate term under sqrt first
+        # Note: inner_val is (P - Q*c0), calculated above
+        multi_rev_inner = (1.0 / (2.0 * mu)) * (inner_val**3 / z)
+        
+        if multi_rev_inner < 0:
+            return np.nan
+            
+        sqrt_term_multirev = np.sqrt(multi_rev_inner)
+        
+        dt_multirev = (np.pi * n_rev / denom) * sqrt_term_multirev
+
+    return dt_principal + dt_multirev
+
+def check_feasibility(n_rev, dt_target, P, Q, mu):
+    """
+    Step 2: Checks if the problem admits a solution.
+    If n_rev > 0, we must find the minimum time (dt_min).
+    If dt_target < dt_min, the transfer is impossible.
+    """
+    if n_rev == 0:
+        # Single rev is generally feasible provided geometry allows it 
+        # (function is monotonic for single-rev in specific domains)
+        return True, 0.0
+
+    # Domain for search:
+    # For n_rev > 0, z must be > 0.
+    # The domain is roughly (0, pi^2) for the first branch.
+    # We search for the minimum of simo_dt(z) in this range.
+    
+    # Golden Section Search for minimum
+    low = 1e-5
+    high = np.pi**2 - 1e-5
+    tol = 1e-9
+    gr = (np.sqrt(5) + 1) / 2
+    
+    c = high - (high - low) / gr
+    d = low + (high - low) / gr
+    
+    while abs(high - low) > tol:
+        tc = simo_dt(c, P, Q, mu, n_rev)
+        td = simo_dt(d, P, Q, mu, n_rev)
+        
+        # Treat NaNs as infinity (invalid regions)
+        if np.isnan(tc): tc = np.inf
+        if np.isnan(td): td = np.inf
+            
+        if tc < td:
+            high = d
+            d = c
+            c = high - (high - low) / gr
+        else:
+            low = c
+            c = d
+            d = low + (high - low) / gr
+            
+    z_min = (low + high) / 2
+    dt_min = simo_dt(z_min, P, Q, mu, n_rev)
+    
+    if dt_target < dt_min:
+        return False, dt_min
+        
+    return True, dt_min
 
 # step 4 of the slide: find z such that Δt(z) = dt_target.
 def solve_z(dt_target, P, Q, mu, z0, tol=1e-12, max_iter=100):
@@ -630,7 +693,7 @@ def terminal_velocities_from_ap(mu, r1_vec, r2_vec, a, p, dtheta, tm, plane_norm
 # Main: Simó Lambert (single revolution)
 # ---------------------------
 def lambert_simo(mu, r1_vec, r2_vec, dt_days, tm=+1,
-                 plane_normal=np.array([0.0,0.0,1.0]), eps_pi=1e-10):
+                 plane_normal=np.array([0.0,0.0,1.0]), eps_pi=1e-10, n_rev = 0):
     """
     Returns v1, v2 in AU/day (if r in AU and mu in AU^3/day^2)
 
@@ -642,11 +705,18 @@ def lambert_simo(mu, r1_vec, r2_vec, dt_days, tm=+1,
     r1_vec = np.asarray(r1_vec, float)
     r2_vec = np.asarray(r2_vec, float)
 
-    # geometry
+    # 1. Geometry
     r1, r2, dtheta, P, Q = lambert_geometry(r1_vec, r2_vec, tm=tm)
 
-    # initial guess (slides: elliptic z0 = (Δθ/2)^2)
+    # 2. Feasibility Check
+    is_feasible, val = check_feasibility(n_rev, dt_days, P, Q, mu)
+    if not is_feasible:
+        raise RuntimeError(f"No Solution: Target dt ({dt_days:.4f}) < Minimum dt ({val:.4f}) for n_rev={n_rev}")
+
+    # 3. Initial guess (slides: elliptic z0 = (Δθ/2)^2)
     z0 = (dtheta/2.0)**2
+
+    # 4. Iterate z value
     z = solve_z(dt_days, P, Q, mu, z0)
 
     # --- consistency check: does z reproduce the target dt?
@@ -670,6 +740,7 @@ def lambert_simo(mu, r1_vec, r2_vec, dt_days, tm=+1,
         raise RuntimeError("Invalid p denom: P - Q*c0(z) <= 0")
     p = 2.0*(A**2)*(C**2) / denom
 
+    # 5. Compute terminal velocities
     v1, v2, extra = terminal_velocities_from_ap(
         mu, r1_vec, r2_vec, a, p, dtheta, tm,
         plane_normal=plane_normal
@@ -706,9 +777,9 @@ r1 = np.array([1.0, 0.0, 0.0])
 r2 = np.array([0.0, 1.0, 0.0])
 
 # first test case - 90 deg short path
-dt = np.pi/2  # quarter period in canonical units (mu=1, r=1)
+dt = 5.4  # quarter period in canonical units (mu=1, r=1)
 
-v1, v2, dbg = lambert_simo(mu, r1, r2, dt, tm=+1)
+v1, v2, dbg = lambert_simo(mu, r1, r2, dt, tm=+1, n_rev = 1)
 print_lambert_test(v1, v2, dbg, "first test case: 90 deg short path")
 print("-----------------------------------------------------------------------------")
 
