@@ -1,3 +1,7 @@
+# Lambert's problem and PCP script
+# Leoni Fritsch, Martí Güell, Gerard Martínez
+
+# Actual Lambert's Simó calculation starts at line 380
 import numpy as np
 
 # ======================================
@@ -15,7 +19,7 @@ TWOPI = np.pi * 2
 # Time: Julian Date (JD) and Julian Century (JC)
 # ======================================
 def JD_from_UTC(year, month, day):
-    """Julian Date at 0h UTC. Same formula used before."""
+    """Julian Date at 0h UTC. Same formula used in A1."""
     if month <= 2:
         year = year - 1
         month = month + 12
@@ -382,7 +386,7 @@ def unit(v, eps=1e-16):
         raise ValueError("unit(): zero norm vector")
     return v / n
 
-# They let you write the transfer-time equation in a unified way for:
+# We write the transfer-time equation in a unified way for:
 # elliptic (z > 0 → cos/sin)
 # hyperbolic (z < 0 → cosh/sinh)
 # near-parabolic (z ≈ 0 → Taylor limits)
@@ -416,35 +420,37 @@ def stumpff_c0c1c2c3(z, eps=1e-14):
 # tm decides direction:
 # tm=+1 → prograde (CCW)
 # tm=-1 → retrograde (CW)
-# long_way=True chooses the long path (2π − short angle)
-def lambert_geometry(r1_vec, r2_vec, tm=+1, long_way=False):
+def lambert_geometry(r1_vec, r2_vec, tm=+1):
     """
     Compute Δθ, P, Q as in slides.
-    tm: +1 prograde (CCW), -1 retrograde (CW) using ecliptic z sign.
-    long_way: True -> 2π-Δθ
+    tm: +1 prograde (CCW), -1 retrograde (CW)
     """
     r1_vec = np.asarray(r1_vec, float)
     r2_vec = np.asarray(r2_vec, float)
 
     r1 = np.linalg.norm(r1_vec)
     r2 = np.linalg.norm(r2_vec)
-
-    cos_d = np.dot(r1_vec, r2_vec) / (r1 * r2)
-    cos_d = np.clip(cos_d, -1.0, 1.0)
-    dtheta = np.arccos(cos_d)  # [0, pi]
-
-    # pick direction via cross product z in ecliptic frame
-    cz = np.cross(r1_vec, r2_vec)[2]
-    is_ccw = (cz >= 0.0)
-    want_ccw = (tm == +1)
-    if want_ccw != is_ccw:
-        dtheta = 2.0*np.pi - dtheta
-
-    if long_way:
-        dtheta = 2.0*np.pi - dtheta
-
-    # P,Q as in Simó slide
     P = r1 + r2
+
+    # 1. First check the direction (tm) to determine the plane normal
+    nh = np.cross(r1_vec, r2_vec)
+    if np.linalg.norm(nh) < 1e-14:
+        # Collinear: use Z-axis as default reference
+        nhat = np.array([0.0, 0.0, 1.0]) if tm == +1 else np.array([0.0, 0.0, -1.0])
+    else:
+        nhat_base = unit(nh)
+        # For tm=+1 (CCW), we want nhat.z >= 0. For tm=-1 (CW), we want nhat.z <= 0.
+        if (tm == +1 and nhat_base[2] >= 0) or (tm == -1 and nhat_base[2] <= 0):
+            nhat = nhat_base
+        else:
+            nhat = -nhat_base
+
+    # 2. Make calculations based on that
+    # Angle dtheta is the angle from r1 to r2 around nhat
+    cos_d = np.clip(np.dot(r1_vec, r2_vec) / (r1 * r2), -1.0, 1.0)
+    sin_d = np.dot(np.cross(r1_vec, r2_vec), nhat) / (r1 * r2)
+    dtheta = np.arctan2(sin_d, cos_d) % (2.0 * np.pi)
+    
     Q = 2.0 * np.sqrt(r1*r2) * np.cos(dtheta/2.0)
 
     return r1, r2, dtheta, P, Q
@@ -455,106 +461,163 @@ def lambert_geometry(r1_vec, r2_vec, tm=+1, long_way=False):
 # ---------------------------
 # Simó transfer-time equation: it predicts the time-of-flight for a given z.
 def simo_dt(z, P, Q, mu):
-    c0, c1, c2, c3 = stumpff_c0c1c2c3(z)
-
+    # 1. Calculate Stumpff functions for z
+    # Corresponds to c0(z), c1(z) in the equation
+    c0, c1, _, _ = stumpff_c0c1c2c3(z)
+    
+    # 2. Calculate Stumpff functions for 4*z
+    # Corresponds to c2(4z), c3(4z) in the equation
+    # Note: Renamed variables because python variables cannot start with a number (e.g., 4c0)
+    _, _, c2_4z, c3_4z = stumpff_c0c1c2c3(4.0 * z)
+    
+    # Denominator: [c1(z)]^3
     denom = c1**3
-    if abs(denom) < 1e-16:
+    if abs(denom) < 1e-14:
         return np.nan
-
-    bracket = P - Q*c0
-    if bracket <= 0.0:
+        
+    # 3. Square Root Term
+    # Equation: sqrt( 2 * (P - Q*c0(z)) / mu )
+    # Note the added factor of 2.0 and the use of c0(z)
+    inner_val = (P - Q * c0)
+    if inner_val < 0.0:
         return np.nan
+    inner_sqrt = 2.0 * inner_val / mu
+    
+    if inner_sqrt < 0.0:
+        return np.nan
+        
+    sqrt_term = np.sqrt(inner_sqrt)
 
-    # NOTE: use c2(z), c3(z), not c2(4z), c3(4z)
-    num = 2.0*P*c3 + Q*(c1*c2 - 2.0*c0*c3)
-
-    return (num/denom) * np.sqrt(bracket/mu)
+    # 4. Numerator Terms
+    # Term 1: 2 * P * c3(4z)
+    term1 = 2.0 * P * c3_4z
+    
+    # Term 2: Q * [ c1(z)*c2(4z) - 2*c0(z)*c3(4z) ]
+    term2 = Q * (c1 * c2_4z - 2.0 * c0 * c3_4z)
+    
+    # 5. Final Calculation
+    # dt = (Numerator / Denominator) * SqrtTerm
+    time = ((term1 + term2) / denom) * sqrt_term
+    
+    return time
 
 # step 4 of the slide: find z such that Δt(z) = dt_target.
-def solve_z_newton(dt_target, P, Q, mu, z0, tol=1e-12, max_iter=60):
+def solve_z(dt_target, P, Q, mu, z0, tol=1e-12, max_iter=100):
     """
-    Simple damped Newton with numerical derivative (works well for your cases).
+    Robust split-region bisection solver for Simó's equation.
     """
-    z = float(z0)
+    # 1. Determine if the solution is elliptic (z > 0) or hyperbolic (z < 0)
+    # based on the parabolic transfer time (z = 0)
+    dt_parabolic = simo_dt(0.0, P, Q, mu)
+    
+    if dt_target > dt_parabolic:
+        # Elliptic solution (z > 0)
+        low = 0.0
+        high = np.pi**2 - 1e-15
+    else:
+        # Hyperbolic solution (z < 0)
+        high = 0.0
+        if Q > 0:
+            low = -(np.arccosh(P/Q))**2 + 1e-15
+        else:
+            low = -1e6 # Safe limit to avoid overflow in cosh
+            # Expand low if target dt is extremely small
+            while simo_dt(low, P, Q, mu) > dt_target and low > -1e12:
+                low *= 10.0
+    
+    # Bisection
     for _ in range(max_iter):
+        z = 0.5 * (low + high)
         dt = simo_dt(z, P, Q, mu)
-        if not np.isfinite(dt):
-            z *= 0.5
-            continue
-
-        F = dt - dt_target
-        if abs(F) < tol:
-            return z
-
-        dz = 1e-6*(1.0 + abs(z))
-        dt_p = simo_dt(z + dz, P, Q, mu)
-        dt_m = simo_dt(z - dz, P, Q, mu)
-        if not (np.isfinite(dt_p) and np.isfinite(dt_m)):
-            z *= 0.8
-            continue
-
-        dF = (dt_p - dt_m)/(2.0*dz)
-        if abs(dF) < 1e-14:
-            z *= 0.8
-            continue
-
-        step = F/dF
-        z = z - 0.7*step  # damping
-    raise RuntimeError("solve_z_newton: no convergence")
+        
+        if not np.isfinite(dt) or dt > dt_target:
+            high = z
+        else:
+            low = z
+            
+        if (high - low) < tol:
+            break
+            
+    return 0.5 * (low + high)
 
 
 def terminal_velocities_from_ap(mu, r1_vec, r2_vec, a, p, dtheta, tm, plane_normal=None):
     r1 = np.linalg.norm(r1_vec)
     r2 = np.linalg.norm(r2_vec)
 
-    # plane normal
+    # 1. Plane Normal and Tangential Unit Vectors
     nh = np.cross(r1_vec, r2_vec)
     if np.linalg.norm(nh) < 1e-14:
         if plane_normal is None:
-            raise RuntimeError("Collinear geometry (Δθ≈0 or π): provide plane_normal.")
-        nhat = unit(plane_normal)
+            # Collinear default reference
+            nhat = np.array([0.0, 0.0, 1.0]) if tm == +1 else np.array([0.0, 0.0, -1.0])
+        else:
+            nhat = unit(plane_normal)
     else:
-        nhat = unit(nh)
+        nhat_base = unit(nh)
+        # Choose nhat to match tm direction (Prograde/CCW vs Retrograde/CW)
+        if (tm == +1 and nhat_base[2] >= 0) or (tm == -1 and nhat_base[2] <= 0):
+            nhat = nhat_base
+        else:
+            nhat = -nhat_base
 
-    # in-plane tangential directions
     rhat1 = unit(r1_vec)
     rhat2 = unit(r2_vec)
-    t1 = unit(np.cross(nhat, rhat1)) * (1.0 if tm == +1 else -1.0)
-    t2 = unit(np.cross(nhat, rhat2)) * (1.0 if tm == +1 else -1.0)
+    
+    # Calculate Tangential Direction Vectors
+    # (n x r) points in the direction of motion relative to nhat
+    t1 = unit(np.cross(nhat, rhat1))
+    t2 = unit(np.cross(nhat, rhat2))
 
-    # eccentricity (elliptic)
+    # 2. Eccentricity
     val = 1.0 - p/a
-    if val < 0.0:
-        raise RuntimeError("Hyperbolic/parabolic handling not implemented in this helper.")
-    e = np.sqrt(val)
-    if e < 1e-14:
-        raise RuntimeError("Near-circular transfer: θ is poorly defined.")
+    # Numerical noise handling for circular orbits
+    if abs(val) < 1e-12: 
+        val = 0.0
+    
+    e = np.sqrt(abs(val))
 
-    # cos(theta) at each endpoint
+    # --- Handle Circular Case (e ~ 0) ---
+    if e < 1e-10:
+        # In a circle: v_radial = 0, v_tangential = sqrt(mu/r)
+        v1 = np.sqrt(mu/r1) * t1
+        v2 = np.sqrt(mu/r2) * t2
+        return v1, v2, dict(e=0.0, th1=0.0, th2=dtheta, r_check_err=0.0)
+    # --------------------------------------------------
+
+    # 3. Standard Case (e > 0)
+    # cos(theta) from conic equation: r = p / (1 + e*cos(theta))
     c1 = (p/r1 - 1.0)/e
     c2 = (p/r2 - 1.0)/e
+    
+    # Clip to avoid domain errors (e.g. 1.0000000001)
     c1 = np.clip(c1, -1.0, 1.0)
     c2 = np.clip(c2, -1.0, 1.0)
 
-    # choose θ1 sign so that θ2=θ1+dθ matches cosθ2 best
+    # Resolve quadrant ambiguity for theta1
     th1_candidates = [np.arccos(c1), -np.arccos(c1)]
     best = None
     for th1 in th1_candidates:
         th2 = th1 + dtheta
-        err = abs(np.cos(th2) - c2)
+        # Check if this th1/th2 pair matches r2
+        cos_th2_derived = np.cos(th2)
+        err = abs(cos_th2_derived - c2)
         if best is None or err < best[0]:
             best = (err, th1, th2)
     _, th1, th2 = best
 
-    # velocities in RT frame
+    # 4. Compute Velocities in Perifocal components
     fac = np.sqrt(mu/p)
-    v1_r = fac * e*np.sin(th1)
-    v1_t = fac * (1.0 + e*np.cos(th1))
-    v2_r = fac * e*np.sin(th2)
-    v2_t = fac * (1.0 + e*np.cos(th2))
+    
+    v1_r = fac * e * np.sin(th1)
+    v1_t = fac * (1.0 + e * np.cos(th1))
+    
+    v2_r = fac * e * np.sin(th2)
+    v2_t = fac * (1.0 + e * np.cos(th2))
 
-    v1 = v1_r*rhat1 + v1_t*t1
-    v2 = v2_r*rhat2 + v2_t*t2
+    # Reconstruct Vectors
+    v1 = v1_r * rhat1 + v1_t * t1
+    v2 = v2_r * rhat2 + v2_t * t2
 
     r1_check = p / (1.0 + e*np.cos(th1))
     r2_check = p / (1.0 + e*np.cos(th2))
@@ -566,7 +629,7 @@ def terminal_velocities_from_ap(mu, r1_vec, r2_vec, a, p, dtheta, tm, plane_norm
 # ---------------------------
 # Main: Simó Lambert (single revolution)
 # ---------------------------
-def lambert_simo(mu, r1_vec, r2_vec, dt_days, tm=+1, long_way=False,
+def lambert_simo(mu, r1_vec, r2_vec, dt_days, tm=+1,
                  plane_normal=np.array([0.0,0.0,1.0]), eps_pi=1e-10):
     """
     Returns v1, v2 in AU/day (if r in AU and mu in AU^3/day^2)
@@ -580,11 +643,11 @@ def lambert_simo(mu, r1_vec, r2_vec, dt_days, tm=+1, long_way=False,
     r2_vec = np.asarray(r2_vec, float)
 
     # geometry
-    r1, r2, dtheta, P, Q = lambert_geometry(r1_vec, r2_vec, tm=tm, long_way=long_way)
+    r1, r2, dtheta, P, Q = lambert_geometry(r1_vec, r2_vec, tm=tm)
 
     # initial guess (slides: elliptic z0 = (Δθ/2)^2)
     z0 = (dtheta/2.0)**2
-    z = solve_z_newton(dt_days, P, Q, mu, z0)
+    z = solve_z(dt_days, P, Q, mu, z0)
 
     # --- consistency check: does z reproduce the target dt?
     dt_from_z = simo_dt(z, P, Q, mu)
@@ -625,6 +688,15 @@ def lambert_simo(mu, r1_vec, r2_vec, dt_days, tm=+1, long_way=False,
     return v1, v2, debug
 
 
+def print_lambert_test(v1, v2, dbg, test_name):
+    print(f"---- {test_name} ----")
+    print("dtheta [deg]:", dbg["dtheta_deg"])
+    print("z:", dbg["z"], " a:", dbg["a"], " p:", dbg["p"])
+    print("dt_err:", dbg["dt_err"], " r_check_err:", dbg["r_check_err"])
+    print("v1:", v1)
+    print("v2:", v2)
+
+
 # ============================================================
 # Elementary test cases (Slide 51)
 # ============================================================#
@@ -636,61 +708,44 @@ r2 = np.array([0.0, 1.0, 0.0])
 # first test case - 90 deg short path
 dt = np.pi/2  # quarter period in canonical units (mu=1, r=1)
 
-v1, v2, dbg = lambert_simo(mu, r1, r2, dt, tm=+1, long_way=False)
-
-print("-----------------------------------------------------------------------------")
-print("ELEMENTARY TEST CASES")
-print("---- first test case: 90 deg short path ----")
-print("Δθ [deg]:", dbg["dtheta_deg"])
-print("z:", dbg["z"], " a:", dbg["a"], " p:", dbg["p"])
-print("dt_err:", dbg["dt_err"], " r_check_err:", dbg["r_check_err"])
-print("v1:", v1)
-print("v2:", v2)
-
-
-print("-----------------------------------------------------------------------------")
-print("---- second test case: 270 deg long path ----")
-# second test case - 270 deg long path
-dt = 3*np.pi/2
-
-v1, v2, dbg = lambert_simo(mu, r1, r2, dt, tm=+1, long_way=True)
-
-print("Δθ [deg]:", dbg["dtheta_deg"])
-print("z:", dbg["z"], " a:", dbg["a"], " p:", dbg["p"])
-print("dt_err:", dbg["dt_err"], " r_check_err:", dbg["r_check_err"])
-print("v1:", v1)
-print("v2:", v2)
+v1, v2, dbg = lambert_simo(mu, r1, r2, dt, tm=+1)
+print_lambert_test(v1, v2, dbg, "first test case: 90 deg short path")
 print("-----------------------------------------------------------------------------")
 
-# third test case tm=-1
-dt = 3*np.pi/2
-
-v1, v2, dbg = lambert_simo(mu, r1, r2, dt, tm=-1, long_way=False)
-print("---- third test case: 270 deg tm=-1----")
-print("Δθ [deg]:", dbg["dtheta_deg"])
-print("z:", dbg["z"], " a:", dbg["a"], " p:", dbg["p"])
-print("dt_err:", dbg["dt_err"], " r_check_err:", dbg["r_check_err"])
-print("v1:", v1,)
-print("v2:", v2,)
-
+# second test case - 90 deg long path
+v1, v2, dbg = lambert_simo(mu, r1, r2, 3*dt, tm=-1)
+print_lambert_test(v1, v2, dbg, "second test case: 90 deg long path")
 print("-----------------------------------------------------------------------------")
 
-print("---- fourth test case: Hohmann Transfer----")
+r1 = np.array([1.0, 0.0, 0.0])
+r2 = np.array([0.0, -1.0, 0.0])
+# third test case - 270 deg short path
+v1, v2, dbg = lambert_simo(mu, r1, r2, dt, tm=-1)
+print_lambert_test(v1, v2, dbg, "third test case: 270 deg short path")
+print("-----------------------------------------------------------------------------")
+
+# fourth test case - 270 deg long path
+v1, v2, dbg = lambert_simo(mu, r1, r2, 3*dt, tm=+1)
+print_lambert_test(v1, v2, dbg, "fourth test case: 270 deg long path")
+print("-----------------------------------------------------------------------------")
+
+# fifth test case - 90 deg rectilinear
+v1, v2, dbg = lambert_simo(mu, r1, r2, 0.01, tm=-1)
+print_lambert_test(v1, v2, dbg, "fifth test case: 90 deg rectilinear")
+print("-----------------------------------------------------------------------------")
+
+# Hohmann Transfer
 r1_vec = np.array([1.0, 0.0, 0.0])
 r2_vec = np.array([-2.0, 0.0, 0.0])   # exactly opposite
 
-# fourth test case. Hohmann time of flight (half period of transfer ellipse)
+# Hohmann time of flight (half period of transfer ellipse)
 a = 0.5*(1.0 + 2.0)
 dt = np.pi * np.sqrt(a**3 / mu)
 
-v1, v2, dbg = lambert_simo(mu, r1_vec, r2_vec, dt, tm=+1, long_way=False,
+v1, v2, dbg = lambert_simo(mu, r1_vec, r2_vec, dt, tm=+1,
                            plane_normal=np.array([0.0,0.0,1.0]))
 
 
-print("v1:", v1, "| |v1|=", np.linalg.norm(v1))
-print("v2:", v2, "| |v2|=", np.linalg.norm(v2))
-print("Δθ [deg]:", dbg["dtheta_deg"])
-print("z:", dbg["z"], " a:", dbg["a"], " p:", dbg["p"])
-print("dt_err:", dbg["dt_err"], " r_check_err:", dbg["r_check_err"])
+print_lambert_test(v1, v2, dbg, "Hohmann transfer: 180 deg CCW")
 
 
