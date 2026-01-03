@@ -60,7 +60,7 @@ switch(problem_type)
     case "bending"
     Fe = [1 N_nodes 3]; %Force = 1 at last node in DOF 3 (uz)
     case "torsion"
-    Fe = [1 N_nodes 5]; %Force = 1 at last node in DOF 5 (theta_y)
+    Fe = [1 N_nodes 4]; %Force = 1 at last node in DOF 4 (theta_x)
 end
 
 % Distributed forces (force, node, dof)
@@ -101,18 +101,18 @@ if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
         x2 = xn(Tn(e,2),:)'; % Node 2 of element e
         Le = norm(x2 - x1);  % Element lenght
     
-        i = (x2 - x1)/Le; 
-        j = j_orientations(Tm(e,1),:)';
-        k = cross(i,j);
+        i = (x2 - x1)/Le; % X axis unit vector
+        j = j_orientations(Tm(e,1),:)'; 
+        k = cross(i,j); % Z axis
     
-        % --- Rotación local Rp (6x6) ----------------------
+        % Rotación local Rp (6x6) 
         R3 = [i j k];
         Rp = blkdiag(R3, R3);
     
-        % --- Rotación global (12x12) ----------------------
+        % Rotación global (12x12)
         Re = blkdiag(Rp, Rp);
     
-        % --- Axial ----------------------------------------
+        % Axial
         Nx = [-1/Le; 1/Le];
         Ba_row = [Nx(1) 0 0 0 0 0 Nx(2) 0 0 0 0 0];
         Ba = sparse(Ba_row);
@@ -290,3 +290,40 @@ switch(problem_type)
     case "torsion"
         sgtitle('Static Solution: Torsion Test (Rotations)');
 end
+
+% --- 4. Plot mode shapes
+ 
+Phi_full = zeros(Ndof, n_modes);
+Phi_full(free_dofs, :) = Phi;
+x_span = xn(:,1);
+
+    
+for i = 1:n_modes
+        
+    uy = Phi_full(2:6:end, i);
+    uz = Phi_full(3:6:end, i); 
+    thx = Phi_full(4:6:end, i);
+
+    % Normalize for visualization
+        
+    scale = max(abs([uy; uz; thx]));      
+    uy = uy / scale;   
+    uz = uz / scale;
+    thx = thx / scale;
+
+    figure;
+    subplot(3,1,1)
+    plot(x_span, uy, 'LineWidth', 1.5); grid on;
+    ylabel('$u_y$', 'Interpreter','latex');
+
+   subplot(3,1,2)
+   plot(x_span, uz, 'LineWidth', 1.5); grid on;
+   ylabel('$u_z$', 'Interpreter','latex');
+
+   subplot(3,1,3)
+   plot(x_span, thx, 'LineWidth', 1.5); grid on;
+   ylabel('$\theta_x$', 'Interpreter','latex');
+   xlabel('Span $x$ [m]', 'Interpreter','latex');
+
+   sgtitle(sprintf('Mode %d  (f = %.2f Hz)', i, frequencies(i)));
+    end

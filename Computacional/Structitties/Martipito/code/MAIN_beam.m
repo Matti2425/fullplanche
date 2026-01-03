@@ -220,42 +220,6 @@ if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
     
     fprintf('Natural frequencies [Hz]:\n');
     disp(frequencies');
-
-    % Plot modes vs displacements
-    %--------------
-    
-    Phi_full = zeros(Ndof, n_modes);
-    Phi_full(free_dofs, :) = Phi;
-    x_span = xn(:,1);
-
-    for i = 1:n_modes
-        uy = Phi_full(2:6:end, i);
-        uz = Phi_full(3:6:end, i);
-        thx = Phi_full(4:6:end, i);
-
-        % Normalize for visualization
-        scale = max(abs([uy; uz; thx]));
-        uy = uy / scale;
-        uz = uz / scale;
-        thx = thx / scale;
-
-        figure;
-        subplot(3,1,1)
-        plot(x_span, uy, 'LineWidth', 1.5); grid on;
-        ylabel('$u_y$', 'Interpreter','latex');
-
-        subplot(3,1,2)
-        plot(x_span, uz, 'LineWidth', 1.5); grid on;
-        ylabel('$u_z$', 'Interpreter','latex');
-
-        subplot(3,1,3)
-        plot(x_span, thx, 'LineWidth', 1.5); grid on;
-        ylabel('$\theta_x$', 'Interpreter','latex');
-        xlabel('Span $x$ [m]', 'Interpreter','latex');
-
-        sgtitle(sprintf('Mode %d  (f = %.2f Hz)', i, frequencies(i)));
-    end
-    %--------------
     
 end
 %% POSTPROCESS
@@ -325,4 +289,41 @@ switch(problem_type)
         sgtitle('Static Solution: Bending Test (Rotations)');
     case "torsion"
         sgtitle('Static Solution: Torsion Test (Rotations)');
+end
+
+% --- 4. Plot mode shapes
+ 
+Phi_full = zeros(Ndof, n_modes);
+Phi_full(free_dofs, :) = Phi;
+x_span = xn(:,1);
+
+    
+for i = 1:n_modes
+        
+    uy = Phi_full(2:6:end, i);
+    uz = Phi_full(3:6:end, i); 
+    thx = Phi_full(4:6:end, i);
+
+    % Normalize for visualization
+        
+    scale = max(abs([uy; uz; thx]));      
+    uy = uy / scale;   
+    uz = uz / scale;
+    thx = thx / scale;
+
+    figure;
+    subplot(3,1,1)
+    plot(x_span, uy, 'LineWidth', 1.5); grid on;
+    ylabel('$u_y$', 'Interpreter','latex');
+
+   subplot(3,1,2)
+   plot(x_span, uz, 'LineWidth', 1.5); grid on;
+   ylabel('$u_z$', 'Interpreter','latex');
+
+   subplot(3,1,3)
+   plot(x_span, thx, 'LineWidth', 1.5); grid on;
+   ylabel('$\theta_x$', 'Interpreter','latex');
+   xlabel('Span $x$ [m]', 'Interpreter','latex');
+
+   sgtitle(sprintf('Mode %d  (f = %.2f Hz)', i, frequencies(i)));
 end
