@@ -523,7 +523,7 @@ def check_feasibility(n_rev, dt_target, P, Q, mu):
     if n_rev == 0:
         # Single rev is generally feasible provided geometry allows it 
         # (function is monotonic for single-rev in specific domains)
-        return True, 0.0
+        return True, 0.0, None
 
     # Domain for search:
     # For n_rev > 0, z must be > 0.
@@ -560,43 +560,70 @@ def check_feasibility(n_rev, dt_target, P, Q, mu):
     dt_min = simo_dt(z_min, P, Q, mu, n_rev)
     
     if dt_target < dt_min:
-        return False, dt_min
+        return False, dt_min, z_min
         
-    return True, dt_min
+    return True, dt_min, z_min
 
 # step 4 of the slide: find z such that Δt(z) = dt_target.
-def solve_z(dt_target, P, Q, mu, z0, tol=1e-12, max_iter=100):
+def solve_z(dt_target, P, Q, mu, z0, tol=1e-12, max_iter=100, n_rev=0, branch="left", z_min=None):
     """
     Robust split-region bisection solver for Simó's equation.
+    Now handles multi-revolution cases.
     """
-    # 1. Determine if the solution is elliptic (z > 0) or hyperbolic (z < 0)
-    # based on the parabolic transfer time (z = 0)
-    dt_parabolic = simo_dt(0.0, P, Q, mu)
-    
-    if dt_target > dt_parabolic:
-        # Elliptic solution (z > 0)
-        low = 0.0
-        high = np.pi**2 - 1e-15
-    else:
-        # Hyperbolic solution (z < 0)
-        high = 0.0
-        if Q > 0:
-            low = -(np.arccosh(P/Q))**2 + 1e-15
+    if n_rev == 0:
+        # 1. Determine if the solution is elliptic (z > 0) or hyperbolic (z < 0)
+        # based on the parabolic transfer time (z = 0)
+        dt_parabolic = simo_dt(0.0, P, Q, mu)
+        
+        if dt_target > dt_parabolic:
+            # Elliptic solution (z > 0)
+            low = 0.0
+            high = np.pi**2 - 1e-15
         else:
-            low = -1e6 # Safe limit to avoid overflow in cosh
-            # Expand low if target dt is extremely small
-            while simo_dt(low, P, Q, mu) > dt_target and low > -1e12:
-                low *= 10.0
+            # Hyperbolic solution (z < 0)
+            high = 0.0
+            if Q > 0:
+                low = -(np.arccosh(P/Q))**2 + 1e-15
+            else:
+                low = -1e6 # Safe limit to avoid overflow in cosh
+                # Expand low if target dt is extremely small
+                while simo_dt(low, P, Q, mu) > dt_target and low > -1e12:
+                    low *= 10.0
+    else:
+        # Multi-revolution (z > 0 always)
+        if z_min is None:
+             _, _, z_min = check_feasibility(n_rev, dt_target, P, Q, mu)
+             
+        if branch == "left":
+            low = 1e-15
+            high = z_min
+        else:
+            low = z_min
+            high = np.pi**2 - 1e-15
     
     # Bisection
     for _ in range(max_iter):
         z = 0.5 * (low + high)
-        dt = simo_dt(z, P, Q, mu)
+        dt = simo_dt(z, P, Q, mu, n_rev)
         
-        if not np.isfinite(dt) or dt > dt_target:
-            high = z
+        if n_rev == 0:
+            if not np.isfinite(dt) or dt > dt_target:
+                high = z
+            else:
+                low = z
         else:
-            low = z
+            if branch == "left":
+                # For n_rev > 0, left branch: dt decreases as z increases
+                if not np.isfinite(dt) or dt > dt_target:
+                    low = z
+                else:
+                    high = z
+            else:
+                # For n_rev > 0, right branch: dt increases as z increases
+                if not np.isfinite(dt) or dt < dt_target:
+                    low = z
+                else:
+                    high = z
             
         if (high - low) < tol:
             break
@@ -693,7 +720,7 @@ def terminal_velocities_from_ap(mu, r1_vec, r2_vec, a, p, dtheta, tm, plane_norm
 # Main: Simó Lambert (single revolution)
 # ---------------------------
 def lambert_simo(mu, r1_vec, r2_vec, dt_days, tm=+1,
-                 plane_normal=np.array([0.0,0.0,1.0]), eps_pi=1e-10, n_rev = 0):
+                 plane_normal=np.array([0.0,0.0,1.0]), eps_pi=1e-10, n_rev = 0, branch="left"):
     """
     Returns v1, v2 in AU/day (if r in AU and mu in AU^3/day^2)
 
@@ -709,18 +736,19 @@ def lambert_simo(mu, r1_vec, r2_vec, dt_days, tm=+1,
     r1, r2, dtheta, P, Q = lambert_geometry(r1_vec, r2_vec, tm=tm)
 
     # 2. Feasibility Check
-    is_feasible, val = check_feasibility(n_rev, dt_days, P, Q, mu)
+    is_feasible, dt_min, z_min = check_feasibility(n_rev, dt_days, P, Q, mu)
     if not is_feasible:
-        print(f"No Solution: Target dt ({dt_days:.4f}) < Minimum dt ({val:.4f}) for n_rev={n_rev}")
+        print(f"No Solution: Target dt ({dt_days:.4f}) < Minimum dt ({dt_min:.4f}) for n_rev={n_rev}")
+        return None, None, None
 
-    # 3. Initial guess (slides: elliptic z0 = (Δθ/2)^2)
+    # 3. Initial guess
     z0 = (dtheta/2.0)**2
 
     # 4. Iterate z value
-    z = solve_z(dt_days, P, Q, mu, z0)
+    z = solve_z(dt_days, P, Q, mu, z0, n_rev=n_rev, branch=branch, z_min=z_min)
 
     # --- consistency check: does z reproduce the target dt?
-    dt_from_z = simo_dt(z, P, Q, mu)
+    dt_from_z = simo_dt(z, P, Q, mu, n_rev=n_rev)
     dt_err = dt_from_z - dt_days
 
     # c0,c1 for a and p
@@ -770,16 +798,26 @@ def print_lambert_test(v1, v2, dbg, test_name):
 
 # ============================================================
 # Elementary test cases (Slide 51)
-# ============================================================#
+# ============================================================
 
 mu = 1.0
 r1 = np.array([1.0, 0.0, 0.0])
 r2 = np.array([0.0, 1.0, 0.0])
 
-# first test case - 90 deg short path
-dt = 10  # quarter period in canonical units (mu=1, r=1)
+# Multi-revolution Test (N=1)
+print("\n--- Multi-revolution Test (N=1) ---")
+dt_target_multi = 10.0 
+v1_l, v2_l, dbg_l = lambert_simo(mu, r1, r2, dt_target_multi, n_rev=1, branch="left")
+v1_r, v2_r, dbg_r = lambert_simo(mu, r1, r2, dt_target_multi, n_rev=1, branch="right")
 
-v1, v2, dbg = lambert_simo(mu, r1, r2, dt, tm=+1, n_rev = 1)
+if dbg_l: print_lambert_test(v1_l, v2_l, dbg_l, "N=1 Left Branch")
+if dbg_r: print_lambert_test(v1_r, v2_r, dbg_r, "N=1 Right Branch")
+print("-----------------------------------------------------------------------------")
+exit()
+
+# first test case - 90 deg short path
+dt = np.pi/2.0  # quarter period in canonical units (mu=1, r=1)
+v1, v2, dbg = lambert_simo(mu, r1, r2, dt, tm=+1, n_rev=0)
 print_lambert_test(v1, v2, dbg, "first test case: 90 deg short path")
 print("-----------------------------------------------------------------------------")
 
@@ -808,15 +846,11 @@ print("-------------------------------------------------------------------------
 # Hohmann Transfer
 r1_vec = np.array([1.0, 0.0, 0.0])
 r2_vec = np.array([-2.0, 0.0, 0.0])   # exactly opposite
-
-# Hohmann time of flight (half period of transfer ellipse)
-a = 0.5*(1.0 + 2.0)
-dt = np.pi * np.sqrt(a**3 / mu)
-
-v1, v2, dbg = lambert_simo(mu, r1_vec, r2_vec, dt, tm=+1,
-                           plane_normal=np.array([0.0,0.0,1.0]))
-
-
+a_hoh = 0.5*(1.0 + 2.0)
+dt_hoh = np.pi * np.sqrt(a_hoh**3 / mu)
+v1, v2, dbg = lambert_simo(mu, r1_vec, r2_vec, dt_hoh, tm=+1, plane_normal=np.array([0.0,0.0,1.0]))
 print_lambert_test(v1, v2, dbg, "Hohmann transfer: 180 deg CCW")
+print("-----------------------------------------------------------------------------")
+
 
 
