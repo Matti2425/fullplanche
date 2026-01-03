@@ -90,7 +90,7 @@ print("----------------------------------------------")
 # =======================
 # Step 5: Determine the argument of the perihelion w and mean anomaly M at JC
 # =======================
-# w = w_bar -omega and M=L-w
+# w = w_bar - omega and M=L-w
 def w (w_bar, omega):
     return deg_correction(w_bar-omega)
 def M (L,w_bar):
