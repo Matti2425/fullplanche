@@ -1,16 +1,15 @@
 %% PART I - BEAM MODELLING 
-% Gerard Martínez Vilella
-% David Rodríguez López
+% Pau Cornudella Quer
+% Martí Güell Domingo
 
-% Useful commands to initialize script
 clear
 close all
 clearvars
 
 %% DATA
 
-problem_type = "torsion"; %1 for bending. 2 for torsion.
-Nm = 6;
+problem_type = "torsion"; % CAS 1: "bending". CAS 2: "torsion".
+Nm = 6; % N vibration modes in the modal analysis
 
 % Define the problem's data (e.g. dimensions, material properties, etc.)
 E = 75e9; %Pa
@@ -19,7 +18,7 @@ G = E/(2*(1+v_poisson));
 rho = 2200; %kg/m3
 c = 0.85; %m
 b = 3; %m
-y0 = 0.924; %m
+y0 = 0.294; %m
 y1 = 0.125; %m
 y2 = 0.475; %m
 h1 = 35e-3; %m
@@ -42,25 +41,26 @@ load('beam.mat','xn','Tn','Tm');
 %      |x1 y1 z1|
 %      |x2 y2 z2|
 %      |  ...   |
-% Tn : Nodal connectivities [Nelem x 2]
+% Tn : Nodal connectivities [Nelem x 2] %Conection between Tn(e,1) to Tn(e,2)
 % Tm : Material connectivities [Nelem x 1]
 
 % Define boundary conditions and forces data matrices: Up, Fe, Qe, Be
-N_elements = size(Tn,1);
+N_elements = size(Tn,1); 
 N_nodes = size(xn,1);
+
 Up = [0 1 1; % displacement, node, dof
-      0 1 2;
+      0 1 2; 
       0 1 3;
       0 1 4;
       0 1 5;
-      0 1 6];
+      0 1 6]; % All 6 DOFs of node 1 = 0. Clamped
 
 % External forces (force, node, dof)
 switch(problem_type)
     case "bending"
-    Fe = [1 N_nodes 3];
+    Fe = [1 N_nodes 3]; %Force = 1 at last node in DOF 3 (uz)
     case "torsion"
-    Fe = [1 N_nodes 5];
+    Fe = [1 N_nodes 4]; %Force = 1 at last node in DOF 4 (theta_x)
 end
 
 % Distributed forces (force, node, dof)
@@ -71,7 +71,7 @@ Be = [0 1 2];
 
 j_orientations = [0 1 0]; 
 
-%more rows would be added if more values existed
+%For convenience; More rows would be added if more values existed
 E_vector = [E]; 
 A_vector = [A];  
 G_vector = [G];  
@@ -86,36 +86,33 @@ rho_vector = [rho];
 %% SOLVER
 
 % Obtain system matrices
-
 % TIP: To avoid recomputing the system matrices use a save/load structure:
 if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
-% ========================================================
-%  SECTION 2 — MATRIX ASSEMBLY (sparse + blkdiag version)
-% ========================================================
 
+    %MATRIX ASSEMBLY (sparse + blkdiag version)
     Ndof = 6*N_nodes;
-    K = sparse(Ndof,Ndof);
-    M  = sparse(Ndof,Ndof);
+    K = sparse(Ndof,Ndof); % Stiffness matrix
+    M  = sparse(Ndof,Ndof);% Mass matrix
     
     for e = 1:N_elements
     
-        % --- Longitud y ejes locales ----------------------
-        x1 = xn(Tn(e,1),:)';
-        x2 = xn(Tn(e,2),:)';
-        Le = norm(x2 - x1);
+        % Lenght and local axes
+        x1 = xn(Tn(e,1),:)'; % Node 1 of element e
+        x2 = xn(Tn(e,2),:)'; % Node 2 of element e
+        Le = norm(x2 - x1);  % Element lenght
     
-        i = (x2 - x1)/Le;
-        j = j_orientations(Tm(e,1),:)';
-        k = cross(i,j);
+        i = (x2 - x1)/Le; % X axis unit vector
+        j = j_orientations(Tm(e,1),:)'; 
+        k = cross(i,j); % Z axis
     
-        % --- Rotación local Rp (6x6) ----------------------
+        % Rotación local Rp (6x6) 
         R3 = [i j k];
         Rp = blkdiag(R3, R3);
     
-        % --- Rotación global (12x12) ----------------------
+        % Rotación global (12x12)
         Re = blkdiag(Rp, Rp);
     
-        % --- Axial ----------------------------------------
+        % Axial
         Nx = [-1/Le; 1/Le];
         Ba_row = [Nx(1) 0 0 0 0 0 Nx(2) 0 0 0 0 0];
         Ba = sparse(Ba_row);
@@ -223,6 +220,42 @@ if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
     
     fprintf('Natural frequencies [Hz]:\n');
     disp(frequencies');
+
+    % Plot modes vs displacements
+    %--------------
+    
+    Phi_full = zeros(Ndof, n_modes);
+    Phi_full(free_dofs, :) = Phi;
+    x_span = xn(:,1);
+
+    for i = 1:n_modes
+        uy = Phi_full(2:6:end, i);
+        uz = Phi_full(3:6:end, i);
+        thx = Phi_full(4:6:end, i);
+
+        % Normalize for visualization
+        scale = max(abs([uy; uz; thx]));
+        uy = uy / scale;
+        uz = uz / scale;
+        thx = thx / scale;
+
+        figure;
+        subplot(3,1,1)
+        plot(x_span, uy, 'LineWidth', 1.5); grid on;
+        ylabel('$u_y$', 'Interpreter','latex');
+
+        subplot(3,1,2)
+        plot(x_span, uz, 'LineWidth', 1.5); grid on;
+        ylabel('$u_z$', 'Interpreter','latex');
+
+        subplot(3,1,3)
+        plot(x_span, thx, 'LineWidth', 1.5); grid on;
+        ylabel('$\theta_x$', 'Interpreter','latex');
+        xlabel('Span $x$ [m]', 'Interpreter','latex');
+
+        sgtitle(sprintf('Mode %d  (f = %.2f Hz)', i, frequencies(i)));
+    end
+    %--------------
     
 end
 %% POSTPROCESS

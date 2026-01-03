@@ -32,7 +32,7 @@ else
     SigVM = InterpFunction(sigVM,Tn);
     patch(x(Tn)',y(Tn)',z(Tn)',SigVM,'facecolor','interp','edgecolor','none');
     % Color axis
-    caxis([0,max([SigVM(:);1])]);
+    clim([0,max([SigVM(:);1])]); %caxis([0,max([SigVM(:);1])]);
     cb = colorbar;
     set(cb,'ticks',[0,max([SigVM(:);1])]);
 end
