@@ -119,7 +119,7 @@ if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
     
         Ca = E_vector(Tm(e,1))*A_vector(Tm(e,1));
     
-        Ka = Le * (Re' * (Ba' * Ca * Ba) * Re);
+        Ka = Le*(Re'*(Ba'*Ca*Ba)*Re);
     
         % --- Flexión --------------------------------------
         Bb = sparse([ ...
