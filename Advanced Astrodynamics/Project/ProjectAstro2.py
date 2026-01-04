@@ -1087,9 +1087,10 @@ porkchop_plot(
     arrival_planet='Mars', 
     launch_window_start_date=(2020, 1, 1), 
     synodic_periods=2,
-    min_tof=100, 
+    min_tof= 0, 
     max_tof=600,
-    res=100
+    res=500,
+    tm = -1
 )
 
 exit()
