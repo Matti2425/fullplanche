@@ -3,6 +3,7 @@
 
 # Actual Lambert's Simó calculation starts at line 380
 import numpy as np
+import matplotlib.pyplot as plt
 
 # ======================================
 # Constants
@@ -247,25 +248,11 @@ def pf_to_ecliptic(elem_deg, r_pf, v_pf):
 # ======================================
 # High-level: planetary state at a given UTC date
 # ======================================
-def planet_state(planet_name, year, month, day, model="full",
-                 in_km=True):
+def planet_state_jd(planet_name, JD, model="full", in_km=True):
     """
-    Heliocentric ecliptic state vector (r, v) of a planet.
-
-    Parameters
-    ----------
-    planet_name : 'Earth', 'Mars', 'Saturn', ...
-    year, month, day : int, UTC calendar date at 0h
-    model : 'full', 'planar_elliptic', 'circular_coplanar'
-    in_km : if True  -> r [km], v [km/s]
-            if False -> r [AU], v [AU/day]
-
-    Returns
-    -------
-    r, v : numpy arrays (3,)
+    Heliocentric ecliptic state vector (r, v) of a planet at a given JD.
     """
     data = PLANETS[planet_name]
-    JD = JD_from_UTC(year, month, day)
     jc = JC(JD)
 
     # 1) Propagate orbital elements
@@ -288,6 +275,26 @@ def planet_state(planet_name, year, month, day, model="full",
         r, v = r_ecl, v_ecl
 
     return r, v
+
+def planet_state(planet_name, year, month, day, model="full",
+                 in_km=True):
+    """
+    Heliocentric ecliptic state vector (r, v) of a planet.
+
+    Parameters
+    ----------
+    planet_name : 'Earth', 'Mars', 'Saturn', ...
+    year, month, day : int, UTC calendar date at 0h
+    model : 'full', 'planar_elliptic', 'circular_coplanar'
+    in_km : if True  -> r [km], v [km/s]
+            if False -> r [AU], v [AU/day]
+
+    Returns
+    -------
+    r, v : numpy arrays (3,)
+    """
+    JD = JD_from_UTC(year, month, day)
+    return planet_state_jd(planet_name, JD, model=model, in_km=in_km)
 
 # ======================================
 # test
@@ -787,6 +794,92 @@ def lambert_simo(mu, r1_vec, r2_vec, dt_days, tm=+1,
     return v1, v2, debug
 
 
+# ======================================
+# Porkchop Plot
+# ======================================
+def porkchop_plot(departure_planet, arrival_planet, dep_range, arr_range, res=60, tm=+1, 
+                  show_contours=True, show_heatmap=True, dv_max=15.0):
+    """
+    Generate a porkchop plot between two planets.
+    dep_range: [ (Y_start, M_start, D_start), (Y_end, M_end, D_end) ]
+    arr_range: [ (Y_start, M_start, D_start), (Y_end, M_end, D_end) ]
+    res: Number of points in each axis.
+    tm: Transfer mode (+1 prograde, -1 retrograde)
+    show_contours: If True, plot level lines.
+    show_heatmap: If True, plot data as a heatmap.
+    dv_max: Maximum Delta V to display (helps with crowded lines in high-energy regions).
+    """
+    jd_dep_start = JD_from_UTC(*dep_range[0])
+    jd_dep_end = JD_from_UTC(*dep_range[1])
+    jd_arr_start = JD_from_UTC(*arr_range[0])
+    jd_arr_end = JD_from_UTC(*arr_range[1])
+
+    dep_dates = np.linspace(jd_dep_start, jd_dep_end, res)
+    arr_dates = np.linspace(jd_arr_start, jd_arr_end, res)
+
+    total_dv = np.full((res, res), np.nan)
+
+    print(f"Generating Porkchop Plot from {departure_planet} to {arrival_planet}...")
+    
+    for i, t_dep in enumerate(dep_dates):
+        r_dep_p, v_dep_p = planet_state_jd(departure_planet, t_dep, in_km=False)
+        for j, t_arr in enumerate(arr_dates):
+            dt = t_arr - t_dep
+            if dt <= 0:
+                continue
+
+            r_arr_p, v_arr_p = planet_state_jd(arrival_planet, t_arr, in_km=False)
+
+            # Solve Lambert
+            try:
+                v1_sc, v2_sc, dbg = lambert_simo(mu_sun_AU, r_dep_p, r_arr_p, dt, tm=tm)
+            except Exception:
+                continue
+
+            if v1_sc is not None:
+                # Excess velocities
+                dv_dep = v1_sc - v_dep_p
+                dv_arr = v2_sc - v_arr_p
+
+                # Convert to km/s
+                dv_dep_km_s = au_per_day_to_km_per_s(np.linalg.norm(dv_dep))
+                dv_arr_km_s = au_per_day_to_km_per_s(np.linalg.norm(dv_arr))
+
+                dv_tot = dv_dep_km_s + dv_arr_km_s
+                
+                # Cap value for plotting if requested
+                if dv_max is not None and dv_tot > dv_max:
+                    total_dv[j, i] = np.nan
+                else:
+                    total_dv[j, i] = dv_tot
+
+    # Plotting
+    DEP, ARR = np.meshgrid(dep_dates, arr_dates)
+    X = DEP - jd_dep_start
+    Y = ARR - jd_arr_start
+
+    plt.figure(figsize=(12, 8))
+    
+    if show_heatmap:
+        # pcolormesh handles NaN values by not plotting them
+        im = plt.pcolormesh(X, Y, total_dv, shading='auto', cmap='jet')
+        plt.colorbar(im, label='Total Delta V (km/s)')
+
+    if show_contours:
+        if not np.all(np.isnan(total_dv)):
+            levels = np.linspace(np.nanmin(total_dv), np.nanmax(total_dv), 15)
+            cp = plt.contour(X, Y, total_dv, levels=levels, colors='white' if show_heatmap else 'black', alpha=0.8)
+            plt.clabel(cp, inline=True, fontsize=10, fmt='%1.1f')
+
+    plt.title(f"Porkchop Plot: {departure_planet} -> {arrival_planet}\n"
+              f"Total Delta V (km/s) | Departure: {dep_range[0]} to {dep_range[1]}")
+    plt.xlabel(f"Days from departure start date {dep_range[0]}")
+    plt.ylabel(f"Days from arrival start date {arr_range[0]}")
+    plt.grid(True, alpha=0.3)
+    #plt.axis('equal')
+    
+    plt.show()
+
 def print_lambert_test(v1, v2, dbg, test_name):
     print(f"---- {test_name} ----")
     print("dtheta [deg]:", dbg["dtheta_deg"])
@@ -813,6 +906,12 @@ v1_r, v2_r, dbg_r = lambert_simo(mu, r1, r2, dt_target_multi, n_rev=1, branch="r
 if dbg_l: print_lambert_test(v1_l, v2_l, dbg_l, "N=1 Left Branch")
 if dbg_r: print_lambert_test(v1_r, v2_r, dbg_r, "N=1 Right Branch")
 print("-----------------------------------------------------------------------------")
+# Porkchop Plot Example: Earth to Mars (2020 window)
+porkchop_plot("Earth", "Mars",
+              dep_range=[(2020, 6, 1), (2021, 1, 20)],
+              arr_range=[(2020, 6, 1), (2022, 5, 31)],
+              res=500)
+
 exit()
 
 # first test case - 90 deg short path
