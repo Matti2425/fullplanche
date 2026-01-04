@@ -1090,7 +1090,8 @@ porkchop_plot(
     min_tof= 0, 
     max_tof=600,
     res=500,
-    tm = -1
+    tm = -1,
+    dv_max= 100.0
 )
 
 exit()
