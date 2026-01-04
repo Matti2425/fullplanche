@@ -16,6 +16,12 @@ SECONDS_PER_DAY = 86400.0
 DEG2RAD = np.pi / 180.0
 TWOPI = np.pi * 2
 
+# Orbital periods in days for synodic calculations
+PLANET_PERIODS = {
+    'Mercury': 87.97, 'Venus': 224.7, 'Earth': 365.25, 'Mars': 687.0,
+    'Jupiter': 4331, 'Saturn': 10747, 'Uranus': 30589, 'Neptune': 59800
+}
+
 # ======================================
 # Time: Julian Date (JD) and Julian Century (JC)
 # ======================================
@@ -26,6 +32,41 @@ def JD_from_UTC(year, month, day):
         month = month + 12
     JD = int(365.25 * year) + int(30.6001 * (month + 1)) + day + 1720981.5
     return JD
+
+import math
+
+def jd_to_date_str(jd):
+    """
+    Converts a Julian Day Number to a YYYY-MM-DD string.
+    """
+    jd = jd + 0.5
+    F, I = math.modf(jd)
+    I = int(I)
+    
+    A = math.trunc((I - 1867216.25)/36524.25)
+    
+    if I > 2299160:
+        B = I + 1 + A - math.trunc(A / 4.)
+    else:
+        B = I
+        
+    C = B + 1524
+    D = math.trunc((C - 122.1) / 365.25)
+    E = math.trunc(365.25 * D)
+    G = math.trunc((C - E) / 30.6001)
+    
+    day = C - E + F - math.trunc(30.6001 * G)
+    if G < 13.5:
+        month = G - 1
+    else:
+        month = G - 13
+        
+    if month > 2.5:
+        year = D - 4716
+    else:
+        year = D - 4715
+        
+    return f"{int(year)}-{int(month):02d}-{int(day):02d}"
 
 def JC(JD):
     """Julian Century since J2000."""
@@ -794,90 +835,224 @@ def lambert_simo(mu, r1_vec, r2_vec, dt_days, tm=+1,
     return v1, v2, debug
 
 
+def propagate_lagrange(r0, v0, mu, dt_array):
+    """
+    Propagates state (r0, v0) over dt_array [days] using universal variables.
+    """
+    r0_vec = np.asarray(r0, float)
+    v0_vec = np.asarray(v0, float)
+    r0_norm = np.linalg.norm(r0_vec)
+    v0_norm = np.linalg.norm(v0_vec)
+
+    sigma0 = np.dot(r0_vec, v0_vec) / np.sqrt(mu)
+    alpha = 2.0 / r0_norm - (v0_norm**2) / mu
+
+    path = []
+    for dt in dt_array:
+        if dt == 0:
+            path.append(r0_vec)
+            continue
+
+        # Initial guess for chi
+        chi = np.sqrt(mu) * abs(alpha) * dt if abs(alpha) > 1e-10 else np.sqrt(mu) * dt / r0_norm
+
+        # Solve Kepler's equation for universal variable chi
+        for _ in range(50):
+            z = alpha * chi**2
+            c0, c1, c2, c3 = stumpff_c0c1c2c3(z)
+
+            f = r0_norm * chi * c1 + sigma0 * chi**2 * c2 + chi**3 * c3 - np.sqrt(mu) * dt
+            fp = r0_norm * c0 + sigma0 * chi * c1 + chi**2 * c2
+
+            if abs(fp) < 1e-14: fp = 1e-14
+            dchi = -f / fp
+            chi += dchi
+            if abs(dchi) < 1e-12:
+                break
+
+        # Final Stumpff values
+        z = alpha * chi**2
+        _, _, c2, c3 = stumpff_c0c1c2c3(z)
+
+        # f and g functions
+        f_func = 1.0 - (chi**2 / r0_norm) * c2
+        g_func = dt - (chi**3 / np.sqrt(mu)) * c3
+
+        r_vec = f_func * r0_vec + g_func * v0_vec
+        path.append(r_vec)
+
+    return np.array(path)
+
+
 # ======================================
 # Porkchop Plot
 # ======================================
-def porkchop_plot(departure_planet, arrival_planet, dep_range, arr_range, res=60, tm=+1, 
-                  show_contours=True, show_heatmap=True, dv_max=15.0):
-    """
-    Generate a porkchop plot between two planets.
-    dep_range: [ (Y_start, M_start, D_start), (Y_end, M_end, D_end) ]
-    arr_range: [ (Y_start, M_start, D_start), (Y_end, M_end, D_end) ]
-    res: Number of points in each axis.
-    tm: Transfer mode (+1 prograde, -1 retrograde)
-    show_contours: If True, plot level lines.
-    show_heatmap: If True, plot data as a heatmap.
-    dv_max: Maximum Delta V to display (helps with crowded lines in high-energy regions).
-    """
-    jd_dep_start = JD_from_UTC(*dep_range[0])
-    jd_dep_end = JD_from_UTC(*dep_range[1])
-    jd_arr_start = JD_from_UTC(*arr_range[0])
-    jd_arr_end = JD_from_UTC(*arr_range[1])
-
-    dep_dates = np.linspace(jd_dep_start, jd_dep_end, res)
-    arr_dates = np.linspace(jd_arr_start, jd_arr_end, res)
-
-    total_dv = np.full((res, res), np.nan)
-
-    print(f"Generating Porkchop Plot from {departure_planet} to {arrival_planet}...")
+def porkchop_plot(departure_planet, arrival_planet, 
+                  dep_range=None, 
+                  synodic_periods=None, launch_window_start_date=None,
+                  min_tof=20, max_tof=500,
+                  res=100, tm=+1, 
+                  show_contours=True, show_heatmap=True, dv_max=50.0):
     
+    # --- 1. Determine Departure Window ---
+    if synodic_periods is not None:
+        if launch_window_start_date is None:
+             raise ValueError("Must provide launch_window_start_date when using synodic_periods.")
+            
+        P1 = PLANET_PERIODS.get(departure_planet, 365.25)
+        P2 = PLANET_PERIODS.get(arrival_planet, 687.0)
+        
+        # Synodic Period: 1/S = |1/P1 - 1/P2|
+        if P1 == P2: S = P1 
+        else: S = 1 / abs(1/P1 - 1/P2)
+        
+        window_days = S * synodic_periods
+        
+        jd_dep_start = JD_from_UTC(*launch_window_start_date)
+        jd_dep_end = jd_dep_start + window_days
+        
+        start_date_str = f"{launch_window_start_date[0]}-{launch_window_start_date[1]}-{launch_window_start_date[2]}"
+        
+    else:
+        # Manual range
+        jd_dep_start = JD_from_UTC(*dep_range[0])
+        jd_dep_end = JD_from_UTC(*dep_range[1])
+        start_date_str = f"{dep_range[0]}"
+
+    # --- 2. Generate Grids (TOF Logic) ---
+    # Y-Axis: Departure Dates
+    dep_dates = np.linspace(jd_dep_start, jd_dep_end, res)
+    
+    # X-Axis: Time of Flight (Days)
+    tof_days = np.linspace(min_tof, max_tof, res)
+    
+    total_dv = np.full((res, res), np.nan) # Grid: Rows=Dep, Cols=TOF
+
+    # Track Minimum Delta V
+    min_dv = np.inf
+    best_transfer = None 
+
+    print(f"Generating Porkchop Plot: {departure_planet} -> {arrival_planet}")
+    print(f"Scanning {res}x{res} trajectories (Dep vs TOF)...")
+
+    # --- 3. Calculation Loop ---
+    # We iterate rows (Departure) and columns (TOF)
     for i, t_dep in enumerate(dep_dates):
         r_dep_p, v_dep_p = planet_state_jd(departure_planet, t_dep, in_km=False)
-        for j, t_arr in enumerate(arr_dates):
-            dt = t_arr - t_dep
-            if dt <= 0:
-                continue
-
+        
+        for j, dt in enumerate(tof_days):
+            
+            # Calculate Arrival Date based on TOF
+            t_arr = t_dep + dt
+            
             r_arr_p, v_arr_p = planet_state_jd(arrival_planet, t_arr, in_km=False)
 
-            # Solve Lambert
             try:
+                # Solve Lambert for this specific dt
                 v1_sc, v2_sc, dbg = lambert_simo(mu_sun_AU, r_dep_p, r_arr_p, dt, tm=tm)
             except Exception:
                 continue
 
             if v1_sc is not None:
-                # Excess velocities
                 dv_dep = v1_sc - v_dep_p
                 dv_arr = v2_sc - v_arr_p
-
-                # Convert to km/s
-                dv_dep_km_s = au_per_day_to_km_per_s(np.linalg.norm(dv_dep))
-                dv_arr_km_s = au_per_day_to_km_per_s(np.linalg.norm(dv_arr))
-
-                dv_tot = dv_dep_km_s + dv_arr_km_s
                 
-                # Cap value for plotting if requested
+                dv_dep_k = au_per_day_to_km_per_s(np.linalg.norm(dv_dep))
+                dv_arr_k = au_per_day_to_km_per_s(np.linalg.norm(dv_arr))
+                dv_tot = dv_dep_k + dv_arr_k
+
+                # Check Min
+                if dv_tot < min_dv:
+                    min_dv = dv_tot
+                    best_transfer = {
+                        't_dep': t_dep, 't_arr': t_arr,
+                        'dt': dt, 'dv_tot': dv_tot,
+                        'r_dep': r_dep_p, 'v_dep': v_dep_p, # Store for 3D plot
+                        'r_arr': r_arr_p, 'v_arr': v_arr_p,
+                        'v_transfer_start': v1_sc
+                    }
+
+                # Store in grid (transpose if needed, but here row=Dep, col=TOF is typical)
+                # Let's align with pcolormesh: Y=Dep, X=TOF.
+                # So grid[i, j] corresponds to dep[i] and tof[j]
                 if dv_max is not None and dv_tot > dv_max:
-                    total_dv[j, i] = np.nan
+                    total_dv[i, j] = np.nan
                 else:
-                    total_dv[j, i] = dv_tot
+                    total_dv[i, j] = dv_tot
 
-    # Plotting
-    DEP, ARR = np.meshgrid(dep_dates, arr_dates)
-    X = DEP - jd_dep_start
-    Y = ARR - jd_arr_start
-
-    plt.figure(figsize=(12, 8))
+    # --- 4. Plotting ---
+    fig = plt.figure(figsize=(16, 7))
+    
+    # A. Heatmap (Left)
+    ax_pork = fig.add_subplot(121)
+    
+    # Create meshgrids
+    # X axis = TOF (days)
+    # Y axis = Departure Date (Years relative to start)
+    
+    X_grid, Y_grid = np.meshgrid(tof_days, (dep_dates - jd_dep_start)/365.25)
     
     if show_heatmap:
-        # pcolormesh handles NaN values by not plotting them
-        im = plt.pcolormesh(X, Y, total_dv, shading='auto', cmap='jet')
-        plt.colorbar(im, label='Total Delta V (km/s)')
+        # shading='auto' or 'gouraud' for smoothing
+        im = ax_pork.pcolormesh(X_grid, Y_grid, total_dv, shading='auto', cmap='jet')
+        plt.colorbar(im, ax=ax_pork, label='Total Delta V (km/s)')
 
-    if show_contours:
-        if not np.all(np.isnan(total_dv)):
-            levels = np.linspace(np.nanmin(total_dv), np.nanmax(total_dv), 15)
-            cp = plt.contour(X, Y, total_dv, levels=levels, colors='white' if show_heatmap else 'black', alpha=0.8)
-            plt.clabel(cp, inline=True, fontsize=10, fmt='%1.1f')
+    if show_contours and not np.all(np.isnan(total_dv)):
+        levels = np.linspace(np.nanmin(total_dv), np.nanmax(total_dv), 20)
+        cp = ax_pork.contour(X_grid, Y_grid, total_dv, levels=levels, colors='white', alpha=0.5)
+        ax_pork.clabel(cp, inline=True, fontsize=8, fmt='%1.1f')
 
-    plt.title(f"Porkchop Plot: {departure_planet} -> {arrival_planet}\n"
-              f"Total Delta V (km/s) | Departure: {dep_range[0]} to {dep_range[1]}")
-    plt.xlabel(f"Days from departure start date {dep_range[0]}")
-    plt.ylabel(f"Days from arrival start date {arr_range[0]}")
-    plt.grid(True, alpha=0.3)
-    #plt.axis('equal')
+    # Plot optimal point
+    if best_transfer:
+        opt_tof = best_transfer['dt']
+        opt_dep_yr = (best_transfer['t_dep'] - jd_dep_start) / 365.25
+        ax_pork.plot(opt_tof, opt_dep_yr, 'w+', markersize=12, markeredgewidth=2, label='Min dV')
+        ax_pork.legend(loc='upper right')
+
+    ax_pork.set_title(f"Porkchop: {departure_planet}-{arrival_planet}\nMin dV: {min_dv:.2f} km/s")
+    ax_pork.set_xlabel("Time of Flight [days]")
+    ax_pork.set_ylabel(f"Departure date [years from {start_date_str}]")
+    ax_pork.grid(True, alpha=0.3)
+
+    # B. 3D Orbit (Right) - Same as before
+    ax_orb = fig.add_subplot(122, projection='3d')
     
+    if best_transfer:
+        bt = best_transfer
+        dep_date_str = jd_to_date_str(bt['t_dep'])
+        ax_orb.scatter([0], [0], [0], color='yellow', s=100, label='Sun')
+        
+        # Dep Planet Path
+        t_span_dep = np.linspace(bt['t_dep'] - 50, bt['t_arr'], 100)
+        path_dep = np.array([planet_state_jd(departure_planet, t, in_km=False)[0] for t in t_span_dep])
+        ax_orb.plot(path_dep[:,0], path_dep[:,1], path_dep[:,2], 'b--', alpha=0.5)
+        ax_orb.scatter([bt['r_dep'][0]], [bt['r_dep'][1]], [bt['r_dep'][2]], color='blue', label=departure_planet)
+
+        # Arr Planet Path
+        t_span_arr = np.linspace(bt['t_dep'], bt['t_arr'] + 50, 100)
+        path_arr = np.array([planet_state_jd(arrival_planet, t, in_km=False)[0] for t in t_span_arr])
+        ax_orb.plot(path_arr[:,0], path_arr[:,1], path_arr[:,2], 'r--', alpha=0.5)
+        ax_orb.scatter([bt['r_arr'][0]], [bt['r_arr'][1]], [bt['r_arr'][2]], color='red', label=arrival_planet)
+
+        # Transfer Path
+        transfer_times = np.linspace(0, bt['dt'], 100)
+        transfer_path = propagate_lagrange(bt['r_dep'], bt['v_transfer_start'], mu_sun_AU, transfer_times)
+        ax_orb.plot(transfer_path[:,0], transfer_path[:,1], transfer_path[:,2], 'k-', linewidth=2, label='Transfer')
+        
+        ax_orb.set_title(f"Optimal Trajectory\nDep: {dep_date_str} | TOF: {bt['dt']:.1f} days")
+
+    # Aspect Ratio and Limits
+    all_pts = np.vstack([path_dep, path_arr]) if best_transfer else np.array([[0,0,0]])
+    max_range = np.ptp(all_pts, axis=0).max() / 2.0
+    mid_pt = (all_pts.max(axis=0) + all_pts.min(axis=0)) * 0.5
+    ax_orb.set_xlim(mid_pt[0] - max_range, mid_pt[0] + max_range)
+    ax_orb.set_ylim(mid_pt[1] - max_range, mid_pt[1] + max_range)
+    ax_orb.set_zlim(mid_pt[2] - max_range, mid_pt[2] + max_range)
+    ax_orb.set_xlabel('X [AU]')
+    ax_orb.set_ylabel('Y [AU]')
+    ax_orb.set_zlabel('Z [AU]')
+    
+    plt.tight_layout()
     plt.show()
 
 def print_lambert_test(v1, v2, dbg, test_name):
@@ -907,10 +1082,15 @@ if dbg_l: print_lambert_test(v1_l, v2_l, dbg_l, "N=1 Left Branch")
 if dbg_r: print_lambert_test(v1_r, v2_r, dbg_r, "N=1 Right Branch")
 print("-----------------------------------------------------------------------------")
 # Porkchop Plot Example: Earth to Mars (2020 window)
-porkchop_plot("Earth", "Mars",
-              dep_range=[(2020, 6, 1), (2021, 1, 20)],
-              arr_range=[(2020, 6, 1), (2022, 5, 31)],
-              res=500)
+porkchop_plot(
+    departure_planet='Earth', 
+    arrival_planet='Mars', 
+    launch_window_start_date=(2020, 1, 1), 
+    synodic_periods=2,
+    min_tof=100, 
+    max_tof=600,
+    res=100
+)
 
 exit()
 
