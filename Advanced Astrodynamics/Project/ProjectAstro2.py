@@ -1074,71 +1074,69 @@ def print_lambert_test(v1, v2, dbg, test_name):
 # ============================================================
 # Elementary test cases (Slide 51)
 # ============================================================
+if __name__ == "__main__":
+    mu = 1.0
+    r1 = np.array([1.0, 0.0, 0.0])
+    r2 = np.array([0.0, 1.0, 0.0])
 
-mu = 1.0
-r1 = np.array([1.0, 0.0, 0.0])
-r2 = np.array([0.0, 1.0, 0.0])
+    # Multi-revolution Test (N=1)
+    print("\n--- Multi-revolution Test (N=1) ---")
+    dt_target_multi = 10.0 
+    v1_l, v2_l, dbg_l = lambert_simo(mu, r1, r2, dt_target_multi, n_rev=1, branch="left")
+    v1_r, v2_r, dbg_r = lambert_simo(mu, r1, r2, dt_target_multi, n_rev=1, branch="right")
 
-# Multi-revolution Test (N=1)
-print("\n--- Multi-revolution Test (N=1) ---")
-dt_target_multi = 10.0 
-v1_l, v2_l, dbg_l = lambert_simo(mu, r1, r2, dt_target_multi, n_rev=1, branch="left")
-v1_r, v2_r, dbg_r = lambert_simo(mu, r1, r2, dt_target_multi, n_rev=1, branch="right")
-
-if dbg_l: print_lambert_test(v1_l, v2_l, dbg_l, "N=1 Left Branch")
-if dbg_r: print_lambert_test(v1_r, v2_r, dbg_r, "N=1 Right Branch")
-print("-----------------------------------------------------------------------------")
-# Porkchop Plot Example: Earth to Mars (2020 window)
+    if dbg_l: print_lambert_test(v1_l, v2_l, dbg_l, "N=1 Left Branch")
+    if dbg_r: print_lambert_test(v1_r, v2_r, dbg_r, "N=1 Right Branch")
+    print("-----------------------------------------------------------------------------")
+    # Porkchop Plot Example: Earth to Mars (2020 window)
 
 
-porkchop_plot(
-    departure_planet='Earth', 
-    arrival_planet='Mars', 
-    launch_window_start_date=(2020, 1, 1), 
-    synodic_periods=2,
-    min_tof= 0, 
-    max_tof=600,
-    res=50
-)
+    porkchop_plot(
+        departure_planet='Earth', 
+        arrival_planet='Mars', 
+        launch_window_start_date=(2020, 1, 1), 
+        synodic_periods=2,
+        min_tof= 0, 
+        max_tof=600,
+        res=50
+    )
 
-exit()
+    # first test case - 90 deg short path
+    dt = np.pi/2.0  # quarter period in canonical units (mu=1, r=1)
+    v1, v2, dbg = lambert_simo(mu, r1, r2, dt, tm=+1, n_rev=0)
+    print_lambert_test(v1, v2, dbg, "first test case: 90 deg short path")
+    print("-----------------------------------------------------------------------------")
 
-# first test case - 90 deg short path
-dt = np.pi/2.0  # quarter period in canonical units (mu=1, r=1)
-v1, v2, dbg = lambert_simo(mu, r1, r2, dt, tm=+1, n_rev=0)
-print_lambert_test(v1, v2, dbg, "first test case: 90 deg short path")
-print("-----------------------------------------------------------------------------")
+    # second test case - 90 deg long path
+    v1, v2, dbg = lambert_simo(mu, r1, r2, 3*dt, tm=-1)
+    print_lambert_test(v1, v2, dbg, "second test case: 90 deg long path")
+    print("-----------------------------------------------------------------------------")
 
-# second test case - 90 deg long path
-v1, v2, dbg = lambert_simo(mu, r1, r2, 3*dt, tm=-1)
-print_lambert_test(v1, v2, dbg, "second test case: 90 deg long path")
-print("-----------------------------------------------------------------------------")
+    r1 = np.array([1.0, 0.0, 0.0])
+    r2 = np.array([0.0, -1.0, 0.0])
+    # third test case - 270 deg short path
+    v1, v2, dbg = lambert_simo(mu, r1, r2, dt, tm=-1)
+    print_lambert_test(v1, v2, dbg, "third test case: 270 deg short path")
+    print("-----------------------------------------------------------------------------")
 
-r1 = np.array([1.0, 0.0, 0.0])
-r2 = np.array([0.0, -1.0, 0.0])
-# third test case - 270 deg short path
-v1, v2, dbg = lambert_simo(mu, r1, r2, dt, tm=-1)
-print_lambert_test(v1, v2, dbg, "third test case: 270 deg short path")
-print("-----------------------------------------------------------------------------")
+    # fourth test case - 270 deg long path
+    v1, v2, dbg = lambert_simo(mu, r1, r2, 3*dt, tm=+1)
+    print_lambert_test(v1, v2, dbg, "fourth test case: 270 deg long path")
+    print("-----------------------------------------------------------------------------")
 
-# fourth test case - 270 deg long path
-v1, v2, dbg = lambert_simo(mu, r1, r2, 3*dt, tm=+1)
-print_lambert_test(v1, v2, dbg, "fourth test case: 270 deg long path")
-print("-----------------------------------------------------------------------------")
+    # fifth test case - 90 deg rectilinear
+    v1, v2, dbg = lambert_simo(mu, r1, r2, 0.01, tm=-1)
+    print_lambert_test(v1, v2, dbg, "fifth test case: 90 deg rectilinear")
+    print("-----------------------------------------------------------------------------")
 
-# fifth test case - 90 deg rectilinear
-v1, v2, dbg = lambert_simo(mu, r1, r2, 0.01, tm=-1)
-print_lambert_test(v1, v2, dbg, "fifth test case: 90 deg rectilinear")
-print("-----------------------------------------------------------------------------")
-
-# Hohmann Transfer
-r1_vec = np.array([1.0, 0.0, 0.0])
-r2_vec = np.array([-2.0, 0.0, 0.0])   # exactly opposite
-a_hoh = 0.5*(1.0 + 2.0)
-dt_hoh = np.pi * np.sqrt(a_hoh**3 / mu)
-v1, v2, dbg = lambert_simo(mu, r1_vec, r2_vec, dt_hoh, tm=+1, plane_normal=np.array([0.0,0.0,1.0]))
-print_lambert_test(v1, v2, dbg, "Hohmann transfer: 180 deg CCW")
-print("-----------------------------------------------------------------------------")
+    # Hohmann Transfer
+    r1_vec = np.array([1.0, 0.0, 0.0])
+    r2_vec = np.array([-2.0, 0.0, 0.0])   # exactly opposite
+    a_hoh = 0.5*(1.0 + 2.0)
+    dt_hoh = np.pi * np.sqrt(a_hoh**3 / mu)
+    v1, v2, dbg = lambert_simo(mu, r1_vec, r2_vec, dt_hoh, tm=+1, plane_normal=np.array([0.0,0.0,1.0]))
+    print_lambert_test(v1, v2, dbg, "Hohmann transfer: 180 deg CCW")
+    print("-----------------------------------------------------------------------------")
 
 
 
