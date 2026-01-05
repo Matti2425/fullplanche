@@ -895,6 +895,8 @@ def porkchop_plot(departure_planet, arrival_planet,
                   res=100, tm=+1, 
                   show_contours=True, show_heatmap=True, dv_max=50.0):
     
+    start_time = time.time()
+
     # --- 1. Determine Departure Window ---
     if synodic_periods is not None:
         if launch_window_start_date is None:
@@ -980,6 +982,10 @@ def porkchop_plot(departure_planet, arrival_planet,
                     total_dv[i, j] = np.nan
                 else:
                     total_dv[i, j] = dv_tot
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed Time: {elapsed_time:.2f} seconds")
 
     # --- 4. Plotting ---
     fig = plt.figure(figsize=(16, 7))
@@ -1084,20 +1090,16 @@ if dbg_r: print_lambert_test(v1_r, v2_r, dbg_r, "N=1 Right Branch")
 print("-----------------------------------------------------------------------------")
 # Porkchop Plot Example: Earth to Mars (2020 window)
 
-start_time = time.time()
+
 porkchop_plot(
     departure_planet='Earth', 
-    arrival_planet='Uranus', 
+    arrival_planet='Mars', 
     launch_window_start_date=(2020, 1, 1), 
     synodic_periods=2,
     min_tof= 0, 
-    max_tof=100*365,
-    res=500
+    max_tof=600,
+    res=50
 )
-
-end_time = time.time()
-elapsed_time = end_time - start_time
-print(f"Elapsed Time: {elapsed_time:.2f} seconds")
 
 exit()
 
