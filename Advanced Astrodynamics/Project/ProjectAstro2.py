@@ -4,6 +4,7 @@
 # Actual Lambert's Simó calculation starts at line 380
 import numpy as np
 import matplotlib.pyplot as plt
+import time
 
 # ======================================
 # Constants
@@ -19,7 +20,7 @@ TWOPI = np.pi * 2
 # Orbital periods in days for synodic calculations
 PLANET_PERIODS = {
     'Mercury': 87.97, 'Venus': 224.7, 'Earth': 365.25, 'Mars': 687.0,
-    'Jupiter': 4331, 'Saturn': 10747, 'Uranus': 30589, 'Neptune': 59800
+    'Jupiter': 4331, 'Saturn': 10747, 'Uranus': 30589, 'Neptune': 59800, 'Pluto': 90560
 }
 
 # ======================================
@@ -987,10 +988,10 @@ def porkchop_plot(departure_planet, arrival_planet,
     ax_pork = fig.add_subplot(121)
     
     # Create meshgrids
-    # X axis = TOF (days)
+    # X axis = TOF (years)
     # Y axis = Departure Date (Years relative to start)
     
-    X_grid, Y_grid = np.meshgrid(tof_days, (dep_dates - jd_dep_start)/365.25)
+    X_grid, Y_grid = np.meshgrid(tof_days / 365.25, (dep_dates - jd_dep_start)/365.25)
     
     if show_heatmap:
         # shading='auto' or 'gouraud' for smoothing
@@ -1004,13 +1005,13 @@ def porkchop_plot(departure_planet, arrival_planet,
 
     # Plot optimal point
     if best_transfer:
-        opt_tof = best_transfer['dt']
+        opt_tof = best_transfer['dt'] / 365.25
         opt_dep_yr = (best_transfer['t_dep'] - jd_dep_start) / 365.25
         ax_pork.plot(opt_tof, opt_dep_yr, 'w+', markersize=12, markeredgewidth=2, label='Min dV')
         ax_pork.legend(loc='upper right')
 
     ax_pork.set_title(f"Porkchop: {departure_planet}-{arrival_planet}\nMin dV: {min_dv:.2f} km/s")
-    ax_pork.set_xlabel("Time of Flight [days]")
+    ax_pork.set_xlabel("Time of Flight [years]")
     ax_pork.set_ylabel(f"Departure date [years from {start_date_str}]")
     ax_pork.grid(True, alpha=0.3)
 
@@ -1082,17 +1083,21 @@ if dbg_l: print_lambert_test(v1_l, v2_l, dbg_l, "N=1 Left Branch")
 if dbg_r: print_lambert_test(v1_r, v2_r, dbg_r, "N=1 Right Branch")
 print("-----------------------------------------------------------------------------")
 # Porkchop Plot Example: Earth to Mars (2020 window)
+
+start_time = time.time()
 porkchop_plot(
     departure_planet='Earth', 
-    arrival_planet='Mars', 
+    arrival_planet='Uranus', 
     launch_window_start_date=(2020, 1, 1), 
     synodic_periods=2,
     min_tof= 0, 
-    max_tof=600,
-    res=500,
-    tm = -1,
-    dv_max= 100.0
+    max_tof=100*365,
+    res=500
 )
+
+end_time = time.time()
+elapsed_time = end_time - start_time
+print(f"Elapsed Time: {elapsed_time:.2f} seconds")
 
 exit()
 
