@@ -1,0 +1,99 @@
+
+
+ARA MATEIX TENIEM UN plotModes i plotDeformed a MAIN_shell que no eren els del professor i realment no treballaven igual.
+
+ESTAVEN COPIADES AL FINAL DE TOT DEL CODI
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+El nostre plotModes:
+
+function plotModes(plotName, Phi, freq, imodes)
+    % Phi    : [Ndof x Nmodes]
+    % freq   : [Nmodes x 1]
+    % imodes : Vector of indices to plot
+    
+    % Load mesh data locally or pass it in. 
+    % Since functions define scope, we assume xn, Tn are available via evalin 
+    % or we need to pass them. For this template, I will assume variables exist 
+    % in workspace (MATLAB script behavior) or use evalin. 
+    % Better practice: Pass xn/Tn as arguments. I will fetch from base workspace.
+    
+    xn = evalin('base', 'xn');
+    Tn = evalin('base', 'Tn');
+    
+    figure('Name', plotName, 'NumberTitle', 'off', 'Color', 'w');
+    
+    num_plots = length(imodes);
+    rows = ceil(sqrt(num_plots));
+    cols = ceil(num_plots/rows);
+    
+    for k = 1:num_plots
+        mode_idx = imodes(k);
+        subplot(rows, cols, k);
+        
+        mode_shape = Phi(:, mode_idx);
+        
+        % Normalize mode for plotting
+        max_disp = max(abs(mode_shape(1:6:end).^2 + mode_shape(2:6:end).^2 + mode_shape(3:6:end).^2));
+        scale = 0.1 * max(max(xn)) / sqrt(max_disp);
+        
+        % Extract deformation
+        dx = mode_shape(1:6:end);
+        dy = mode_shape(2:6:end);
+        dz = mode_shape(3:6:end);
+        
+        xn_def = xn + scale * [dx, dy, dz];
+        
+        % Plot
+        patch('Vertices', xn_def, 'Faces', Tn, ...
+              'FaceVertexCData', dz, ... % Color by Z
+              'FaceColor', 'interp', 'EdgeColor', 'k', 'FaceAlpha', 0.8);
+          
+        title(sprintf('Mode %d: %.2f Hz', mode_idx, freq(mode_idx)));
+        axis equal; axis vis3d; axis off;
+        view(3);
+    end
+    sgtitle(plotName);
+    colormap jet;
+end
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+El nostre plotDeformed:
+
+function plotDeformed(plotName, xn, Tn, u, scale)
+    % xn : [Nnodes x 3]
+    % Tn : [Nelem x 4]
+    % u  : [Ndof x 1]
+    
+    figure('Name', plotName, 'NumberTitle', 'off', 'Color', 'w');
+    
+    % Extract displacements
+    ux = u(1:6:end);
+    uy = u(2:6:end);
+    uz = u(3:6:end);
+    
+    % Deformed coordinates
+    xn_def = xn + scale * [ux, uy, uz];
+    
+    % Plot undeformed (wireframe, transparent)
+    patch('Vertices', xn, 'Faces', Tn, ...
+          'FaceColor', 'none', 'EdgeColor', [0.7 0.7 0.7], 'LineStyle', ':');
+    hold on;
+    
+    % Plot deformed (colored by Z displacement)
+    % CData is used for color mapping. We map Z-displacement to color.
+    % We need one color value per vertex or per face.
+    cdata = uz; 
+    
+    p = patch('Vertices', xn_def, 'Faces', Tn, ...
+          'FaceVertexCData', cdata, ...
+          'FaceColor', 'interp', 'EdgeColor', 'k', 'FaceAlpha', 0.9);
+      
+    title(sprintf('%s (Scale: %.1f)', plotName, scale));
+    axis equal; axis vis3d;
+    xlabel('X'); ylabel('Y'); zlabel('Z');
+    colorbar; colormap jet;
+    view(3); grid on;
+end

@@ -291,11 +291,10 @@ for i = 1:n_modes
     thx = Phi_full(4:6:end, i);
 
     % Normalize for visualization
-        
     scale = max(abs([uy; uz; thx]));      
-    uy = uy / scale;   
-    uz = uz / scale;
-    thx = thx / scale;
+    uy = uy/scale;   
+    uz = uz/scale;
+    thx = thx/scale;
 
     figure;
     subplot(3,1,1)
