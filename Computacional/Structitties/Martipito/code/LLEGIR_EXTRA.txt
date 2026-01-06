@@ -1,6 +1,11 @@
 
 
 ARA MATEIX TENIEM UN plotModes i plotDeformed a MAIN_shell que no eren els del professor i realment no treballaven igual.
+EL NOSTRA PLOTEJA COLORS I LA MALLA, ESTA MOLT MÉS GUAPO, PERÒ L'ESCALA O LA NORMALITZACIÓ DE LES FORMES NO ÉS LA MATEIXA I NO SURTEN LES MATEIXES FORMES MODALS.
+
+MIRAR QUE ES POT FER
+
+
 
 ESTAVEN COPIADES AL FINAL DE TOT DEL CODI
 %%%%%%%%%%%%%%%%%%%%%%%%%
