@@ -5,7 +5,7 @@ close all
 clc
 
 %% DATA
-problem_type = 1; % 1 for bending (Force), 2 for torsion (Torque)
+problem_type = 2; % 1 for bending (Force), 2 for torsion (Torque)
 Nm = 6; % Number of modes to extract
 
 % Dimensions and Material Properties

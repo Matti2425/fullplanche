@@ -69,7 +69,7 @@ Qe = [0 1 2];
 % Body forces (force, node, dof)
 Be = [0 1 2];
 
-j_orientations = [0 1 0]; 
+j_orientations = [0 1 0]; %input data, volem que sigui cap a y global
 
 %For convenience; More rows would be added if more values existed
 E_vector = [E]; 
@@ -90,7 +90,7 @@ rho_vector = [rho];
 if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
 
     %MATRIX ASSEMBLY (sparse + blkdiag version)
-    Ndof = 6*N_nodes;
+    Ndof = 6*N_nodes; 
     K = sparse(Ndof,Ndof); % Stiffness matrix
     M  = sparse(Ndof,Ndof);% Mass matrix
     
@@ -101,9 +101,9 @@ if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
         x2 = xn(Tn(e,2),:)'; % Node 2 of element e
         Le = norm(x2 - x1);  % Element lenght
     
-        i = (x2 - x1)/Le; % X axis unit vector
-        j = j_orientations(Tm(e,1),:)'; 
-        k = cross(i,j); % Z axis
+        i = (x2 - x1)/Le; % Local X axis unit vector
+        j = j_orientations(Tm(e,1),:)'; % Local Y axis unit vector
+        k = cross(i,j); %Local Z axis unit vector
     
         % Rotación local Rp (6x6) 
         R3 = [i j k];
@@ -112,81 +112,66 @@ if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
         % Rotación global (12x12)
         Re = blkdiag(Rp, Rp);
     
-        % Axial
-        Nx = [-1/Le; 1/Le];
-        Ba_row = [Nx(1) 0 0 0 0 0 Nx(2) 0 0 0 0 0];
+        % Axial (pag 6)
+        Nx = [-1/Le; 1/Le]; 
+        Ba_row = [Nx(1) 0 0 0 0 0 Nx(2) 0 0 0 0 0]; % Al node
         Ba = sparse(Ba_row);
-    
         Ca = E_vector(Tm(e,1))*A_vector(Tm(e,1));
-    
         Ka = Le*(Re'*(Ba'*Ca*Ba)*Re);
     
-        % --- Flexión --------------------------------------
-        Bb = sparse([ ...
-            0 0 0 0 Nx(1) 0   0 0 0 0 Nx(2) 0;
-            0 0 0 0 0 Nx(1)  0 0 0 0 0 Nx(2)]);
-    
+        % Flexió (pag 6)
+        Bb = sparse([0 0 0 0 Nx(1) 0   0 0 0 0 Nx(2) 0;
+                     0 0 0 0 0 Nx(1)  0 0 0 0 0 Nx(2)]);
         Cb = E_vector(Tm(e,1)) * diag([Iy_vector(Tm(e,1)) Iz_vector(Tm(e,1))]);
+        Kb = Le*(Re'*(Bb'*Cb*Bb)*Re);
     
-        Kb = Le * (Re' * (Bb' * Cb * Bb) * Re);
-    
-        % --- Cortante --------------------------------------
+        % Tallant (pag 7)
         N_G = 1/2;
+        Bs = sparse([0 Nx(1) 0 0 0 -N_G  0 Nx(2) 0 0 0 -N_G;
+                     0 0 Nx(1) 0 N_G 0   0 0 Nx(2) 0 N_G 0 ]);
+        Cs = G_vector(Tm(e,1))*A_vector(Tm(e,1))*diag([ky_vector(Tm(e,1)) kz_vector(Tm(e,1))]);
+        Ks = Le*(Re'*(Bs'*Cs*Bs)*Re);
     
-        Bs = sparse([ ...
-            0 Nx(1) 0 0 0 -N_G  0 Nx(2) 0 0 0 -N_G;
-            0 0 Nx(1) 0 N_G 0   0 0 Nx(2) 0 N_G 0 ]);
-    
-        Cs = G_vector(Tm(e,1))*A_vector(Tm(e,1))* ...
-             diag([ky_vector(Tm(e,1)) kz_vector(Tm(e,1))]);
-    
-        Ks = Le * (Re' * (Bs' * Cs * Bs) * Re);
-    
-        % --- Torsión --------------------------------------
+        %Torsió (pag 7)
         Bt_row = [0 0 0 Nx(1) 0 0 0 0 0 Nx(2) 0 0];
         Bt = sparse(Bt_row);
-    
         Ct = G_vector(Tm(e,1))*J_vector(Tm(e,1))*kt_vector(Tm(e,1));
+        Kt = Le*(Re'*(Bt'*Ct*Bt)*Re);
     
-        Kt = Le * (Re' * (Bt' * Ct * Bt) * Re);
-    
-        % -----------------------------------------------
-        %     MASA CONSISTENTE (también local)
-        % -----------------------------------------------
+        %Ass Martix (local) (pag 8)
         Xi = [-1/sqrt(3); 1/sqrt(3)];
         w  = [1; 1];
-    
+        
         A  = A_vector(Tm(e,1));
         Iy = Iy_vector(Tm(e,1));
         Iz = Iz_vector(Tm(e,1));
         J  = J_vector(Tm(e,1));
         rho = rho_vector(Tm(e,1));
     
-        rho_mat = rho * blkdiag(A*speye(3), J, Iy, Iz);  % 6×6
+        rho_mat = rho * blkdiag(A*speye(3), J, Iy, Iz);  % 6×6 speye=identitat (mantenim sparse)
     
         Me = sparse(12,12);
     
         for kk = 1:2
             N = [(1 - Xi(kk))/2; (1 + Xi(kk))/2];
             Nrow = [N(1) 0 0 0 0 0 N(2) 0 0 0 0 0];
-    
             Nmat = sparse(6,12);
                 for k = 1:6
-                    Nmat(k, k)     = N(1);
-                    Nmat(k, 6 + k) = N(2);
+                    Nmat(k, k)   = N(1);
+                    Nmat(k, 6+k) = N(2);
                 end
 
-            Me = Me + (w(kk)*Le/2) * (Re' * (Nmat' * rho_mat * Nmat) * Re);
+            Me = Me + (w(kk)*Le/2) * (Re'*(Nmat'*rho_mat*Nmat) * Re);
         end
     
-        % --- DOFs globales --------------------------------
+        % DOFs globals (pag 9)
         Idof = zeros(12,1);
         for j = 1:6
-            Idof(j)     = 6*(Tn(e,1)-1) + j;
+            Idof(j) = 6*(Tn(e,1)-1) + j;
             Idof(6 + j) = 6*(Tn(e,2)-1) + j;
         end
     
-        % --- Ensamblaje global -----------------------------
+        % Ensamblatge (pag 9)
         K(Idof,Idof) = K(Idof,Idof) + Ka + Kb + Ks + Kt;
         M(Idof,Idof)  = M(Idof,Idof)  + Me;
     
@@ -195,24 +180,25 @@ if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
 
     fprintf('--- Applying boundary conditions and loads ---\n');
     
-    % --- External Force Vector ---
+    % External Force Vector (pag 10)
     F = zeros(Ndof, 1);
     F_node = Fe(1,2);
     F_dof = Fe(1,3);
-    F_global = (F_node - 1) * 6 + F_dof;
-    F(F_global) = Fe(1,1); % apply unit or specified load
+    F_global = (F_node - 1) * 6 + F_dof; %nodee to global dofs
+   
+    F(F_global) = Fe(1,1); % Specified load
     
-    % --- Apply Boundary Conditions ---
+    % Apply Boundary Conditions (pag 12)
     prescribed_dofs = (Up(:,2) - 1) * 6 + Up(:,3);
     free_dofs = setdiff(1:Ndof, prescribed_dofs);
     
-    % --- Solve system ---
+    % Solve system (pag 12)
     U = zeros(Ndof, 1);
     U(free_dofs) = K(free_dofs, free_dofs) \ F(free_dofs);
     
     fprintf('--- Static solution complete ---\n');
     
-    % Perform modal analysis
+    % Perform modal analysis (pag 4 frequency)
     fprintf('--- Performing modal analysis ---\n');
     n_modes = min(Nm, length(free_dofs));
     [Phi, Omega2] = eigs(K(free_dofs, free_dofs), M(free_dofs, free_dofs), n_modes, 'sm');
@@ -231,9 +217,9 @@ save('beam_results.mat');
 % --- 1. Extract Displacements from Global Vector U ---
 % U is stored as [ux1; uy1; uz1; thx1; thy1; thz1; ux2; ... ]
 u_x = U(1:6:end);       % Axial displacement
-u_y = U(2:6:end);       % Lateral displacement (Y)
-u_z = U(3:6:end);       % Vertical displacement (Z)
-theta_x = U(4:6:end);   % Torsion/Twist
+u_y = U(2:6:end);       % Lateral displacement 
+u_z = U(3:6:end);       % Vertical displacement 
+theta_x = U(4:6:end);   % Torsion
 theta_y = U(5:6:end);   % Bending rotation about Y
 theta_z = U(6:6:end);   % Bending rotation about Z
 
