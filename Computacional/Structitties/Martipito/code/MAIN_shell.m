@@ -388,6 +388,8 @@ for i=1:n_pts
     res_theta(i) = theta_val;
 end
 
+%% PLOTS
+
 % Plot Spanwise Results
 figure('Name','Spanwise Results');
 subplot(2,1,1);
@@ -415,15 +417,61 @@ plotModes('Modes Shapes', Phi, freq, imodes);
 
 
 %%%%%%%%%%%%%%%%%EXTRA MODE ANALYSIS
+%% --- Modal postprocess (Part II requirement): ubar_y, ubar_z, thetabar_x vs span ---
 
+n_pts = length(indSpar1);
+x_span = xn(indSpar1,1);
+dist_y = (y2 - y1);
+
+for k = 1:Nm   % or for k = 1:n_modes_calc if you prefer
+    % Modal vector (full size Ndof)
+    phi = Phi(:,k);
+
+    ubar_y = zeros(n_pts,1);
+    ubar_z = zeros(n_pts,1);
+    thetabar_x = zeros(n_pts,1);
+
+    for i = 1:n_pts
+        n1 = indSpar1(i);   % front spar node index at station i
+        n2 = indSpar2(i);   % rear spar node index at station i
+
+        uy1 = phi(6*(n1-1) + 2);
+        uy2 = phi(6*(n2-1) + 2);
+
+        uz1 = phi(6*(n1-1) + 3);
+        uz2 = phi(6*(n2-1) + 3);
+
+        % Averages / twist (statement formulas)
+        ubar_y(i) = 0.5*(uy1 + uy2);
+        thetabar_x(i) = (uz2 - uz1) / dist_y;
+        ubar_z(i) = uz1 + thetabar_x(i)*(yc - y1);
+    end
+
+    % Normalize for visualization (optional, same reason as Part I)
+    scale = max(abs([ubar_y; ubar_z; thetabar_x])) + eps;
+    ubar_y = ubar_y/scale;
+    ubar_z = ubar_z/scale;
+    thetabar_x = thetabar_x/scale;
+
+    figure;
+    subplot(3,1,1); plot(x_span, ubar_y, 'LineWidth', 1.5); grid on;
+    ylabel('$\bar{u}_y$', 'Interpreter','latex');
+
+    subplot(3,1,2); plot(x_span, ubar_z, 'LineWidth', 1.5); grid on;
+    ylabel('$\bar{u}_z$', 'Interpreter','latex');
+
+    subplot(3,1,3); plot(x_span, thetabar_x, 'LineWidth', 1.5); grid on;
+    ylabel('$\bar{\theta}_x$', 'Interpreter','latex');
+    xlabel('Span $x$ [m]', 'Interpreter','latex');
+
+    sgtitle(sprintf('Mode %d (f = %.2f Hz)', k, freq(k)));
+end
 
 
 %%%%%%%%%%%%%%%%%EXTRA MODE ANALYSYS
 
 
-%% LOCAL PLOT FUNCTIONS
-
-%AQUI ESTAVA COPIAT plotModes i plotDeformed nostres (Llegir LLEGIR_EXTRA.txt)
+%% MODIFIED PLOT MODES AND PLOTDEFORMED
 
 function plotDeformed(plotName, xn, Tn, u, scale)
     % xn : [Nnodes x 3]

@@ -1,12 +1,10 @@
 %% PART III - WING MODELLING (TEMPLATE)
-
 % Useful commands to initialize script
 clear
 close all
 clc
 
 %% SOLUTION CONTROLS
-
 problem_type = 3;  % 1: Bending, 2: Torsion, 3: Pressure + Weight
 solution_type = 1; % 1: Direct Method, 2: Model Order Reduction (MOR)
 Nm = 10;           % Number of modes to compute
@@ -19,16 +17,19 @@ RB = 1; % Ribs
 SK = 1; % Skin
 
 %% DATA
-
 % Material Properties
-E = 71e9;       % Pa
-v_poisson = 0.33;
-rho = 2300;     % kg/m3
+E = 75e9;       % Pa
+v_poisson = 0.3;
+rho = 2200;     % kg/m3
 G = E/(2*(1+v_poisson));
 
 % Geometry
-c = 0.8; b = 5.5; % m
-y0 = 0.3083; y1 = 0.176; y2 = 0.464; yc = 0.2954; % m
+c = 0.85; %m
+b = 3; %m
+y0 = 0.924; %m
+y1 = 0.125; %m
+y2 = 0.475; %m
+yc = 0.285; %m
 
 % Loads Data
 F = 1; % N (Unit force for bending)
@@ -38,7 +39,6 @@ alpha = 10*pi/180; % rad (Angle of attack)
 g0 = 9.80665;    % m/s^2
 
 %% PREPROCESS
-
 % Load mesh data
 if isfile('wing.mat')
     load('wing.mat','xn','Tn_st','Tm_st','Tn_wb','Tm_wb','Tn_rb','Tm_rb','Tn_sk','Tm_sk','indRoot','indPointA','indPointB','indSpar1','indSpar2','n_u','n_l');
@@ -88,7 +88,6 @@ switch(problem_type)
 end
 
 % --- 3. Element Properties ---
-
 % Wing Box (Shells)
 h_vector_wb = [17.5e-3; 15e-3; 6e-3]; 
 E_vector_wb = repmat(E,3,1);
@@ -115,20 +114,19 @@ h_vector_sk = 2e-3;
 E_vector_sk = E; v_vector_sk = v_poisson; rho_vector_sk = rho;
 
 %% SOLVER
-
 % Obtain system matrices
 if 1 % Set to 1 to (re)compute, 0 to load
     fprintf('Computing Wing Box Matrices...\n');
-    [K_wb,M_wb,f_wb] = ComputeKM_shells(xn,N_nodes,size(Tn_wb,1),Tn_wb,Tm_wb,h_vector_wb,E_vector_wb,v_vector_wb,rho_vector_wb,Fe_wb,Be,Pe_wb);
+    [K_wb,M_wb,f_wb,Bb_wb,Bmn_wb,Bmt_wb,Bs_wb,R_wb] = ComputeKM_shells(xn,N_nodes,size(Tn_wb,1),Tn_wb,Tm_wb,h_vector_wb,E_vector_wb,v_vector_wb,rho_vector_wb,Fe_wb,Be,Pe_wb);
     
     fprintf('Computing Stringer Matrices...\n');
     [K_st,M_st,f_st] = ComputeKM_beams(xn,N_nodes,size(Tn_st,1),Tn_st,Tm_st,E_vector_st,G_vector_st,rho_vector_st,j_orientations,A_vector_st,Iy_vector_st,Iz_vector_st,J_vector_st,ky_vector_st,kz_vector_st,kt_vector_st,Fe_st,Be,Qe_st);
     
     fprintf('Computing Rib Matrices...\n');
-    [K_rb,M_rb,f_rb] = ComputeKM_shells(xn,N_nodes,size(Tn_rb,1),Tn_rb,Tm_rb,h_vector_rb,E_vector_rb,v_vector_rb,rho_vector_rb,Fe_rb,Be,Pe_rb);
+    [K_rb,M_rb,f_rb,Bb_rb,Bmn_rb,Bmt_rb,Bs_rb,R_rb] = ComputeKM_shells(xn,N_nodes,size(Tn_rb,1),Tn_rb,Tm_rb,h_vector_rb,E_vector_rb,v_vector_rb,rho_vector_rb,Fe_rb,Be,Pe_rb);
     
     fprintf('Computing Skin Matrices...\n');
-    [K_sk,M_sk,f_sk] = ComputeKM_shells(xn,N_nodes,size(Tn_sk,1),Tn_sk,Tm_sk,h_vector_sk,E_vector_sk,v_vector_sk,rho_vector_sk,Fe_sk,Be,Pe_sk);
+    [K_sk,M_sk,f_sk,Bb_sk,Bmn_sk,Bmt_sk,Bs_sk,R_sk] = ComputeKM_shells(xn,N_nodes,size(Tn_sk,1),Tn_sk,Tm_sk,h_vector_sk,E_vector_sk,v_vector_sk,rho_vector_sk,Fe_sk,Be,Pe_sk);
     
     % Save results
     save('wing_matrices.mat','K_wb','M_wb','K_st','M_st','K_rb','M_rb','K_sk','M_sk','f_wb','f_st','f_rb','f_sk');
@@ -156,8 +154,8 @@ fprintf('Performing Modal Analysis...\n');
 [V, D] = eigs(K(free_dofs,free_dofs), M(free_dofs,free_dofs), Nm, 'sm');
 [lambda_sorted, idx] = sort(diag(D));
 V_sorted = V(:, idx);
-
 freq = sqrt(lambda_sorted)/(2*pi);
+
 Phi = zeros(Ndof, Nm);
 Phi(free_dofs, :) = V_sorted;
 
@@ -225,30 +223,36 @@ for i = 1:n_points
 end
 
 figure('Name', 'Spanwise Results', 'Color', 'w');
+
 subplot(2,1,1);
 plot(xn_plot, u_z, 'LineWidth', 1.5);
-title('Vertical Deflection (u_z) along Span');
-xlabel('x (m)'); ylabel('u_z (m)'); grid on;
+title('(u_z) along Span');
+xlabel('Spanwise Coordinate x [m]');   % <--- Unidades añadidas
+ylabel('Vertical Deflection u_z [m]'); % <--- Unidades añadidas
+grid on;
 legend(sprintf('Problem Type %d', problem_type));
 
 subplot(2,1,2);
 plot(xn_plot, theta_x, 'LineWidth', 1.5);
 title('Twist Angle (\theta_x) along Span');
-xlabel('x (m)'); ylabel('\theta_x (rad)'); grid on;
+xlabel('Spanwise Coordinate x [m]'); % <--- Unidades añadidas
+ylabel('Twist Angle \theta_x [rad]'); % <--- Unidades añadidas
+grid on;
 
 % --- 2. 3D Deformation & Stress Plots ---
 % Determine scale factor automatically if needed
 scale = 0.1 * max(abs(xn(:,1))) / max(abs(u(3:6:end)) + eps);
 fprintf('Plotting deformations with scale factor: %.2f\n', scale);
 
+% Se añaden unidades [Pa] a los títulos de los plots 3D
 plotDeformed('wing', xn, Tn_wb, u, scale, sigVM_wb); 
-title(['Wingbox Deformation & Stress - Scale: ' num2str(scale)]);
+title(['Wingbox Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale)]); % <--- Unidad añadida
 
 plotDeformed('wing', xn, Tn_rb, u, scale, sigVM_rb); 
-title(['Ribs Deformation & Stress - Scale: ' num2str(scale)]);
+title(['Ribs Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale)]);    % <--- Unidad añadida
 
 plotDeformed('wing', xn, Tn_sk, u, scale, sigVM_sk); 
-title(['Skin Deformation & Stress - Scale: ' num2str(scale)]);
+title(['Skin Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale)]);    % <--- Unidad añadida
 
 % --- 3. Mode Shapes ---
 fprintf('Plotting Mode Shapes...\n');
