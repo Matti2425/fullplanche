@@ -282,6 +282,8 @@ end
 Phi_full = zeros(Ndof, n_modes);
 Phi_full(free_dofs, :) = Phi;
 x_span = xn(:,1);
+%plotModes('Beam Vibration Modes', xn, Tn, Phi_full, frequencies, 1:n_modes);
+
 
     
 for i = 1:n_modes
@@ -312,3 +314,4 @@ for i = 1:n_modes
 
    sgtitle(sprintf('Mode %d  (f = %.2f Hz)', i, frequencies(i)));
 end
+

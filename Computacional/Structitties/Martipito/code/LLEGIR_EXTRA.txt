@@ -157,3 +157,90 @@ for k = 1:Nm   % or for k = 1:n_modes_calc if you prefer
 end
 
 %%%%%%%%%%%%%%%%%%%%%  MODAL ANALYSIS %%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+%%%%%%%%%%%%%%%%%%% AL MAIN BEAMS HE FICAT UN PLOT MODES TAMBÉ (CHAT GPT) %%%%%%%%%%%%%%%%%%%
+
+function plotModes_beam(plotName, xn, Tn, Phi, freq, imodes)
+% Beam mode shape plot (shell-like style):
+% - undeformed discretised line (grey dashed)
+% - deformed line, coloured by u_z (jet)
+%
+% xn : [Nnodes x 3]
+% Tn : [Nelem x 2] connectivity
+% Phi: [Ndof x Nmodes] full eigenvectors (including fixed DOFs if you rebuilt them)
+% freq: [Nmodes x 1]
+% imodes: indices to plot
+
+    figure('Name', plotName, 'NumberTitle','off', 'Color','w');
+
+    num_plots = length(imodes);
+    rows = ceil(sqrt(num_plots));
+    cols = ceil(num_plots/rows);
+
+    x0 = xn(:,1); y0 = xn(:,2); z0 = xn(:,3);
+
+    for kk = 1:num_plots
+        I = imodes(kk);
+        subplot(rows, cols, kk); hold on;
+
+        mode = Phi(:,I);
+
+        % Extract translational components
+        dx = mode(1:6:end);
+        dy = mode(2:6:end);
+        dz = mode(3:6:end);
+
+        % Scale so it looks nice (eigenvectors arbitrary amplitude)
+        max_disp = max(sqrt(dx.^2 + dy.^2 + dz.^2)) + eps;
+        scale = 0.15 * (max(x0) - min(x0)) / max_disp;
+
+        x = x0 + scale*dx;
+        y = y0 + scale*dy;
+        z = z0 + scale*dz;
+
+        % --- Undeformed discretised beam (grey dashed) ---
+        for e = 1:size(Tn,1)
+            n1 = Tn(e,1); n2 = Tn(e,2);
+            plot3([x0(n1) x0(n2)], [y0(n1) y0(n2)], [z0(n1) z0(n2)], ...
+                  ':', 'Color', 0.7*[1 1 1], 'LineWidth', 1.0);
+        end
+
+        % --- Deformed beam, coloured by u_z (jet) ---
+        % colour per segment = average nodal dz
+        c = 0.5*(dz(Tn(:,1)) + dz(Tn(:,2)));
+        cmin = min(c); cmax = max(c);
+        if abs(cmax-cmin) < 1e-14, cmax = cmin + 1; end
+
+        cmap = jet(256);
+        for e = 1:size(Tn,1)
+            n1 = Tn(e,1); n2 = Tn(e,2);
+
+            % map c(e) to colormap index
+            t = (c(e)-cmin)/(cmax-cmin);
+            idx = 1 + round(t*(size(cmap,1)-1));
+            idx = max(1, min(size(cmap,1), idx));
+
+            plot3([x(n1) x(n2)], [y(n1) y(n2)], [z(n1) z(n2)], ...
+                  '-', 'Color', cmap(idx,:), 'LineWidth', 2.0);
+        end
+
+        % cosmetics
+        axis equal; axis vis3d; axis off;
+        view(40,20);
+        %title(sprintf('Mode %d: %.2f Hz', I, freq(I)));
+
+        colormap jet;
+        cb = colorbar;
+        ylabel(cb,'u_z ');
+    end
+
+    sgtitle(plotName);
+end
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
+
+%%%%%%%%%%% O AMB EL PLOT MODES QUE JA TENIEM DEL SHELL_MODEL %%%%%%%%%%%%%%

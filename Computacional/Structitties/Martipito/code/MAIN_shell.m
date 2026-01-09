@@ -561,6 +561,3 @@ function plotModes(plotName, Phi, freq, imodes)
 end
 
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
