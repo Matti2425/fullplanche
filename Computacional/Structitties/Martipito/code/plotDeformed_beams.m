@@ -1,55 +1,40 @@
 function plotDeformed_beams(xn, Tn_st, u, scale, sigVM_st)
-% plotDeformed_beams: deformed beam mesh coloured by element stress
-% xn: [Nnodes x 3]
-% Tn_st: [Nelem x 2]
-% u: [Ndof x 1]
-% scale: deformation scale
-% sigVM_st: [Nelem x 1] (elementwise) or [] to colour by uz
+% Plots wing geometry (undeformed+deformed) and overlays stringers coloured by sigVM_st.
+% Requires: plotDeformed.m (professor) in path, and wing.mat accessible for Tc in plotDeformed.
 
-    x0 = xn(:,1); y0 = xn(:,2); z0 = xn(:,3);
+    % 1) Plot wing geometry using professor function (no stress)
+    load('wing.mat','Tn_sk');              % uses skin as outer surface
+    plotDeformed('wing', xn, Tn_sk, u, scale);  % <-- no sigVM
+    hold on;
 
+    % 2) Deformed nodal coordinates
     ux = u(1:6:end); uy = u(2:6:end); uz = u(3:6:end);
-    x = x0 + scale*ux;
-    y = y0 + scale*uy;
-    z = z0 + scale*uz;
+    x = xn(:,1) + scale*ux;
+    y = xn(:,2) + scale*uy;
+    z = xn(:,3) + scale*uz;
 
-    figure('Color','w'); hold on;
-
-    % Undeformed discretised mesh (grey dashed)
-    for e = 1:size(Tn_st,1)
-        n1 = Tn_st(e,1); n2 = Tn_st(e,2);
-        plot3([x0(n1) x0(n2)], [y0(n1) y0(n2)], [z0(n1) z0(n2)], ...
-              ':', 'Color', 0.7*[1 1 1], 'LineWidth', 1.0);
-    end
-
-    % If stress not provided, colour by uz
-    if nargin < 5 || isempty(sigVM_st)
-        c = 0.5*(uz(Tn_st(:,1)) + uz(Tn_st(:,2)));   % element colour
-        cb_label = 'u_z (arb.)';
-    else
-        c = sigVM_st(:);
-        cb_label = '\sigma_{VM} [Pa]';
-    end
-
-    % Colormap mapping
+    % 3) Colour mapping (element-wise)
+    c = sigVM_st(:);
+    cmin = min(c); cmax = max(c);
+    if abs(cmax-cmin) < 1e-14, cmax = cmin + 1; end
     cmap = jet(256);
-    cmin = min(c); 
-    cmax = max(c);
 
-    % Deformed mesh coloured
     for e = 1:size(Tn_st,1)
         n1 = Tn_st(e,1); n2 = Tn_st(e,2);
+
         t = (c(e)-cmin)/(cmax-cmin);
         idx = 1 + round(t*(size(cmap,1)-1));
         idx = max(1, min(size(cmap,1), idx));
+
         plot3([x(n1) x(n2)], [y(n1) y(n2)], [z(n1) z(n2)], ...
               '-', 'Color', cmap(idx,:), 'LineWidth', 2.0);
     end
 
-    axis equal; axis vis3d; grid on;
-    view(40,20);
     colormap jet
-    caxis([cmin cmax]) %Pa
+    caxis([cmin cmax])  %Pa colorbar
     cb = colorbar;
     cb.Label.String = '\sigma_{VM} [Pa]';
+
+    view(40,20);
+    axis equal; axis vis3d;
 end
