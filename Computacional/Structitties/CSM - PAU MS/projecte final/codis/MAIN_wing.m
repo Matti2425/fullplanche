@@ -7,15 +7,15 @@ close all
 
 %% SOLUTION CONTROLS
 
-problem_type = 3; % 1 for bending, 2 for torsion, 3 for pressure and weight
-solution_type = 2; % 1 for direct method, 2 for model-order reduction solution
+problem_type = 2; % 1 for bending, 2 for torsion, 3 for pressure and weight
+solution_type = 1; % 1 for direct method, 2 for model-order reduction solution
 Nm = 9; % Number of desired modes to be computed (this is the number that will be used to solve the system if model-order reduction solution is requested)
 Im = [1,2,3,4,6,7]; %Number of modes to be used for the modal projection
 
 WB = 1; %Set to 1 to include, set to 0 to neglect
-ST = 1; %Set to 1 to include, set to 0 to neglect
-RB = 1; %Set to 1 to include, set to 0 to neglect
-SK = 1; %Set to 1 to include, set to 0 to neglect
+ST = 0; %Set to 1 to include, set to 0 to neglect
+RB = 0; %Set to 1 to include, set to 0 to neglect
+SK = 0; %Set to 1 to include, set to 0 to neglect
 
 computeModes = WB*ST*RB*SK; % Don't compute modes if any is 0
 
@@ -27,17 +27,17 @@ end
 %% DATA
 
 % Define the problem's data (e.g. dimensions, material properties, etc.)
-E = 71e9; %Pa
-v_poisson = 0.33; %chan chachachan chachachchanchanchan chan chachachachan chachac
-rho = 2300; %kg/m3
+E = 75e9; %Pa
+v_poisson = 0.3; %chan chachachan chachachchanchanchan chan chachachachan chachac
+rho = 2200; %kg/m3
 G = E/(2*(1+v_poisson));
 
-c = 0.8; %m
-b = 5.5; %m
-y0 = 0.3083; %m
-y1 = 0.176; %m
-y2 = 0.464; %m
-yc = 0.2954; %m
+c = 0.85; %m
+b = 3; %m
+y0 = 0.0294; %m
+y1 = 0.125; %m
+y2 = 0.475; %m
+yc = 0.285; %m
 
 % Loads 
 F = 1; %N
@@ -45,8 +45,8 @@ T = 1; %Nm
 
 % other
 
-p_inf = 12500; % Pa
-alpha = 10*pi/180; % rad
+p_inf = 1.5e5; % Pa
+alpha = 20*pi/180; % rad
 g0 = 9.80665; %m/s^2
 
 
