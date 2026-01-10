@@ -14,7 +14,7 @@ Im = 1:9;          % Modes to use for MOR projection
 WB = 1; % Wingbox
 ST = 1; % Stringers
 RB = 1; % Ribs
-SK = 1; % Skin
+SK = 0; % Skin
 
 %% DATA
 % Material Properties
@@ -142,25 +142,30 @@ end
 fprintf('Assembling Global System...\n');
 K = WB*K_wb + ST*K_st + RB*K_rb + SK*K_sk;
 M = WB*M_wb + ST*M_st + RB*M_rb + SK*M_sk;
-f = f_wb + f_st + f_rb + f_sk;
+f = WB*f_wb + ST*f_st + RB*f_rb + SK*f_sk;
 
 % Partition System (Free vs Prescribed DOFs)
 prescribed_dofs = 6*(Up(:,2)-1) + Up(:,3);
-free_dofs = setdiff(1:Ndof, prescribed_dofs);
+active_dofs = find(diag(K) ~= 0 | diag(M) ~= 0);
+free_dofs = intersect(active_dofs, setdiff(1:Ndof, prescribed_dofs));
 
 % --- Modal Analysis ---
 fprintf('Performing Modal Analysis...\n');
+% Adjust number of modes if system is too small
+Nm_eff = min(Nm, length(free_dofs));
+Im_eff = Im(Im <= Nm_eff);
+
 % Using MATLAB eigs instead of custom MAIN_modal
-[V, D] = eigs(K(free_dofs,free_dofs), M(free_dofs,free_dofs), Nm, 'sm');
+[V, D] = eigs(K(free_dofs,free_dofs), M(free_dofs,free_dofs), Nm_eff, 'sm');
 [lambda_sorted, idx] = sort(diag(D));
 V_sorted = V(:, idx);
 freq = sqrt(lambda_sorted)/(2*pi);
 
-Phi = zeros(Ndof, Nm);
+Phi = zeros(Ndof, Nm_eff);
 Phi(free_dofs, :) = V_sorted;
 
 % Normalize Mass (Optional but recommended)
-for k = 1:Nm
+for k = 1:Nm_eff
     norm_factor = sqrt(Phi(:,k)' * M * Phi(:,k));
     Phi(:,k) = Phi(:,k) / norm_factor;
 end
@@ -182,7 +187,7 @@ elseif solution_type == 2 % Model Order Reduction
     
     % We need enough modes for accuracy. Check if Nm is sufficient.
     u_reduced = zeros(Ndof, 1);
-    for k = Im
+    for k = Im_eff
         modal_force = Phi(:,k)' * f;
         stiffness_val = lambda_sorted(k); % eigenvalue = omega_n^2
         alpha = modal_force / stiffness_val;
@@ -193,10 +198,11 @@ end
 
 % --- Stress Calculation ---
 fprintf('Calculating Stresses...\n');
-% We calculate stresses for shell components
-sigVM_wb = Compute_stress_shells(size(Tn_wb,1),u,Tn_wb,Tm_wb,h_vector_wb,v_vector_wb,E_vector_wb,Bb_wb,Bmn_wb,Bmt_wb,Bs_wb,R_wb);
-sigVM_rb = Compute_stress_shells(size(Tn_rb,1),u,Tn_rb,Tm_rb,h_vector_rb,v_vector_rb,E_vector_rb,Bb_rb,Bmn_rb,Bmt_rb,Bs_rb,R_rb);
-sigVM_sk = Compute_stress_shells(size(Tn_sk,1),u,Tn_sk,Tm_sk,h_vector_sk,v_vector_sk,E_vector_sk,Bb_sk,Bmn_sk,Bmt_sk,Bs_sk,R_sk);
+% We calculate stresses for shell components if they are included
+sigVM_wb = []; sigVM_rb = []; sigVM_sk = [];
+if WB, sigVM_wb = Compute_stress_shells(size(Tn_wb,1),u,Tn_wb,Tm_wb,h_vector_wb,v_vector_wb,E_vector_wb,Bb_wb,Bmn_wb,Bmt_wb,Bs_wb,R_wb); end
+if RB, sigVM_rb = Compute_stress_shells(size(Tn_rb,1),u,Tn_rb,Tm_rb,h_vector_rb,v_vector_rb,E_vector_rb,Bb_rb,Bmn_rb,Bmt_rb,Bs_rb,R_rb); end
+if SK, sigVM_sk = Compute_stress_shells(size(Tn_sk,1),u,Tn_sk,Tm_sk,h_vector_sk,v_vector_sk,E_vector_sk,Bb_sk,Bmn_sk,Bmt_sk,Bs_sk,R_sk); end
 
 %% POSTPROCESS
 save('wing_results.mat');
@@ -265,24 +271,29 @@ grid on;
 scale = 0.1 * max(abs(xn(:,1))) / max(abs(u(3:6:end)) + eps);
 fprintf('Plotting deformations with scale factor: %.2f\n', scale);
 
-plotDeformed('wing', xn, Tn_wb, u, scale, sigVM_wb); 
-sgtitle({['\bf Wingbox Deformation & Von Mises Stress [Pa] - Scale: ', num2str(scale, '%.1f')], ...
-         [test_name, ' calculated by ', method_name]}, ...
-         'Interpreter', 'tex');
-st.HorizontalAlignment = 'center';
+if WB
+    plotDeformed('wing', xn, Tn_wb, u, scale, sigVM_wb); 
+    sgtitle({['\bf Wingbox Deformation & Von Mises Stress [Pa] - Scale: ', num2str(scale, '%.1f')], ...
+             [test_name, ' calculated by ', method_name]}, ...
+             'Interpreter', 'tex');
+end
 
-plotDeformed('wing', xn, Tn_rb, u, scale, sigVM_rb); 
-sgtitle({['Ribs Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale, '%.1f')], ...
-         [test_name, ' calculated by ', method_name]}, ...
-         'Interpreter', 'tex');
+if RB
+    plotDeformed('wing', xn, Tn_rb, u, scale, sigVM_rb); 
+    sgtitle({['Ribs Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale, '%.1f')], ...
+             [test_name, ' calculated by ', method_name]}, ...
+             'Interpreter', 'tex');
+end
 
-plotDeformed('wing', xn, Tn_sk, u, scale, sigVM_sk); 
-sgtitle({['Skin Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale, '%.1f')], ...
-         [test_name, ' calculated by ', method_name]}, ...
-         'Interpreter', 'tex');
+if SK
+    plotDeformed('wing', xn, Tn_sk, u, scale, sigVM_sk); 
+    sgtitle({['Skin Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale, '%.1f')], ...
+             [test_name, ' calculated by ', method_name]}, ...
+             'Interpreter', 'tex');
+end
 
 % --- 3. Mode Shapes ---
 fprintf('Plotting Mode Shapes...\n');
-plotModes('wing', Phi, freq, 1:min(9, Nm));
+plotModes('wing', Phi, freq, 1:min(9, Nm_eff));
 
 fprintf('--- Analysis Complete ---\n');

@@ -1,4 +1,5 @@
 function sigma_VM = Compute_stress_shells(N_elements,u,Tn,Tm,h_vector,v_poisson_vector,E_vector,Bb,Bmn,Bmt,Bs,R)
+sigma_VM = zeros(N_elements, 4);
 for e=1:1:N_elements
         for jj=1:1:6
             Idof(jj,1) = 6*(Tn(e,1)-1)+jj;
