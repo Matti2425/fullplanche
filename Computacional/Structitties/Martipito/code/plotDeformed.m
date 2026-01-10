@@ -38,7 +38,7 @@ else
 end
 
 % Additional options
-title(sprintf('Deformation scale = %g',scale));
+%title(sprintf('Deformation scale = %g',scale));
 set(gca,'color','none','xcolor','none','ycolor','none','zcolor','none');
 axis equal
 axis vis3d
