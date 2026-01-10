@@ -99,47 +99,29 @@ if 1 % Set to 1 to (re)compute, 0 to load
         % Nodes: 1-2-3-4
         x_e = xn(Tn(e,:), :); % 4x3 coordinates
         
-        % Vectors for local axes (pag 5)
+        % Vectors for local axes
         v13 = x_e(3,:) - x_e(1,:);
         v24 = x_e(4,:) - x_e(2,:);
         Normal = cross(v13, v24); 
         k_dir = (Normal / norm(Normal))'; % Local z
         
-        % Local x (i_dir) approx aligned with 1-2 or midpoints
+        % Local x (i_dir) approx aligned with 1-2 or midpoints (pag 5)
         v_bisect = (x_e(2,:) + x_e(3,:) - x_e(4,:) - x_e(1,:)) / 2;
-        i_dir = (v_bisect / norm(v_bisect))';
+        i_dir = (v_bisect / norm(v_bisect))'; %Local x
         j_dir = cross(k_dir, i_dir); % Local y
         
-        % Rotation Matrix (3x3) -> Expanded to (24x24)
-        Rp = [i_dir, j_dir, k_dir]; % 3x3 global to local
-        % Full element rotation matrix (blkdiag logic manually implemented for speed)
-        % Note: The reference code assumes 5 local DOFs + drilling, mapped to 6 global
-        % But actually constructs a 24x24 matrix (4 nodes * 6 dofs)
-        
-        % Usually R maps Global U to Local U. u_local = R' * u_global ?
-        % The reference defines Rp such that [u_local] = Rp' * [u_global]
-        % Let's build the 3x3 block:
-        R_block = blkdiag(Rp', Rp'); % 6x6 block (Rotation for u and theta)
-        % Actually, usually we rotate the stiffness: K_global = R * K_local * R'
-        % The reference creates a matrix R of size 20x24. 
-        % 5 local DOFs (u,v,w, th_x, th_y) per node -> 20 rows
-        % 6 global DOFs per node -> 24 columns.
-        % This implies the local formulation ignores the "drilling" rotation initially.
-        
-        % Reconstructing Reference Logic exactly:
+        % Rotation Matrix (3x3)
+        Rp = [i_dir, j_dir, k_dir];
+        R_block = blkdiag(Rp', Rp');
         R_node = zeros(5,6);
         R_node(1:3, 1:3) = Rp'; % Rotates displacements
-        R_node(4:5, 4:6) = Rp(:,1:2)'; % Rotates rotations (takes only local x,y components)
-        
+        R_node(4:5, 4:6) = Rp(:,1:2)'; % Rotates rotations (takes only local x,y components
         R_ele = zeros(20,24);
         for n = 1:4
             R_ele( (n-1)*5+(1:5), (n-1)*6+(1:6) ) = R_node;
         end
         
-        % --- 2. Stiffness Matrices ---
-        
-        % A) Shear Stiffness (Ks) - Reduced integration / MITC assumptions
-        % Center point (xi=0, nu=0) evaluation for shear (avoid locking)
+        % --- 2. Stiffness Matrices --- (pag 6)
         J_center = zeros(2,2);
         for n=1:4
             dNi_dxi = [a_coef(n); b_coef(n)]/4;
@@ -150,26 +132,17 @@ if 1 % Set to 1 to (re)compute, 0 to load
         
         Bs = zeros(2, 20); % 2 strains (gamma_xz, gamma_yz), 20 DOFs
         for n=1:4
-            % Derivatives of N mapped to physical x,y
+            % Derivatives of N mapped to physical x,y (pag 7)
             dN_phys = invJ * [a_coef(n); b_coef(n)]/4; 
-            N_val = 1/4; % at center
-            
-            % Shear B-matrix part for node n
-            % Local DOFs: [u, v, w, th_x, th_y]
-            % Strain-disp: gamma_xz = dw/dx + th_y ... gamma_yz = dw/dy - th_x
-            % (Check specific element formulation signs)
-            % Reference:
-            % Row 1 (xz): N,x * w + N * th_y 
-            % Row 2 (yz): N,y * w - N * th_x
-            
+            N_val = 1/4; % at center           
             col_idx = (n-1)*5 + (1:5);
             %              u v  w           th_x    th_y
             Bs(1, col_idx) = [0 0 dN_phys(1)  0       N_val];
             Bs(2, col_idx) = [0 0 dN_phys(2) -N_val   0    ];
         end
         
-        Cs = eye(2) * 5/6 * E_vector(e)*h_vector(e) / (2*(1+v_vector(e))); % Shear modulus * Area * k
-        Ks = (4 * detJ) * (R_ele' * Bs' * Cs * Bs * R_ele); % Area = 4*detJ roughly
+        Cs = eye(2) * 5/6 * E_vector(e)*h_vector(e) / (2*(1+v_vector(e)));
+        Ks = (4 * detJ) * (R_ele' * Bs' * Cs * Bs * R_ele);
         
         % B) Membrane (Km) and Bending (Kb) + Mass (Me) - Full integration
         Km = sparse(24,24);
@@ -217,9 +190,7 @@ if 1 % Set to 1 to (re)compute, 0 to load
                 Bm(2, col) = [0 dN_phys(2,n) 0 0 0];
                 Bm(3, col) = [dN_phys(2,n) dN_phys(1,n) 0 0 0];
                 
-                % Bending [dth_y/dx; -dth_x/dy; dth_y/dy - dth_x/dx]
-                % Note: Assuming th_x is rot about x, th_y about y.
-                % Reference logic check:
+                % Bending [dth_y/dx; -dth_x/dy; dth_y/dy - dth_x/dx
                 % Row 1: d(th_y)/dx -> col 5
                 % Row 2: -d(th_x)/dy -> col 4
                 Bb(1, col) = [0 0 0  0             dN_phys(1,n)];
@@ -250,11 +221,8 @@ if 1 % Set to 1 to (re)compute, 0 to load
         M(Idof, Idof) = M(Idof, Idof) + Me;
     end
     
-    % --- 3. Drilling Rotation Stabilization (Kr) ---
-    % Add artificial stiffness for the 6th DOF (Rotation about normal Z)
-    % otherwise the matrix is singular for flat shells.
-    fprintf('Applying Drilling Rotation Stiffness...\n');
-    % Calculate node normals
+    % --- 3. Artificial Rotation (Kr) ---
+    fprintf('Applying Artifial Rotation Stiffness...\n');
     Normal_Node = zeros(N_nodes, 3);
     for e=1:N_elements
         v13 = xn(Tn(e,3),:) - xn(Tn(e,1),:);
@@ -267,7 +235,7 @@ if 1 % Set to 1 to (re)compute, 0 to load
     end
     
     Kr = sparse(Ndof, Ndof);
-    alpha_coeff = 1e-3 * E * h1; % Small stiffness coefficient
+    alpha_coeff = 1e-3 * E * h1;  % Small artificial stiffness
     
     for e=1:N_elements
         % Re-calculate element normal
@@ -280,19 +248,12 @@ if 1 % Set to 1 to (re)compute, 0 to load
         for i=1:4
             node = Tn(e,i);
             n_node = Normal_Node(node, :) / norm(Normal_Node(node, :));
+            alignment = dot(n_ele, n_node); % Cos of angle between normals
             
-            % Check alignment. If element normal is close to node normal (smooth area)
-            % add stiffness to drilling dof.
-            alignment = dot(n_ele, n_node);
-            
-            % If reasonably flat (alignment ~ 1), add penalty
+            % If reasonably flat (alignment ~ 1)
             if abs(alignment) > 0.9
-                % Project stiffness onto global DOFs [th_x, th_y, th_z]
-                % Local drilling is rotation about n_ele
-                % Stiffness matrix part: k * (n_ele * n_ele')
-                K_rot_penalty = (alpha_coeff * Area) * (n_ele' * n_ele);
-                
-                idx_rot = 6*(node-1) + (4:6);
+                K_rot_penalty = (alpha_coeff * Area) * (n_ele' * n_ele); % Normal-direction rotation
+                idx_rot = 6*(node-1) + (4:6); % Rotational DOFs
                 Kr(idx_rot, idx_rot) = Kr(idx_rot, idx_rot) + K_rot_penalty;
             end
         end
@@ -411,8 +372,7 @@ imodes = 1:min(6, Nm);
 plotModes('Modes Shapes', Phi, freq, imodes);
 
 
-%%%%%%%%%%%%%%%%%EXTRA MODE ANALYSIS
-%% --- Modal postprocess (Part II requirement): ubar_y, ubar_z, thetabar_x vs span ---
+% --- Modal postprocess ----
 
 n_pts = length(indSpar1);
 x_span = xn(indSpar1,1);
@@ -463,9 +423,6 @@ for k = 1:Nm   % or for k = 1:n_modes_calc if you prefer
 end
 
 
-%%%%%%%%%%%%%%%%%EXTRA MODE ANALYSYS
-
-
 %% MODIFIED PLOT MODES AND PLOTDEFORMED
 
 function plotDeformed(plotName, xn, Tn, u, scale)
@@ -488,9 +445,6 @@ function plotDeformed(plotName, xn, Tn, u, scale)
           'FaceColor', 'none', 'EdgeColor', [0.7 0.7 0.7], 'LineStyle', ':');
     hold on;
     
-    % Plot deformed (colored by Z displacement)
-    % CData is used for color mapping. We map Z-displacement to color.
-    % We need one color value per vertex or per face.
     cdata = uz; 
     
     p = patch('Vertices', xn_def, 'Faces', Tn, ...
@@ -550,7 +504,7 @@ function plotModes(plotName, Phi, freq, imodes)
         view(3);
     end
     
-    % Add a super title for the entire figure
+    % Title for the entire figure
     sgtitle(plotName);
     colormap jet;
 end
