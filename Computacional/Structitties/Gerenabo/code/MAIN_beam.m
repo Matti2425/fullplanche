@@ -9,7 +9,7 @@ clearvars
 
 %% DATA
 
-problem_type = "torsion"; %1 for bending. 2 for torsion.
+problem_type = "torsion"; % bending or torsion
 Nm = 6;
 
 % Define the problem's data (e.g. dimensions, material properties, etc.)
@@ -19,7 +19,7 @@ G = E/(2*(1+v_poisson));
 rho = 2200; %kg/m3
 c = 0.85; %m
 b = 3; %m
-y0 = 0.924; %m
+y0 = 0.294; %m
 y1 = 0.125; %m
 y2 = 0.475; %m
 h1 = 35e-3; %m
@@ -60,7 +60,7 @@ switch(problem_type)
     case "bending"
     Fe = [1 N_nodes 3];
     case "torsion"
-    Fe = [1 N_nodes 5];
+    Fe = [1 N_nodes 4];
 end
 
 % Distributed forces (force, node, dof)
@@ -248,18 +248,18 @@ figure('Name', 'Translational Displacements', 'NumberTitle', 'off');
 
 subplot(3,1,1);
 plot(x_span, u_x, 'LineWidth', 1.5);
-title('Axial Displacement (u_x)');
-ylabel('u_x (m)'); grid on;
+title('Axial Displacement (u_x)', 'FontSize', 14);
+ylabel('u_x (m)', 'FontSize', 14); grid on;
 
 subplot(3,1,2);
 plot(x_span, u_y, 'LineWidth', 1.5);
-title('Lateral Displacement (u_y)');
-ylabel('u_y (m)'); grid on;
+title('Lateral Displacement (u_y)', 'FontSize', 14);
+ylabel('u_y (m)', 'FontSize', 14); grid on;
 
 subplot(3,1,3);
 plot(x_span, u_z, 'LineWidth', 1.5);
-title('Vertical Deflection (u_z)');
-xlabel('Span x (m)'); ylabel('u_z (m)'); grid on;
+title('Vertical Deflection (u_z)', 'FontSize', 14);
+xlabel('Span x (m)', 'FontSize', 14); ylabel('u_z (m)', 'FontSize', 14); grid on;
 
 % Add legend based on problem type
 switch(problem_type)
@@ -274,18 +274,18 @@ figure('Name', 'Rotational Displacements', 'NumberTitle', 'off');
 
 subplot(3,1,1);
 plot(x_span, theta_x, 'LineWidth', 1.5);
-title('Twist Angle (\theta_x)');
-ylabel('\theta_x (rad)'); grid on;
+title('Twist Angle (\theta_x)', 'FontSize', 14);
+ylabel('\theta_x (rad)', 'FontSize', 14); grid on;
 
 subplot(3,1,2);
 plot(x_span, theta_y, 'LineWidth', 1.5);
-title('Rotation about Y (\theta_y)');
-ylabel('\theta_y (rad)'); grid on;
+title('Rotation about Y (\theta_y)', 'FontSize', 14);
+ylabel('\theta_y (rad)', 'FontSize', 14); grid on;
 
 subplot(3,1,3);
 plot(x_span, theta_z, 'LineWidth', 1.5);
-title('Rotation about Z (\theta_z)');
-xlabel('Span x (m)'); ylabel('\theta_z (rad)'); grid on;
+title('Rotation about Z (\theta_z)', 'FontSize', 14);
+xlabel('Span x (m)', 'FontSize', 14); ylabel('\theta_z (rad)', 'FontSize', 14); grid on;
 
 switch(problem_type)
     case "bending"
@@ -293,3 +293,42 @@ switch(problem_type)
     case "torsion"
         sgtitle('Static Solution: Torsion Test (Rotations)');
 end
+
+% --- 4. Plot mode shapes
+ 
+Phi_full = zeros(Ndof, n_modes);
+Phi_full(free_dofs, :) = Phi;
+x_span = xn(:,1);
+%plotModes('Beam Vibration Modes', xn, Tn, Phi_full, frequencies, 1:n_modes);
+
+
+    
+for i = 1:n_modes
+        
+    uy = Phi_full(2:6:end, i);
+    uz = Phi_full(3:6:end, i); 
+    thx = Phi_full(4:6:end, i);
+
+    % Normalize for visualization
+    scale = max(abs([uy; uz; thx]));      
+    uy = uy/scale;   
+    uz = uz/scale;
+    thx = thx/scale;
+
+    figure;
+    subplot(3,1,1)
+    plot(x_span, uy, 'LineWidth', 1.5); grid on;
+    ylabel('$u_y$', 'Interpreter','latex', 'FontSize', 16);
+
+   subplot(3,1,2)
+   plot(x_span, uz, 'LineWidth', 1.5); grid on;
+   ylabel('$u_z$', 'Interpreter','latex', 'FontSize', 16);
+
+   subplot(3,1,3)
+   plot(x_span, thx, 'LineWidth', 1.5); grid on;
+   ylabel('$\theta_x$', 'Interpreter','latex', 'FontSize', 16);
+   xlabel('Span $x$ [m]', 'Interpreter','latex', 'FontSize', 16);
+
+   sgtitle(sprintf('Mode %d  (f = %.2f Hz)', i, frequencies(i)));
+end
+

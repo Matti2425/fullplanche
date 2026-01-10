@@ -1,4 +1,6 @@
-%% PART II - SHELL MODELLING (TEMPLATE)
+%% PART II - SHELL MODELLING
+% Gerard Martínez Vilella
+% David Rodríguez Gonzalez
 % Useful commands to initialize script
 clear
 close all
