@@ -4,11 +4,14 @@ clear
 close all
 clc
 
+t = tic;
+pause(2)
 %% SOLUTION CONTROLS
 problem_type = 3;  % 1: Bending, 2: Torsion, 3: Pressure + Weight
-solution_type = 1; % 1: Direct Method, 2: Model Order Reduction (MOR)
+solution_type = 2; % 1: Direct Method, 2: Model Order Reduction (MOR)
 Nm = 10;           % Number of modes to compute
-Im = 1:9;          % Modes to use for MOR projection
+Im = 1:5;          % Modes to use for MOR projection
+recompute = 1;     % Set to 1 to (re)compute, 0 to load
 
 % Component flags (1: Include, 0: Neglect)
 WB = 1; % Wingbox
@@ -18,7 +21,7 @@ SK = 1; % Skin
 
 %% DATA
 % Material Properties
-E = 75e9;       % Pa
+E = 75e9; % Pa
 v_poisson = 0.3;
 rho = 2200;     % kg/m3
 G = E/(2*(1+v_poisson));
@@ -32,10 +35,10 @@ y2 = 0.475; %m
 yc = 0.285; %m
 
 % Loads Data
-F = 1; % N (Unit force for bending)
-T = 1; % Nm (Unit torque)
-p_inf = 12500;   % Pa (Pressure)
-alpha = 10*pi/180; % rad (Angle of attack)
+F = 1; % N (bending)
+T = 1; % Nm (torque)
+p_inf = 12500;   % Pa
+alpha = 10*pi/180; % rad
 g0 = 9.80665;    % m/s^2
 
 %% PREPROCESS
@@ -49,29 +52,27 @@ end
 N_nodes = size(xn,1);
 Ndof = 6*N_nodes;
 
-% --- 1. Boundary Conditions (Up) ---
-% Fix all DOFs at root nodes (Vectorized)
+%% Boundary Conditions (Up)
 num_root_nodes = length(indRoot);
 Up = zeros(num_root_nodes * 6, 3);
 Up(:, 1) = 0;                                  % Displacement value
 Up(:, 2) = repelem(indRoot, 6);                % Node indices
 Up(:, 3) = repmat((1:6)', num_root_nodes, 1);  % DOFs 1 to 6
 
-% --- 2. Load Definitions (Fe, Pe, Be) ---
-% Calculate Load magnitudes
+%% Load Definitions (Fe, Pe, Be) ---
 Fa_shear = F*((y2-yc)/(y2-y1));
 Fb_shear = F*((yc-y1)/(y2-y1));
 Fa_torque = -T/(y2-y1);
 Fb_torque = T/(y2-y1);
 
-% Initialize empty arrays
+%% Initialize empty arrays
 Fe_wb = []; Pe_wb = []; 
 Fe_st = []; Qe_st = [];
 Fe_rb = []; Pe_rb = [];
 Fe_sk = []; Pe_sk = [];
 Be = [];
 
-% Define specific loads based on problem type
+%% Define specific loads based on problem type
 switch(problem_type)
     case 1 % Bending (Shear Force)
         Fe_wb = [Fa_shear indPointA 3;
@@ -87,7 +88,7 @@ switch(problem_type)
         Be = [-g0 * ones(N_nodes,1), node_indices, 3*ones(N_nodes,1)];
 end
 
-% --- 3. Element Properties ---
+%% Element Properties
 % Wing Box (Shells)
 h_vector_wb = [17.5e-3; 15e-3; 6e-3]; 
 E_vector_wb = repmat(E,3,1);
@@ -95,10 +96,11 @@ v_vector_wb = repmat(v_poisson,3,1);
 rho_vector_wb = repmat(rho,3,1);
 
 % Stringers (Beams)
-r_st = 5e-3; 
+r_st = 20e-3; 
 A_st = pi*r_st^2;
 I_st = (pi/4)*r_st^4;
 J_st = (pi/2)*r_st^4;
+
 % Beam properties vectors
 E_vector_st = E; G_vector_st = G; rho_vector_st = rho;
 A_vector_st = A_st; Iy_vector_st = I_st; Iz_vector_st = I_st; J_vector_st = J_st;
@@ -115,7 +117,7 @@ E_vector_sk = E; v_vector_sk = v_poisson; rho_vector_sk = rho;
 
 %% SOLVER
 % Obtain system matrices
-if 1 % Set to 1 to (re)compute, 0 to load
+if recompute 
     fprintf('Computing Wing Box Matrices...\n');
     [K_wb,M_wb,f_wb,Bb_wb,Bmn_wb,Bmt_wb,Bs_wb,R_wb] = ComputeKM_shells(xn,N_nodes,size(Tn_wb,1),Tn_wb,Tm_wb,h_vector_wb,E_vector_wb,v_vector_wb,rho_vector_wb,Fe_wb,Be,Pe_wb);
     
@@ -138,7 +140,7 @@ else
     fprintf('Matrices loaded.\n');
 end
 
-% Assemble Global System
+% Assemble System
 fprintf('Assembling Global System...\n');
 K = WB*K_wb + ST*K_st + RB*K_rb + SK*K_sk;
 M = WB*M_wb + ST*M_st + RB*M_rb + SK*M_sk;
@@ -148,9 +150,8 @@ f = f_wb + f_st + f_rb + f_sk;
 prescribed_dofs = 6*(Up(:,2)-1) + Up(:,3);
 free_dofs = setdiff(1:Ndof, prescribed_dofs);
 
-% --- Modal Analysis ---
+% Modal Analysis
 fprintf('Performing Modal Analysis...\n');
-% Using MATLAB eigs instead of custom MAIN_modal
 [V, D] = eigs(K(free_dofs,free_dofs), M(free_dofs,free_dofs), Nm, 'sm');
 [lambda_sorted, idx] = sort(diag(D));
 V_sorted = V(:, idx);
@@ -159,14 +160,13 @@ freq = sqrt(lambda_sorted)/(2*pi);
 Phi = zeros(Ndof, Nm);
 Phi(free_dofs, :) = V_sorted;
 
-% Normalize Mass (Optional but recommended)
 for k = 1:Nm
     norm_factor = sqrt(Phi(:,k)' * M * Phi(:,k));
     Phi(:,k) = Phi(:,k) / norm_factor;
 end
 fprintf('Natural frequencies computed. First freq: %.2f Hz\n', freq(1));
 
-% --- Static Solution ---
+% Static
 fprintf('Solving Static System...\n');
 u = zeros(Ndof, 1);
 u(prescribed_dofs) = Up(:,1);
@@ -191,17 +191,21 @@ elseif solution_type == 2 % Model Order Reduction
     u = u_reduced; % Ignoring boundary corrections for simplicity in MOR
 end
 
-% --- Stress Calculation ---
+% Stress
 fprintf('Calculating Stresses...\n');
 % We calculate stresses for shell components
 sigVM_wb = Compute_stress_shells(size(Tn_wb,1),u,Tn_wb,Tm_wb,h_vector_wb,v_vector_wb,E_vector_wb,Bb_wb,Bmn_wb,Bmt_wb,Bs_wb,R_wb);
 sigVM_rb = Compute_stress_shells(size(Tn_rb,1),u,Tn_rb,Tm_rb,h_vector_rb,v_vector_rb,E_vector_rb,Bb_rb,Bmn_rb,Bmt_rb,Bs_rb,R_rb);
 sigVM_sk = Compute_stress_shells(size(Tn_sk,1),u,Tn_sk,Tm_sk,h_vector_sk,v_vector_sk,E_vector_sk,Bb_sk,Bmn_sk,Bmt_sk,Bs_sk,R_sk);
+sigVM_st = Compute_stress_beams(xn, Tn_st, u, E_vector_st, G_vector_st, r_st, 1);
+
+% Stop calculation timer
+elapsed = toc(t)-2
 
 %% POSTPROCESS
 save('wing_results.mat');
 
-% --- 1. 2D Plots: Spanwise Deflection & Twist ---
+% 2D Plots: Spanwise Deflection & Twist
 n_points = size(indSpar1,1);
 theta_x = zeros(n_points,1);
 u_z = zeros(n_points,1);
@@ -215,7 +219,7 @@ for i = 1:n_points
     uz_rear  = u(6*(node_rear-1) + 3);
     
     % Twist = (delta_z) / distance
-    dist_y = y2 - y1; % Approximate, or calculate norm(xn(node_rear)-xn(node_front))
+    dist_y = y2 - y1; % Approximation
     theta_x(i) = (uz_rear - uz_front) / dist_y;
     
     % Uz at Shear Center
@@ -227,34 +231,38 @@ figure('Name', 'Spanwise Results', 'Color', 'w');
 subplot(2,1,1);
 plot(xn_plot, u_z, 'LineWidth', 1.5);
 title('Vertical Deflection (u_z) along Span');
-xlabel('Spanwise Coordinate x [m]');   % <--- Unidades añadidas
-ylabel('Vertical Deflection u_z [m]'); % <--- Unidades añadidas
+xlabel('Spanwise Coordinate x [m]');   
+ylabel('Vertical Deflection u_z [m]'); 
 grid on;
 legend(sprintf('Problem Type %d', problem_type));
 
 subplot(2,1,2);
 plot(xn_plot, theta_x, 'LineWidth', 1.5);
 title('Twist Angle (\theta_x) along Span');
-xlabel('Spanwise Coordinate x [m]'); % <--- Unidades añadidas
-ylabel('Twist Angle \theta_x [rad]'); % <--- Unidades añadidas
+xlabel('Spanwise Coordinate x [m]'); 
+ylabel('Twist Angle \theta_x [rad]'); 
 grid on;
 
-% --- 2. 3D Deformation & Stress Plots ---
+% 3D Deformation and Stress Plots
 % Determine scale factor automatically if needed
 scale = 0.1 * max(abs(xn(:,1))) / max(abs(u(3:6:end)) + eps);
 fprintf('Plotting deformations with scale factor: %.2f\n', scale);
 
 % Se añaden unidades [Pa] a los títulos de los plots 3D
 plotDeformed('wing', xn, Tn_wb, u, scale, sigVM_wb); 
-title(['Wingbox Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale)]); % <--- Unidad añadida
+%title(['Wingbox Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale)]); 
 
 plotDeformed('wing', xn, Tn_rb, u, scale, sigVM_rb); 
-title(['Ribs Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale)]);    % <--- Unidad añadida
+%title(['Ribs Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale)]);    
 
 plotDeformed('wing', xn, Tn_sk, u, scale, sigVM_sk); 
-title(['Skin Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale)]);    % <--- Unidad añadida
+%title(['Skin Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale)]); 
 
-% --- 3. Mode Shapes ---
+plotDeformed_beams(xn, Tn_st, u, scale, sigVM_st);
+%title(['Stringers Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale)]);
+
+
+% Mode Shapes
 fprintf('Plotting Mode Shapes...\n');
 plotModes('wing', Phi, freq, 1:min(9, Nm));
 

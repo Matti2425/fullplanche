@@ -71,7 +71,7 @@ Be = [0 1 2];
 
 j_orientations = [0 1 0]; %input data, volem que sigui cap a y global
 
-%For convenience; More rows would be added if more values existed
+%For convenience;
 E_vector = [E]; 
 A_vector = [A];  
 G_vector = [G];  
@@ -89,7 +89,7 @@ rho_vector = [rho];
 % TIP: To avoid recomputing the system matrices use a save/load structure:
 if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
 
-    %MATRIX ASSEMBLY (sparse + blkdiag version)
+    %Matrix assembly (sparse + blkdiag version)
     Ndof = 6*N_nodes; 
     K = sparse(Ndof,Ndof); % Stiffness matrix
     M  = sparse(Ndof,Ndof);% Mass matrix
@@ -117,7 +117,9 @@ if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
         Ba_row = [Nx(1) 0 0 0 0 0 Nx(2) 0 0 0 0 0]; % Al node
         Ba = sparse(Ba_row);
         Ca = E_vector(Tm(e,1))*A_vector(Tm(e,1));
+        %K glb = Re^T *(K local) * Re
         Ka = Le*(Re'*(Ba'*Ca*Ba)*Re);
+        
     
         % Flexió (pag 6)
         Bb = sparse([0 0 0 0 Nx(1) 0   0 0 0 0 Nx(2) 0;
@@ -184,7 +186,7 @@ if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
     F = zeros(Ndof, 1);
     F_node = Fe(1,2);
     F_dof = Fe(1,3);
-    F_global = (F_node - 1) * 6 + F_dof; %nodee to global dofs
+    F_global = (F_node - 1) * 6 + F_dof; %node to global dofs
    
     F(F_global) = Fe(1,1); % Specified load
     
@@ -210,8 +212,7 @@ if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
 end
 %% POSTPROCESS
 
-% Save data for postprocessing in separate script file (useful when results
-% from different runs need to be compared)
+% Save data for postprocessing in separate script file
 save('beam_results.mat');
 
 % --- 1. Extract Displacements from Global Vector U ---
@@ -223,7 +224,6 @@ theta_x = U(4:6:end);   % Torsion
 theta_y = U(5:6:end);   % Bending rotation about Y
 theta_z = U(6:6:end);   % Bending rotation about Z
 
-% Define x-axis for plotting (Spanwise coordinate)
 x_span = xn(:,1); 
 
 % --- 2. Plot Translational Displacements (ux, uy, uz) ---
@@ -244,7 +244,7 @@ plot(x_span, u_z, 'LineWidth', 1.5);
 title('Vertical Deflection (u_z)');
 xlabel('Span x (m)'); ylabel('u_z (m)'); grid on;
 
-% Add legend based on problem type
+% Legend
 switch(problem_type)
     case "bending"
         sgtitle('Static Solution: Bending Test (Translations)');
@@ -282,9 +282,7 @@ end
 Phi_full = zeros(Ndof, n_modes);
 Phi_full(free_dofs, :) = Phi;
 x_span = xn(:,1);
-%plotModes('Beam Vibration Modes', xn, Tn, Phi_full, frequencies, 1:n_modes);
-
-
+plotModes('Beam Vibration Modes', xn, Tn, Phi_full, frequencies, 1:n_modes);
     
 for i = 1:n_modes
         
