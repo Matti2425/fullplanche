@@ -8,7 +8,7 @@ t = tic;
 pause(2)
 %% SOLUTION CONTROLS
 problem_type = 3;  % 1: Bending, 2: Torsion, 3: Pressure + Weight
-solution_type = 2; % 1: Direct Method, 2: Model Order Reduction (MOR)
+solution_type = 1; % 1: Direct Method, 2: Model Order Reduction (MOR)
 Nm = 10;           % Number of modes to compute
 Im = 1:5;          % Modes to use for MOR projection
 recompute = 1;     % Set to 1 to (re)compute, 0 to load
