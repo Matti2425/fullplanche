@@ -7,7 +7,7 @@ close all
 clc
 
 %% DATA
-problem_type = 'torsion'; % bending or torsion
+problem_type = 'bending'; % bending or torsion
 Nm = 6; % Number of modes to extract
 
 % Dimensions and Material Properties
