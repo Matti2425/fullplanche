@@ -1,12 +1,14 @@
-%% PART II - SHELL MODELLING (TEMPLATE)
-% Useful commands to initialize script
+%% PART II - SHELL MODELLING 
+% Pau Cornudella Quer
+% Martí Güell Domingo
+
 clear
 close all
 clc
 
 %% DATA
 problem_type = 2; % 1 for bending (Force), 2 for torsion (Torque)
-Nm = 6; % Number of modes to extract
+Nm = 6; % nº modes to extract
 
 % Dimensions and Material Properties
 E = 75e9; % Pa
@@ -22,19 +24,14 @@ c = 0.85; b = 3;
 y0 = 0.924; %m
 y1 = 0.125; %m
 y2 = 0.475; %m
-yc = 0.285; %m % Shear center approx
+yc = 0.285; %m
 h1 = 35e-3; %m
 h2 = 30e-3; %m
 h3 = 25e-3; %m
 
 %% PREPROCESS
 % Load mesh data
-% Ensure 'shell.mat' exists in your path
-try
-    load('shell.mat','xn','Tn','Tm','indRoot','indPointA','indPointB','indSpar1','indSpar2');
-catch
-    error('File shell.mat not found. Please ensure the mesh file is in the directory.');
-end
+load('shell.mat','xn','Tn','Tm','indRoot','indPointA','indPointB','indSpar1','indSpar2');
 
 N_elements = size(Tn,1);
 N_nodes = size(xn,1);
@@ -42,8 +39,8 @@ Ndof = 6 * N_nodes;
 
 % --- 1. Define Boundary Conditions (Up) ---
 % Fix all 6 DOFs at the root nodes
-% Vectorized approach for efficiency
 Up = zeros(length(indRoot)*6, 3);
+
 idx = 1;
 for i = 1:length(indRoot)
     for dof = 1:6
@@ -53,7 +50,7 @@ for i = 1:length(indRoot)
 end
 
 % --- 2. Define Loads (Fe) ---
-% Calculate load distribution based on geometry
+%Statement formulas
 Fa_shear = F_load * ((y2-yc)/(y2-y1));
 Fb_shear = F_load * ((yc-y1)/(y2-y1));
 Fa_torque = -T_load / (y2-y1);
@@ -65,17 +62,15 @@ switch(problem_type)
         Fe = [Fa_shear, indPointA, 3;
               Fb_shear, indPointB, 3];
     case 2 % Torsion
-        % Force in Z (DOF 3) creating a couple
+        % Force in Z (DOF 3)
         Fe = [Fa_torque, indPointA, 3;
               Fb_torque, indPointB, 3];
 end
 
-% Placeholder for distributed/body forces (empty as per reference)
 Pe = zeros(0,3); 
 Be = zeros(0,3);
 
 % Property Vectors based on material index Tm
-% Assuming Tm maps to: 1=h1, 2=h2, 3=h3
 h_vals = [h1; h2; h3];
 h_vector = h_vals(Tm);
 E_vector = repmat(E, N_elements, 1);
@@ -89,26 +84,26 @@ if 1 % Set to 1 to (re)compute, 0 to load
     K = sparse(Ndof, Ndof);
     M = sparse(Ndof, Ndof);
     
-    % Pre-computations for Gauss integration (MITC4 / Q4 Shell logic)
-    % Standard linear shape function derivatives for Q4
+    % (pag 6)
     a_coef = [-1 1 1 -1];
     b_coef = [-1 -1 1 1];
     
-    % Integration points for Mass and Bending (2x2 Gauss)
+    % (pag 8)
     xi4 = [-1 1 1 -1]/sqrt(3);
     nu4 = [-1 -1 1 1]/sqrt(3);
     w4 = [1 1 1 1];
     
     for e = 1:N_elements
+        
         % --- 1. Local Coordinate System (R) ---
         % Nodes: 1-2-3-4
         x_e = xn(Tn(e,:), :); % 4x3 coordinates
         
-        % Vectors for local axes
+        % Vectors for local axes (pag 5)
         v13 = x_e(3,:) - x_e(1,:);
         v24 = x_e(4,:) - x_e(2,:);
         Normal = cross(v13, v24); 
-        k_dir = (Normal / norm(Normal))'; % Normal to element (local z)
+        k_dir = (Normal / norm(Normal))'; % Local z
         
         % Local x (i_dir) approx aligned with 1-2 or midpoints
         v_bisect = (x_e(2,:) + x_e(3,:) - x_e(4,:) - x_e(1,:)) / 2;
