@@ -27,7 +27,7 @@ patch(x0(Tc)',y0(Tc)',z0(Tc)',ones(size(Tc))','facecolor','none','edgecolor',0.5
 patch(x(Tc)',y(Tc)',z(Tc)',ones(size(Tc))','facecolor','none','edgecolor','k');
 
 if ~exist('sigVM','var')
-    patch(x(Tn)',y(Tn)',z(Tn)',ones(size(Tn))','facecolor',0.5*[1,1,1],'edgecolor','none');
+   % patch(x(Tn)',y(Tn)',z(Tn)',ones(size(Tn))','facecolor',0.5*[1,1,1],'edgecolor','none');
 else
     SigVM = InterpFunction(sigVM,Tn);
     patch(x(Tn)',y(Tn)',z(Tn)',SigVM,'facecolor','interp','edgecolor','none');
@@ -45,6 +45,7 @@ axis vis3d
 view(40,20);
 
 end
+
 
 function sign = InterpFunction(sige,Tn)
     a = [-1,1,1,-1];
