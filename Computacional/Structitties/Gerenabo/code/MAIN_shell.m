@@ -7,7 +7,7 @@ close all
 clc
 
 %% DATA
-problem_type = 1; % 1 for bending (Force), 2 for torsion (Torque)
+problem_type = 'torsion'; % bending or torsion
 Nm = 6; % Number of modes to extract
 
 % Dimensions and Material Properties
@@ -62,11 +62,11 @@ Fa_torque = -T_load / (y2-y1);
 Fb_torque = T_load / (y2-y1);
 
 switch(problem_type)
-    case 1 % Bending
+    case 'bending' % Bending
         % Force in Z (DOF 3)
         Fe = [Fa_shear, indPointA, 3;
               Fb_shear, indPointB, 3];
-    case 2 % Torsion
+    case 'torsion' % Torsion
         % Force in Z (DOF 3) creating a couple
         Fe = [Fa_torque, indPointA, 3;
               Fb_torque, indPointB, 3];
@@ -413,10 +413,66 @@ plotDeformed('Shell Static Deformation', xn, Tn, U, scale_factor);
 
 % Plot Modes
 imodes = 1:min(6, Nm);
-plotModes('Shell Vibration Modes', Phi, freq, imodes);
+plotModes('Modes Shapes', Phi, freq, imodes);
 
 
-%% LOCAL PLOT FUNCTIONS
+% MODE ANALYSIS
+%% --- Modal postprocess (Part II requirement): ubar_y, ubar_z, thetabar_x vs span ---
+
+n_pts = length(indSpar1);
+x_span = xn(indSpar1,1);
+dist_y = (y2 - y1);
+
+for k = 1:Nm   % or for k = 1:n_modes_calc if you prefer
+    % Modal vector (full size Ndof)
+    phi = Phi(:,k);
+
+    ubar_y = zeros(n_pts,1);
+    ubar_z = zeros(n_pts,1);
+    thetabar_x = zeros(n_pts,1);
+
+    for i = 1:n_pts
+        n1 = indSpar1(i);   % front spar node index at station i
+        n2 = indSpar2(i);   % rear spar node index at station i
+
+        uy1 = phi(6*(n1-1) + 2);
+        uy2 = phi(6*(n2-1) + 2);
+
+        uz1 = phi(6*(n1-1) + 3);
+        uz2 = phi(6*(n2-1) + 3);
+
+        % Averages / twist (statement formulas)
+        ubar_y(i) = 0.5*(uy1 + uy2);
+        thetabar_x(i) = (uz2 - uz1) / dist_y;
+        ubar_z(i) = uz1 + thetabar_x(i)*(yc - y1);
+    end
+
+    % Normalize for visualization (optional, same reason as Part I)
+    scale = max(abs([ubar_y; ubar_z; thetabar_x])) + eps;
+    ubar_y = ubar_y/scale;
+    ubar_z = ubar_z/scale;
+    thetabar_x = thetabar_x/scale;
+
+    figure;
+    subplot(3,1,1); plot(x_span, ubar_y, 'LineWidth', 1.5); grid on;
+    ylabel('$\bar{u}_y$', 'Interpreter','latex', 'FontSize', 16);
+
+    subplot(3,1,2); plot(x_span, ubar_z, 'LineWidth', 1.5); grid on;
+    ylabel('$\bar{u}_z$', 'Interpreter','latex', 'FontSize', 16);
+
+    subplot(3,1,3); plot(x_span, thetabar_x, 'LineWidth', 1.5); grid on;
+    ylabel('$\bar{\theta}_x$', 'Interpreter','latex', 'FontSize', 16);
+    xlabel('Span $x$ [m]', 'Interpreter','latex', 'FontSize', 16);
+
+    sgtitle(sprintf('Mode %d (f = %.2f Hz)', k, freq(k)));
+end
+
+
+% MODE ANALYSYS
+
+
+%% MODIFIED PLOT MODES AND PLOTDEFORMED
+
 function plotDeformed(plotName, xn, Tn, u, scale)
     % xn : [Nnodes x 3]
     % Tn : [Nelem x 4]
@@ -490,13 +546,21 @@ function plotModes(plotName, Phi, freq, imodes)
         
         xn_def = xn + scale * [dx, dy, dz];
         
-        % Plot
-        patch('Vertices', xn_def, 'Faces', Tn, ...
-              'FaceVertexCData', dz, ... % Color by Z
+        % Plot Undeformed Shape (Wireframe)
+        patch('Vertices', xn, 'Faces', Tn, 'FaceColor', 'none', 'EdgeColor', [0.7 0.7 0.7], 'LineStyle', ':');
+        hold on;
+        
+        % Plot Deformed Shape (Colored by Z displacement)
+        patch('Vertices', xn_def, 'Faces', Tn, 'FaceVertexCData', dz, ...
               'FaceColor', 'interp', 'EdgeColor', 'k', 'FaceAlpha', 0.8);
           
-        title(sprintf('Mode %d: %.2f Hz', mode_idx, freq(mode_idx)));
-        axis equal; axis vis3d; axis off;
+        % Set the title (static and positioned outside the plot)
+        title(sprintf('Mode %d: %.2f Hz', mode_idx, freq(mode_idx)), ...
+              'Position', [1, -0.6, -0.5], 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
+        
+        axis equal; 
+        axis vis3d; 
+        axis off;
         view(3);
     end
     sgtitle(plotName);
