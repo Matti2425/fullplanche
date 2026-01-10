@@ -7,11 +7,11 @@ clc
 t = tic;
 pause(2)
 %% SOLUTION CONTROLS
-problem_type = 1;  % 1: Bending, 2: Torsion, 3: Pressure + Weight
-solution_type = 1; % 1: Direct Method, 2: Model Order Reduction (MOR)
+problem_type = 3;  % 1: Bending, 2: Torsion, 3: Pressure + Weight
+solution_type = 2; % 1: Direct Method, 2: Model Order Reduction (MOR)
 Nm = 10;           % Number of modes to compute
 Im = 1:5;          % Modes to use for MOR projection
-recompute = 0;     % Set to 1 to (re)compute, 0 to load
+recompute = 1;     % Set to 1 to (re)compute, 0 to load
 
 % Component flags (1: Include, 0: Neglect)
 WB = 1; % Wingbox
@@ -250,16 +250,16 @@ fprintf('Plotting deformations with scale factor: %.2f\n', scale);
 
 % Se añaden unidades [Pa] a los títulos de los plots 3D
 plotDeformed('wing', xn, Tn_wb, u, scale, sigVM_wb); 
-title(['Wingbox Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale)]); 
+%title(['Wingbox Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale)]); 
 
 plotDeformed('wing', xn, Tn_rb, u, scale, sigVM_rb); 
-title(['Ribs Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale)]);    
+%title(['Ribs Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale)]);    
 
 plotDeformed('wing', xn, Tn_sk, u, scale, sigVM_sk); 
-title(['Skin Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale)]); 
+%title(['Skin Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale)]); 
 
 plotDeformed_beams(xn, Tn_st, u, scale, sigVM_st);
-title(['Stringers Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale)]);
+%title(['Stringers Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale)]);
 
 
 % Mode Shapes
