@@ -6,7 +6,7 @@ clc
 
 %% SOLUTION CONTROLS
 problem_type = 3;  % 1: Bending, 2: Torsion, 3: Pressure + Weight
-solution_type = 1; % 1: Direct Method, 2: Model Order Reduction (MOR)
+solution_type = 2; % 1: Direct Method, 2: Model Order Reduction (MOR)
 Nm = 10;           % Number of modes to compute
 Im = 1:9;          % Modes to use for MOR projection
 
@@ -222,18 +222,39 @@ for i = 1:n_points
     u_z(i) = uz_front + theta_x(i)*(yc - y1);
 end
 
+% --- Lógica de Títulos ---
+if problem_type == 1
+    test_name = 'Bending';
+elseif problem_type == 2
+    test_name = 'Torsion';
+else
+    test_name = 'Tunnel test';
+end
+
+if solution_type == 1
+    method_name = 'Direct Method';
+else
+    method_name = 'Model Order Reduction';
+end
+
+
 figure('Name', 'Spanwise Results', 'Color', 'w');
+sgtitle(['Static Analysis: ', test_name, ' (', method_name, ')'], ...
+    'FontSize', 14, 'FontWeight', 'bold');
+
 
 subplot(2,1,1);
 plot(xn_plot, u_z, 'LineWidth', 1.5);
+xlim([0 3]);
 title('Vertical Deflection (u_z) along Span');
 xlabel('Spanwise Coordinate x [m]');   % <--- Unidades añadidas
 ylabel('Vertical Deflection u_z [m]'); % <--- Unidades añadidas
 grid on;
-legend(sprintf('Problem Type %d', problem_type));
+% legend(sprintf('Problem Type %d', problem_type));
 
 subplot(2,1,2);
 plot(xn_plot, theta_x, 'LineWidth', 1.5);
+xlim([0 3]);
 title('Twist Angle (\theta_x) along Span');
 xlabel('Spanwise Coordinate x [m]'); % <--- Unidades añadidas
 ylabel('Twist Angle \theta_x [rad]'); % <--- Unidades añadidas
@@ -244,15 +265,21 @@ grid on;
 scale = 0.1 * max(abs(xn(:,1))) / max(abs(u(3:6:end)) + eps);
 fprintf('Plotting deformations with scale factor: %.2f\n', scale);
 
-% Se añaden unidades [Pa] a los títulos de los plots 3D
 plotDeformed('wing', xn, Tn_wb, u, scale, sigVM_wb); 
-title(['Wingbox Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale)]); % <--- Unidad añadida
+sgtitle({['\bf Wingbox Deformation & Von Mises Stress [Pa] - Scale: ', num2str(scale, '%.1f')], ...
+         [test_name, ' calculated by ', method_name]}, ...
+         'Interpreter', 'tex');
+st.HorizontalAlignment = 'center';
 
 plotDeformed('wing', xn, Tn_rb, u, scale, sigVM_rb); 
-title(['Ribs Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale)]);    % <--- Unidad añadida
+sgtitle({['Ribs Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale, '%.1f')], ...
+         [test_name, ' calculated by ', method_name]}, ...
+         'Interpreter', 'tex');
 
 plotDeformed('wing', xn, Tn_sk, u, scale, sigVM_sk); 
-title(['Skin Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale)]);    % <--- Unidad añadida
+sgtitle({['Skin Deformation & Von Mises Stress [Pa] - Scale: ' num2str(scale, '%.1f')], ...
+         [test_name, ' calculated by ', method_name]}, ...
+         'Interpreter', 'tex');
 
 % --- 3. Mode Shapes ---
 fprintf('Plotting Mode Shapes...\n');
