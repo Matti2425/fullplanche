@@ -71,7 +71,7 @@ Be = [0 1 2];
 
 j_orientations = [0 1 0]; %input data, volem que sigui cap a y global
 
-%For convenience; More rows would be added if more values existed
+%For convenience;
 E_vector = [E]; 
 A_vector = [A];  
 G_vector = [G];  
@@ -89,7 +89,7 @@ rho_vector = [rho];
 % TIP: To avoid recomputing the system matrices use a save/load structure:
 if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
 
-    %MATRIX ASSEMBLY (sparse + blkdiag version)
+    %Matrix assembly (sparse + blkdiag version)
     Ndof = 6*N_nodes; 
     K = sparse(Ndof,Ndof); % Stiffness matrix
     M  = sparse(Ndof,Ndof);% Mass matrix
@@ -118,6 +118,7 @@ if 1 % Set to 1 to (re)compute the system matrices and '0' to load them
         Ba = sparse(Ba_row);
         Ca = E_vector(Tm(e,1))*A_vector(Tm(e,1));
         Ka = Le*(Re'*(Ba'*Ca*Ba)*Re);
+        %K glb = ....(K local).......
     
         % Flexió (pag 6)
         Bb = sparse([0 0 0 0 Nx(1) 0   0 0 0 0 Nx(2) 0;
